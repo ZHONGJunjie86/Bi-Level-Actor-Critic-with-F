@@ -19,6 +19,7 @@ parser.add_argument(
 parser.add_argument("num_good",  default=1, type=int)  
 parser.add_argument("num_adversaries",  default=3, type=int)  
 parser.add_argument("num_obstacles",  default=2, type=int) 
+parser.add_argument("agent_nums", default=4, type=int)
 parser.add_argument("max_cycles", default=25, type=int)  # Agent Environment Cycle 等于游戏步
 
 # PPO

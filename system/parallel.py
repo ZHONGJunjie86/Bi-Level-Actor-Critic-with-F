@@ -1,4 +1,3 @@
-import torch
 import torch.multiprocessing as mp
 import sys
 from utils import *
@@ -9,7 +8,7 @@ os.environ['OMP_NUM_THREADS'] = '1'
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 
-def parallel_trainer(bulider, model_path):
+def parallel_trainer(bulider):
     if sys.version_info[0] > 2:
         mp.set_start_method('spawn')  # this must not be in global scope
     elif sys.platform == 'linux' or sys.platform == 'linux2':
@@ -23,22 +22,24 @@ def parallel_trainer(bulider, model_path):
                               bulider.get_model_load_path(), bulider.get_model_save_path(),
                               main_device)
     
-    
-    if False:#True:#args.load_model:  # 
+    bulider_args = bulider.get_args()
+    # load previous model
+    if bulider_args.load_model:  
         shared_data.load_model()
     shared_data.save_model()
 
-    
     processes = []
-    bulider_args = bulider.get_args()
-
     for rank in range(bulider.get_args().processes):  # rank 编号
         
-        if rank < 3 or rank==0:  
+        if rank < bulider.get_args().processes//2 or rank==0:  
             print("start", rank)
-            p = mp.Process(target=step, args=(rank, shared_data, bulider_args, bulider.build_agents(main_device), bulider.build_env()))
+            p = mp.Process(target=step, args=(rank, shared_data, bulider_args, 
+                                              bulider.build_agents(main_device), 
+                                              bulider.build_env()))
         else:
-            p = mp.Process(target=step, args=(rank, shared_data, bulider_args, bulider.build_agents(device), bulider.build_env()))
+            p = mp.Process(target=step, args=(rank, shared_data, bulider_args, 
+                                              bulider.build_agents(device), 
+                                              bulider.build_env()))
 
         p.start()
         processes.append(p)

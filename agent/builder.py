@@ -1,4 +1,3 @@
-from agent.agent_manager import Shared_grad_buffers
 from config.config import *
 from agent_manager import Agents2Env
 
@@ -20,10 +19,6 @@ class Bulider():
         return model_save_path[agent_name]
 
     @staticmethod
-    def get_shared_model():
-        return Shared_grad_buffers()
-
-    @staticmethod
     def get_main_device():
         return main_device
 
@@ -33,7 +28,7 @@ class Bulider():
 
     @staticmethod
     def build_agents(run_device):
-        return Agents2Env(agent_name_list, obs_shape, run_device) 
+        return Agents2Env(agent_name_list, obs_shape, run_device, main_device) 
 
     @staticmethod
     def build_env():
