@@ -8,6 +8,7 @@ class Memory:
         self.hidden_state = []
         self.num_vectors = []
         self.value = []
+        self.action_value = []
     
     def clear_memory(self):
         del self.actions[:]
@@ -18,4 +19,5 @@ class Memory:
         del self.hidden_state[:]
         del self.num_vectors[:]
         del self.value[:]
+        del self.action_value[:]
 

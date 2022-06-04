@@ -43,8 +43,8 @@ agent_name_list = [agent_name for agent_name in env.agents]
 obs_shape = {env.observation_spaces[agent_name].shape[0] for agent_name in env.agents}
 
 # 定义保存路径
-model_load_path = {agent_name:"" for agent_name in env.agents}
-model_save_path = {agent_name:"" for agent_name in env.agents}
+model_load_path = {"agent": "", "adversary":""}
+model_save_path = {"agent": "", "adversary":""}
 
 # multiprocessing
 main_device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 

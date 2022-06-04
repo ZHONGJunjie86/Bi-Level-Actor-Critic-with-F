@@ -11,64 +11,107 @@ from torch.autograd import Variable
 from network import Actor
 from utils import Memory
 
-
 torch.set_default_tensor_type(torch.DoubleTensor)
 
 
-
 class PPO:
-    def __init__(self,  args, device):
+    def __init__(self,  args, obs_shape, device):
         self.device = device
         self.a_lr = args.a_lr
         self.gamma = args.gamma
 
         # Initialise actor network 
-        self.actor = Actor().to(self.device)
-        self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=self.a_lr)
+        self.agent_name_list = ["leader", "follower"]
+        self.action_dim = {"leader":5, "follower":1}
+        self.actor = {name: Actor(self.action_dim[name], name).to(self.device) for name in self.agent_name_list}
+        self.actor_optimizer = {name: torch.optim.Adam(self.actor[name].parameters(),
+                                                          lr=self.a_lr) for name in self.agent_name_list}
         self.SmoothL1Loss = torch.nn.SmoothL1Loss()
 
         #
-        self.memory_leader = Memory()
-        self.memory_follower = Memory()
+        self.memory ={name: Memory() for name in self.agent_name_list}
         self.hidden_state_zero = torch.zeros(1,1,64).to(self.device)
-        self.hidden_state = torch.zeros(1,1,64).to(self.device)
-        #
-        self.c_loss = 0
-        self.a_loss = 0
+        self.loss_name_list = ["actor_loss_", "critic_loss_"]
+        self.loss_dic = {loss_name + agent_name: 0 for agent_name in self.agent_name_list for loss_name in self.loss_name_list}
         
+        #
+        self.obs_shape = obs_shape
         self.eps_clip = 0.2
         self.vf_clip_param = 0.2
         self.lam = 0.95
         self.K_epochs = args.K_epochs
         self.old_value_1, self.old_value_2 = 0,0
-        #learning_rate=5e-4, entropy_coef=0.01
-        #
-        self.shared_loss = 0
-        self.loss_dic = [0,0]
+        self.entropy_coef = 0.01
+
+        # for K updates
         self.advantages = []
         self.target_value = []
-        self.num_vector_length = 6
 
+    def bilevel_compare_action(self, obs_tensor, reward):
+        leader_action_values = []
+        for leader_action_index in range(self.action_dim["leader"]):
+            leader_action = np.zeros(self.action_dim["leader"])
+            leader_action[leader_action_index] = 1
+            follower_logprob, follower_action_value, follower_action, follower_hidden_state = self.actor["follower"](obs_tensor, torch.tensor(leader_action))
+            leader_logprob, leader_action_value, leader_hidden_state = \
+                                    self.actor["leader"](obs_tensor, torch.tensor(leader_action, follower_action))
+            leader_action_values.append([leader_action_value, follower_action_value,
+                                         leader_action_index, follower_action,
+                                         leader_logprob, follower_logprob,
+                                         leader_hidden_state, follower_hidden_state])
 
-    def choose_action(self, obs, num_vector, our_turn = False, release = False):
-        memery_index = 0 if our_turn else 1
+        # sort
+        leader_action_values.sort(key = lambda x: x[0], reversed = True)
+        # return
+        action = {}
+        action_logprob = {}
+        h_s = {}
+        action_value = {}
+        value = {}
+        action_value["leader"] = leader_action_values[0][0]
+        action_value["follower"] = leader_action_values[0][1]
+        action["leader"] = leader_action_values[0][2]
+        action["follower"] = leader_action_values[0][3]
+        action_logprob["leader"] = leader_action_values[0][4]
+        action_logprob["follower"] = leader_action_values[0][6]
+        h_s["leader"] = leader_action_values[0][7]
+        h_s["follower"] = leader_action_values[0][8]
+        value["leader"] = 0
+        value["follower"] = 0
+        for i in leader_action_values:
+            value["leader"] += leader_action_values[0][0]
+            value["follower"] += leader_action_values[0][1]
+        value["leader"] = value["leader"]/self.action_dim["leader"]
+        value["follower"] = value["follower"]/self.action_dim["leader"]
 
-        num_vector = torch.tensor(num_vector, device = self.device) #np.full(1, step/100)
-        obs_tensor = torch.Tensor(obs).to(self.device).reshape(1,4,30,30)
-        if len(self.memory_our_enemy[memery_index].hidden_state)==0:
-            self.memory_our_enemy[memery_index].hidden_state.append(self.hidden_state_zero.cpu().detach().numpy())
+        reward_dic = {"leader": reward, "follower": self.compute_follower_reward(reward)}
+
+        return action_value, action, action_logprob, h_s, value, reward_dic
+
+    def compute_follower_reward(self, reward):
+        pass
+
+    def choose_action(self, state, reward, done):
         
-        h_s = torch.tensor(self.memory_our_enemy[memery_index].hidden_state[-1]).to(self.device)
-        action,action_logprob,_,h_s, value = self.actor(obs_tensor, num_vector, h_s)
+        if len(self.memory["leader"].states) ==0:
+            for name in self.agent_name_list:
+                with torch.no_grad():
+                    self.memory[name].hidden_state.append(self.hidden_state_zero.cpu().numpy())
         
-        if release == False:
-            self.memory_our_enemy[memery_index].states.append(obs)
-            self.memory_our_enemy[memery_index].actions.append(action.cpu().detach().numpy())
-            self.memory_our_enemy[memery_index].logprobs.append(action_logprob.cpu().detach().numpy()) #[0]
-            self.memory_our_enemy[memery_index].hidden_state.append(h_s.cpu().detach().numpy())
-            self.memory_our_enemy[memery_index].num_vectors.append(num_vector.cpu().detach().numpy())
-            self.memory_our_enemy[memery_index].value.append(value.cpu().detach().numpy())
-        return action.reshape(1,2).cpu().detach().numpy()[0]
+        obs_tensor = torch.Tensor(state).to(self.device).reshape(1,self.obs_shape)        
+        action_value, action, action_logprob, h_s, value, reward_dic = self.bilevel_compare_action(obs_tensor, reward)
+
+        with torch.no_grad():
+            self.memory["leader"].states.append(state)
+            for name in self.agent_name_list:
+                self.memory[name].actions.append(action[name].cpu().numpy())
+                self.memory[name].logprobs.append(action_logprob[name].cpu().numpy()) 
+                self.memory[name].hidden_state.append(h_s[name].cpu().numpy())
+                self.memory[name].action_value.append(action_value[name].cpu().numpy())
+                self.memory[name].value.append(value[name].cpu().numpy())
+                self.memory[name].rewards.append(reward_dic[name])
+        
+        return action["leader"].reshape(1,1).cpu().detach().numpy()[0]
 
 
     def compute_GAE(self, training_time, main_process = False):
@@ -174,7 +217,7 @@ class PPO:
         critic_loss = 0.5 * torch.max(critic_loss1 , critic_loss2).mean()
         #critic_loss = torch.nn.SmoothL1Loss()(state_values_1, target_value) + torch.nn.SmoothL1Loss()(state_values_2, target_value)
 
-        actor_loss = -surr3.mean() - 0.02*dist_entropy + 0.5 * critic_loss
+        actor_loss = -surr3.mean() - self.entropy_coef * dist_entropy + 0.5 * critic_loss
         
         # do the back-propagation...
         self.actor.zero_grad()

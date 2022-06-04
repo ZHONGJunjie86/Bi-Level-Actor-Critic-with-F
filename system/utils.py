@@ -24,7 +24,7 @@ class Shared_Data:
     def __init__(self, agent_model, adversary_model, load_path, save_path, main_device):
         self.shared_lock = mp.Manager().Lock()
         self.event = mp.Event()
-        self.shared_count = mp.Value("d", 0)
+        self.shared_count = mp.Value("waiting_process", 0)
         self.list_1 = mp.Manager().list()
         self.list_2 = mp.Manager().list()
         self.loss = mp.Manager().dict(
