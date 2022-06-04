@@ -32,8 +32,10 @@ class Shared_Data:
 
         self.load_path = load_path
         self.save_path = save_path
-        self.shared_agent_model = Shared_grad_buffers(agent_model, main_device)
-        self.shared_adversary_model = Shared_grad_buffers(adversary_model, main_device)
+        self.shared_model = {
+                            "agent":Shared_grad_buffers(agent_model, main_device), 
+                            "adversary":Shared_grad_buffers(adversary_model, main_device)
+                            }
 
     def save_model(self):
         pass

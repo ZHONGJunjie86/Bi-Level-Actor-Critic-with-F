@@ -5,10 +5,10 @@ class Memory:
         self.logprobs = []
         self.rewards = []
         self.is_terminals = []
-        self.hidden_state = []
+        self.hidden_states = []
         self.num_vectors = []
-        self.value = []
-        self.action_value = []
+        self.values = []
+        self.action_values = []
     
     def clear_memory(self):
         del self.actions[:]
@@ -16,8 +16,8 @@ class Memory:
         del self.logprobs[:]
         del self.rewards[:]
         del self.is_terminals[:]
-        del self.hidden_state[:]
+        del self.hidden_states[:]
         del self.num_vectors[:]
-        del self.value[:]
-        del self.action_value[:]
+        del self.values[:]
+        del self.action_values[:]
 

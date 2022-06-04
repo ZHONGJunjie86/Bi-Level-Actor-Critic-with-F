@@ -47,10 +47,10 @@ class Agents2Env:
     def update(self, grads, processes):
         pass
 
-    def compute_GAE(self, training_time):
+    def compute_loss(self, training_time):
         pass
 
-    def add_gradient(self, shared_grad_buffer):
+    def add_gradient(self, shared_model):
         pass
 
     def reset_loss(self):

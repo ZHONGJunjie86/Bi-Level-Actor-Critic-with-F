@@ -9,7 +9,7 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
 
         while training_time < args.K_epochs:
             # wait
-            a_loss, c_loss = agents.compute_GAE(training_time)
+            a_loss, c_loss = agents.compute_loss(training_time)
 
             while shared_data.shared_count.value < args.processes-1:
                 time.sleep(0.01)
@@ -22,7 +22,7 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
             shared_data.shared_lock.release()
 
             # update
-            agents.update(copy.deepcopy(shared_data.shared_grad_buffer.grads), args.processes)
+            agents.update(copy.deepcopy(shared_data.shared_model.grads), args.processes) # bug
             shared_data.shared_grad_buffer.reset()
             c_loss, a_loss = agents.get_loss()
             agents.save_model()
@@ -40,11 +40,11 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
         # workers
         training_time = 0
         while training_time < args.K_epochs:
-            a_loss, c_loss = agents.compute_GAE(training_time)
+            a_loss, c_loss = agents.compute_loss(training_time)
 
             # add
             shared_data.acquire()
-            agents.add_gradient(shared_data.shared_grad_buffer)
+            agents.add_gradient(shared_data.shared_model)
             shared_data.shared_count.value += 1
             shared_data.shared_lock.release()
             
