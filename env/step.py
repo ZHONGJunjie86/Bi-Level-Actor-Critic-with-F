@@ -28,9 +28,13 @@ def step(rank, shared_data, args, agents, env):
             agent_index = 0
             states = {}
             while agent_index < args.agent_nums:
+                
                 state, reward, done, info = env.last()
                 total_step_reward[agents.get_agent_name(agent_index)] += reward
                 states[agents.get_agent_name(agent_index)] = state
+                
+                # pass hidden states between agents who can see each other
+                information_share(states, agents)
 
                 if not done:
                     agents.get_action(state, reward, done, agent_index)
@@ -39,9 +43,6 @@ def step(rank, shared_data, args, agents, env):
             
                 agent_index += 1
             
-            # pass hidden states between agents who can see each other
-            information_share(states, agents)
-
             step += 1
             if RENDER and rank == 0 and episode % 10 == 0:
                 env.render()
@@ -51,10 +52,10 @@ def step(rank, shared_data, args, agents, env):
                 if rank == 0:
                     print("Episode: ", episode)
 
-                a_loss, c_loss = K_epochs_PPO_training(rank, args, episode, shared_data, agents)
+                loss_dict = K_epochs_PPO_training(rank, args, episode, shared_data, agents)
 
                 if rank == 0:
-                    send_curve_data(a_loss, c_loss, total_step_reward)
+                    send_curve_data(loss_dict, total_step_reward)
                 
                 # reset
                 agents.clear_memory()

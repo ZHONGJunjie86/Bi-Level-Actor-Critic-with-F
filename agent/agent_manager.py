@@ -1,3 +1,4 @@
+from torch import ctc_loss
 from algorithm.DPPO import PPO
 
 
@@ -22,38 +23,48 @@ class Agents2Env:
         # ['adversary_0', 'adversary_1', 'adversary_2', 'agent_0']
         for name in self.agent_name_list:
             if "adversar" in name:
-                self.adversaries[name] = PPO(self.args, obs_shape[name], self.device)
+                self.adversaries[name] = PPO(self.args, obs_shape[name], self.device, "adversary")
             else:
-                self.agents[name] = PPO(self.args, obs_shape[name], self.device)
+                self.agents[name] = PPO(self.args, obs_shape[name], self.device, "agent")
 
     def get_action(self, state, reward, done, agent_index):
         name = self.get_agent_name(agent_index)
         return self.agents[name].choose_ation(state, reward, done)
 
     def load_model(self):
-        pass
+        for agent in self.agents:
+            agent.load_model(self.model_load_path)
 
     def save_model(self):
-        pass
-    # model.actor.load_state_dict(
-    #             shared_model.get_actor().state_dict())
+        self.agents['agent_0'].save(self.model_save_path)
+        self.agents['adversary_0'].save(self.model_save_path)
 
     def get_agent_name(self, index):
         return self.agent_name_list[index]
 
     def clear_memory(self):
-        pass
+        for agent in self.agents:
+            agent.clear_memory()
 
-    def update(self, grads, processes):
-        pass
+    def update(self, grads_dict):
+        self.agents['agent_0'].update(grads_dict)
+        self.agents['adversary_0'].update(grads_dict)
 
     def compute_loss(self, training_time):
-        pass
+        for agent in self.agents:
+            agent.compute_loss(training_time)
 
-    def add_gradient(self, shared_model):
-        pass
+    def add_gradient(self, shared_model_dict):
+        for agent in self.agents:
+            agent.add_gradient(shared_model_dict)
+
+    def get_loss(self):
+        loss_dict = {"agent":self.agents['agent_0'].loss_dic,
+                     "adversary":self.agents['adversary_0'].loss_dic}
+        return loss_dict
 
     def reset_loss(self):
-        pass
+        for agent in self.agents:
+            agent.reset_loss()
     
 

@@ -42,6 +42,10 @@ env = simple_tag_v2.parallel_env(args.num_good, args.num_adversaries, args.num_o
 agent_name_list = [agent_name for agent_name in env.agents]
 obs_shape = {env.observation_spaces[agent_name].shape[0] for agent_name in env.agents}
 
+agent_type_list = ["agent", "adversary"]
+obs_shape_by_type = {"agent": 14, "adversary": 16}
+action_dim_by_type = {"leader": 5, "follower": 1}
+
 # 定义保存路径
 model_load_path = {"agent": "", "adversary":""}
 model_save_path = {"agent": "", "adversary":""}

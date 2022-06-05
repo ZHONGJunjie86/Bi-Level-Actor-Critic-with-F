@@ -18,9 +18,10 @@ def parallel_trainer(bulider):
     main_device = bulider.get_main_device()
     device = bulider.get_device()
 
-    shared_data = Shared_Data(bulider.agent_model(), bulider.adversary_model(), 
-                              bulider.get_model_load_path(), bulider.get_model_save_path(),
-                              main_device)
+    shared_data = Shared_Data(bulider.build_model_dict(),
+                               bulider.get_model_load_path(), 
+                               bulider.get_model_save_path(),
+                               main_device)
     
     bulider_args = bulider.get_args()
     # load previous model

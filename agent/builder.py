@@ -1,5 +1,6 @@
 from config.config import *
 from agent_manager import Agents2Env
+from algorithm.network import ActorCritic
 
 class Bulider():
     @staticmethod
@@ -11,12 +12,12 @@ class Bulider():
         return args
 
     @staticmethod
-    def get_model_load_path(agent_name):
-        return model_load_path[agent_name]
+    def get_model_load_path(agent_type):
+        return model_load_path[agent_type]
 
     @staticmethod
-    def get_model_save_path(agent_name):
-        return model_save_path[agent_name]
+    def get_model_save_path(agent_type):
+        return model_save_path[agent_type]
 
     @staticmethod
     def get_main_device():
@@ -32,6 +33,17 @@ class Bulider():
                           run_device, main_device,
                           model_load_path, model_save_path,
                           args) 
+
+    @staticmethod
+    def build_model_dict():
+        model_dict = {}
+        for agent_type in agent_type_list:
+            for name in ["leader", "follower"]:
+                model_dict[agent_type][name] = ActorCritic(obs_shape_by_type[agent_type], 
+                                                           action_dim_by_type[name], 
+                                                           action_dim_by_type[name], 
+                                                           name) 
+        return model_dict
 
     @staticmethod
     def build_env():

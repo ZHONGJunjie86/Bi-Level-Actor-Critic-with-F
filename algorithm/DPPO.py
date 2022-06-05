@@ -1,4 +1,5 @@
 import os
+from time import sleep
 import torch
 import numpy as np
 from torch.nn.utils import clip_grad_norm_
@@ -8,31 +9,19 @@ base_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(base_dir))
 import torch.nn as nn
 from torch.autograd import Variable
-from network import Actor
+from network import ActorCritic
 from utils import Memory
-
+import torch.nn.functional as F
 torch.set_default_tensor_type(torch.DoubleTensor)
 
 
 class PPO:
-    def __init__(self,  args, obs_shape, device):
+    def __init__(self,  args, obs_shape, device, agent_type):
         self.device = device
         self.a_lr = args.a_lr
         self.gamma = args.gamma
+        self.agent_type = agent_type
 
-        # Initialise actor network 
-        self.agent_name_list = ["leader", "follower"]
-        self.action_dim = {"leader":5, "follower":1}
-        self.actor = {name: Actor(self.action_dim[name], name).to(self.device) for name in self.agent_name_list}
-        self.actor_optimizer = {name: torch.optim.Adam(self.actor[name].parameters(),
-                                                          lr=self.a_lr) for name in self.agent_name_list}
-        self.SmoothL1Loss = torch.nn.SmoothL1Loss()
-
-        #
-        self.memory ={name: Memory() for name in self.agent_name_list}
-        self.loss_name_list = ["actor_loss_", "critic_loss_"]
-        self.loss_dic = {loss_name + agent_name: 0 for agent_name in self.agent_name_list for loss_name in self.loss_name_list}
-        
         #
         self.obs_shape = obs_shape
         self.eps_clip = 0.2
@@ -44,56 +33,77 @@ class PPO:
         self.hidden_size = 64
         self.hidden_state_zero = torch.zeros(1,1,self.hidden_size).to(self.device)
 
+        # social reward coef
+        self.env_coef = 0.5
+        self.social_coef = 0.5
+        self.reward_follower_last = 0
+
         # for K updates
         self.advantages = {}
         self.target_value = {}
+        
+        # Initialise actor network 
+        self.agent_name_list = ["leader", "follower"]
+        self.action_dim = {"leader":5, "follower":1}
+        self.actor = {name: ActorCritic(self.obs_shape, self.action_dim["leader"], 
+                                       self.action_dim["follower"], 
+                                       name).to(self.device) 
+                                       for name in self.agent_name_list}
+        self.actor_optimizer = {name: torch.optim.Adam(self.actor[name].parameters(),
+                                                          lr=self.a_lr) for name in self.agent_name_list}
+        self.SmoothL1Loss = torch.nn.SmoothL1Loss()
+
+        #
+        self.memory ={name: Memory() for name in self.agent_name_list}
+        self.loss_name_list = ["a_loss", "c_loss"]
+        self.loss_dic = {loss_name:{agent_name: 0} for agent_name in self.agent_name_list for loss_name in self.loss_name_list}
+
 
     def bilevel_compare_action(self, obs_tensor, reward):
-        leader_action_values = []
+        data_dict_list = []
         leader_hidden = self.memory["leader"].hidden_states[-1]
         follower_hidden = self.memory["follower"].hidden_states[-1]
         for leader_action_index in range(self.action_dim["leader"]):
             leader_action = np.zeros(self.action_dim["leader"])
             leader_action[leader_action_index] = 1
-            follower_logprob, follower_action_value, follower_action, follower_hidden_state =\
-                                    self.actor["follower"](obs_tensor, torch.tensor(leader_action), follower_hidden)
-            leader_logprob, leader_action_value, leader_hidden_state = \
-                                    self.actor["leader"](obs_tensor, torch.tensor(leader_action), follower_action, leader_hidden)
-            leader_action_values.append([leader_action_value, follower_action_value,
-                                         leader_action_index, follower_action,
-                                         leader_logprob, follower_logprob,
-                                         leader_hidden_state, follower_hidden_state])
+            follower_logprob, follower_action_value, follower_action, follower_hidden_state, _ =\
+                                    self.actor["follower"](obs_tensor,  follower_hidden, torch.tensor(leader_action))
+            leader_logprob, leader_action_value, leader_action_behaviour, leader_hidden_state, _ = \
+                                    self.actor["leader"](obs_tensor, leader_hidden, torch.tensor(leader_action), follower_action)
+            data_dict_list.append({"action_value":{"leader":leader_action_value, "follower": follower_action_value},
+                                    "action":{"leader":leader_action_behaviour, "follower": follower_action},
+                                    "action_logprob":{"leader":leader_logprob, "follower": follower_logprob},
+                                     "h_s":{"leader": leader_hidden_state, "follower": follower_hidden_state}
+                                })
+
+        # return
+        value_dic = {"leader": 0, "follower": 0}
+        for i in data_dict_list:
+            value_dic["leader"] += i["action_value"]["leader"]
+            value_dic["follower"] += i["action_value"]["follower"]
+        value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
+        value_dic["follower"] = value_dic["follower"]/self.action_dim["leader"]
 
         # sort
-        leader_action_values.sort(key = lambda x: x[0], reversed = True)
-        # return
-        action = {}
-        action_logprob = {}
-        h_s = {}
-        action_value = {}
-        value = {}
-        action_value["leader"] = leader_action_values[0][0]
-        action_value["follower"] = leader_action_values[0][1]
-        action["leader"] = leader_action_values[0][2]
-        action["follower"] = leader_action_values[0][3]
-        action_logprob["leader"] = leader_action_values[0][4]
-        action_logprob["follower"] = leader_action_values[0][6]
-        h_s["leader"] = leader_action_values[0][7]
-        h_s["follower"] = leader_action_values[0][8]
-        value["leader"] = 0
-        value["follower"] = 0
-        for i in leader_action_values:
-            value["leader"] += leader_action_values[0][0]
-            value["follower"] += leader_action_values[0][1]
-        value["leader"] = value["leader"]/self.action_dim["leader"]
-        value["follower"] = value["follower"]/self.action_dim["leader"]
+        data_dict_list.sort(key = lambda x: x["action_value"]["leader"], reversed = True)
+        return_dict = data_dict_list[0]
+        return_dict["value"] = {"leader": value_dic["leader"], "follower": value_dic["follower"]}
 
-        reward_dic = {"leader": reward, "follower": self.compute_follower_reward(reward)}
+        # reward_shaping
+        return_dict["reward"] = {"leader": reward, 
+                                "follower": self.compute_follower_reward(reward, 
+                                                                        return_dict["action_value"]["leader"],
+                                                                        return_dict["value"]["leader"]
+                                                                        )}
+        return return_dict
 
-        return action_value, action, action_logprob, h_s, value, reward_dic
 
-    def compute_follower_reward(self, reward):
-        pass
+    def compute_follower_reward(self, reward, leader_action_value, leader_state_value):
+        leader_adv =  leader_action_value - leader_state_value
+        reward_follower = self.social_coef * self.reward_follower_last + self.entropy_coef * reward 
+        self.reward_follower_last = leader_adv
+        return reward_follower
+
 
     def choose_action(self, state, reward, done):
         
@@ -103,20 +113,20 @@ class PPO:
                     self.memory[name].hidden_state.append(self.hidden_state_zero.cpu().numpy())
         
         obs_tensor = torch.Tensor(state).to(self.device).reshape(1,self.obs_shape)        
-        action_value, action, action_logprob, h_s, value, reward_dic = self.bilevel_compare_action(obs_tensor, reward)
+        data_dict = self.bilevel_compare_action(obs_tensor, reward)
 
         with torch.no_grad():
             self.memory["leader"].states.append(state)
             self.memory["leader"].is_terminals.append(done)
             for name in self.agent_name_list:
-                self.memory[name].actions.append(action[name].cpu().numpy())
-                self.memory[name].logprobs.append(action_logprob[name].cpu().numpy()) 
-                self.memory[name].hidden_states.append(h_s[name].cpu().numpy())
-                self.memory[name].action_values.append(action_value[name].cpu().numpy())
-                self.memory[name].values.append(value[name].cpu().numpy())
-                self.memory[name].rewards.append(reward_dic[name])
+                self.memory[name].actions.append(data_dict["action"][name].cpu().numpy())
+                self.memory[name].logprobs.append(data_dict["action_logprob"][name].cpu().numpy()) 
+                self.memory[name].hidden_states.append(data_dict["h_s"][name].cpu().numpy())
+                self.memory[name].action_values.append(data_dict["action_value"][name].cpu().numpy())
+                self.memory[name].values.append(data_dict["value"][name].cpu().numpy())
+                self.memory[name].rewards.append(data_dict["reward"][name])
         
-        return action["leader"].reshape(1,1).cpu().detach().numpy()[0]
+        return data_dict["action"]["leader"].reshape(1,1).cpu().detach().numpy()[0]
 
     def compute_loss(self, training_time, main_process = False):
         if training_time ==0:
@@ -133,7 +143,7 @@ class PPO:
                 for name in self.agent_name_list:
                     self.old_logprobs[name] = torch.tensor(self.memory[name].logprobs
                                                             ).view(-1, 1, self.action_dim[name]).to(self.device)
-                    self.old_actions[name] = torch.tensor(self.memory_our_enemy[0].actions
+                    self.old_actions[name] = torch.tensor(self.memory[name].actions
                                                          ).view(-1, 1, self.action_dim[name]).to(self.device)
                     self.old_values[name] = torch.tensor(self.memory[name].values).view(-1, 1, 1).to(self.device)
                     self.old_action_values[name] = torch.tensor(self.memory[name].action_values).view(-1, 1, 1).to(self.device)
@@ -156,14 +166,10 @@ class PPO:
             old_value = self.old_values[name][indices]
             target_value = self.target_value[name][indices]
 
-            if name == "leader":
-                _, logprobs, dist_entropy, _, value = self.actor[name](old_states, old_actions, 
-                                                                       self.old_actions["follower"][indices], 
-                                                                       old_hidden)
-            else:
-                _, logprobs, dist_entropy, _, value = self.actor[name](old_states, self.old_actions["leader"][indices], 
-                                                                       old_actions, 
-                                                                       old_hidden)
+
+            logprobs, action_value, _, _, entropy = self.actor[name](old_states, old_hidden, 
+                                                            self.old_actions["leader"][indices], 
+                                                            self.old_actions["follower"][indices])
     
             ratios = torch.exp(logprobs - old_logprobs.detach())
 
@@ -174,13 +180,13 @@ class PPO:
             #torch.min(surr1, surr2)#
             
             value_pred_clip = old_value.detach() +\
-                torch.clamp(value -old_value.detach(), -self.vf_clip_param, self.vf_clip_param)
-            critic_loss1 = (value - target_value.detach()).pow(2)
+                torch.clamp(action_value - old_value.detach(), -self.vf_clip_param, self.vf_clip_param)
+            critic_loss1 = (action_value - target_value.detach()).pow(2)
             critic_loss2 = (value_pred_clip - target_value.detach()).pow(2)
             critic_loss = 0.5 * torch.max(critic_loss1 , critic_loss2).mean()
             #critic_loss = torch.nn.SmoothL1Loss()(state_values_1, target_value) + torch.nn.SmoothL1Loss()(state_values_2, target_value)
 
-            actor_loss = -surr3.mean() - self.entropy_coef * dist_entropy + 0.5 * critic_loss
+            actor_loss = -surr3.mean() - self.entropy_coef * entropy + 0.5 * critic_loss
             
             # do the back-propagation...
             self.actor.zero_grad()
@@ -191,9 +197,9 @@ class PPO:
             else:
                 self.hidden_state = torch.zeros(1,1,self.hidden_size).to(self.device)
 
-            self.a_loss += float(actor_loss.cpu().detach().numpy())
-            self.c_loss += float(critic_loss.cpu().detach().numpy())
-            return actor_loss.detach(), critic_loss.detach()
+            self.loss_dic['a_loss'][name] += float(actor_loss.cpu().detach().numpy())
+            self.loss_dic['c_loss'][name] += float(critic_loss.cpu().detach().numpy())
+            return 0, 0
         
     def compute_GAE(self, compute_rewards, compute_termi, training_time, name):
         if training_time ==0:
@@ -203,25 +209,26 @@ class PPO:
             target_value = []
             #
             discounted_reward = 0
-            values_pre = 0
+            action_value_pre = None
             advatage = 0
 
-            for reward, is_terminal,values in zip(reversed(compute_rewards), reversed(compute_termi),
-                                        reversed(self.old_value)): #反转迭代
+            for reward, is_terminal, value, action_value in zip(reversed(compute_rewards), reversed(compute_termi),
+                                                  reversed(self.memory[name].values), reversed(self.memory[name].action_values)): #反转迭代
                 
-                values = values.cpu().detach().numpy()
+                value = value.cpu().detach().numpy()
                 reward = reward.cpu().detach().numpy()
                 is_terminal = is_terminal.cpu().detach().numpy()
 
-                discounted_reward = reward +  self.gamma *discounted_reward 
+                discounted_reward = reward +  self.gamma *discounted_reward
                 rewards.insert(0, discounted_reward) #插入列表
 
-                
-                delta = reward + (1-is_terminal)*self.gamma*values_pre - values  
+                if action_value_pre == None:   #  最后补一个
+                    action_value_pre = action_value
+                delta = reward + (1-is_terminal)*self.gamma*action_value_pre - value  
                 advatage = delta + self.gamma*self.lam*advatage * (1-is_terminal)
                 GAE_advantage.insert(0, advatage) #插入列表
-                target_value.insert(0,float(values + advatage))
-                values_pre = values
+                target_value.insert(0,float(value + advatage))
+                action_value_pre = action_value
             
             # Normalizing the rewards:
             rewards = torch.tensor(rewards).to(self.device).view(-1,1,1)
@@ -231,68 +238,65 @@ class PPO:
         
         return None
             
-        
 
-    def add_gradient(self, shared_grad_buffer):
+    def add_gradient(self, shared_model_dict):
         # add the gradient to the shared_buffer...
-        shared_grad_buffer.add_gradient(self.actor)
+        for name in self.agent_name_list:
+            shared_model_dict[self.agent_type][name].add_gradient(self.actor[name])
 
 
-    def update(self, shared_grad_buffer_grads, worker_num):     
-
-        self.actor.zero_grad()
-        for n, p in self.actor.named_parameters():
-            p.grad = Variable(shared_grad_buffer_grads[n + '_grad'])
-        
-        nn.utils.clip_grad_norm_(self.actor.parameters(),5)
-        self.actor_optimizer.step()
+    def update(self, grads_dict):     
+        for name in self.agent_name_list:
+            self.actor[name].zero_grad()
+            
+            for n, p in self.actor.named_parameters():
+                p.grad = Variable(grads_dict[self.agent_type][name][n + '_grad'])
+            
+            nn.utils.clip_grad_norm_(self.actor[name].parameters(),5)
+            self.actor_optimizer[name].step()
 
         self.hidden_state = torch.zeros(1,1,self.hidden_size).to(self.device)
 
-        return self.c_loss, self.a_loss
 
     def get_loss(self):
-        return self.c_loss, self.a_loss
+        return self.a_loss, self.c_loss
+
 
     def get_actor(self):
         return self.actor
 
+
     def reset_loss(self):
         self.a_loss = 0
         self.c_loss = 0
-
-    def copy_memory(self, sample_mem):
-        self.memory_our_enemy = sample_mem
     
     def clear_memory(self):
-        self.memory_our_enemy[0].clear_memory()
-        self.memory_our_enemy[1].clear_memory()
+        for name in self.agent_name_list:
+            self.memory[name].clear_memory()
 
-    def load_model(self, run_dir, episode):
-        print(f'\nBegin to load model: ')
-        base_path = os.path.join(run_dir, 'trained_model')
-        print("base_path",base_path)
+    def load_model(self, model_load_path):
 
-        model_actor_path = os.path.join(base_path, "actor_"  + ".pth")
-        print(f'Actor path: {model_actor_path}')
+        # "path + agent/adversary + leader/follower + .pth"
+        model_actor_path = model_load_path + self.agent_type  
+        for name in self.agent_name_list:
+            model_actor_path = model_actor_path + name + ".pth"
+            print(f'Actor path: {model_actor_path}')
+            if  os.path.exists(model_actor_path):
+                actor = torch.load(model_actor_path, map_location=self.device)
+                self.actor[name].load_state_dict(actor)
+                print("Model loaded!")
+            else:
+                sys.exit(f'Model not founded!')
 
-        if  os.path.exists(model_actor_path):
-            actor = torch.load(model_actor_path, map_location=self.device)
-            self.actor.load_state_dict(actor)
-            print("Model loaded!")
-        else:
-            sys.exit(f'Model not founded!')
-
-    def save_model(self, run_dir, episode):
+    def save_model(self, model_save_path):
         print("---------------save-------------------")
-        base_path = os.path.join(run_dir, 'trained_model')
-        print("base_path", base_path)
         print("new_lr: ",self.a_lr)
-        if not os.path.exists(base_path):
-            os.makedirs(base_path)
 
-        model_actor_path = os.path.join(base_path, "actor_"  + ".pth") #+ str(episode)
-        torch.save(self.actor.state_dict(), model_actor_path)
+        # "path + agent/adversary + leader/follower + .pth"
+        model_actor_path = model_save_path + self.agent_type  
+        for name in self.agent_name_list:
+            model_actor_path = model_actor_path + name + ".pth"
+            torch.save(self.actor[name].state_dict(), model_actor_path)
 
 
 
