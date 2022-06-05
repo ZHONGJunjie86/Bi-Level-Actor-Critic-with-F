@@ -35,7 +35,7 @@ class ActorCritic(nn.Module):
         self.linear_critic_2 = nn.Linear(64, 1)
         
 
-    def forward(self, obs, h_old,  leader_action, follower_action): 
+    def forward(self, obs, h_old,  leader_action, follower_action = False): 
         # share info
         batch_size = obs.size()[0]
         if self.name == "follower":

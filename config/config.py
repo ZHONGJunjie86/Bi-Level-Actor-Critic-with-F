@@ -1,4 +1,4 @@
-from pettingzoo.mpe import simple_tag_v2
+import pettingzoo.mpe.simple_tag_v2 as simple_tag_v2
 import argparse
 import datetime
 import sys
@@ -16,11 +16,12 @@ parser.add_argument("--model_episode", default=0, type=int)
 parser.add_argument(
     '--log_dir', default=datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
 # env
-parser.add_argument("num_good",  default=1, type=int)  
-parser.add_argument("num_adversaries",  default=3, type=int)  
-parser.add_argument("num_obstacles",  default=2, type=int) 
-parser.add_argument("agent_nums", default=4, type=int)
-parser.add_argument("max_cycles", default=25, type=int)  # Agent Environment Cycle 等于游戏步
+parser.add_argument("--num_good",  default=1, type=int)  
+parser.add_argument("--num_adversaries",  default=2, type=int)  
+parser.add_argument("--num_obstacles",  default=2, type=int) 
+parser.add_argument("--agent_nums", default=2, type=int)
+parser.add_argument("--max_cycles", default=25, type=int)  # Agent Environment Cycle 等于游戏步
+parser.add_argument("--max_episodes", default=10000000, type=int)
 
 # PPO
 parser.add_argument("--load_model", action='store_true')  # 加是true；不加为false
@@ -33,22 +34,25 @@ parser.add_argument('--processes', default=1, type=int,
                     help='number of processes to train with')
 
                                 
-
 args = parser.parse_args()
 
 
 # 环境相关
-env = simple_tag_v2.parallel_env(args.num_good, args.num_adversaries, args.num_obstacles, args.max_cycles, continuous_actions=False)
-agent_name_list = [agent_name for agent_name in env.agents]
-obs_shape = {env.observation_spaces[agent_name].shape[0] for agent_name in env.agents}
+env = simple_tag_v2.parallel_env(num_good=args.num_good, num_adversaries=args.num_adversaries,
+                                 num_obstacles=args.num_obstacles, max_cycles=args.max_cycles, continuous_actions=False)
+agent_name_list = [agent_name for agent_name in env.possible_agents]
+obs_shape = {agent_name: env.observation_spaces[agent_name].shape[0] for agent_name in agent_name_list}
 
 agent_type_list = ["agent", "adversary"]
-obs_shape_by_type = {"agent": 14, "adversary": 16}
+obs_shape_by_type = {"agent": 4 + 2 * (args.agent_nums - 1 + args.num_adversaries) + 2 * (args.agent_nums - 1), 
+                     "adversary": 4 + 2 * (args.agent_nums + args.num_adversaries - 1) + 2 * args.agent_nums}
 action_dim_by_type = {"leader": 5, "follower": 1}
 
 # 定义保存路径
-model_load_path = {"agent": "", "adversary":""}
-model_save_path = {"agent": "", "adversary":""}
+model_load_path = {"agent": "C:/1Workspace/PythonWork/MARL/Bi-Level-Actor-Critic-with-F/model/", 
+                   "adversary":"C:/1Workspace/PythonWork/MARL/Bi-Level-Actor-Critic-with-F/model/"}
+model_save_path = {"agent": "C:/1Workspace/PythonWork/MARL/Bi-Level-Actor-Critic-with-F/model/", 
+                   "adversary":"C:/1Workspace/PythonWork/MARL/Bi-Level-Actor-Critic-with-F/model/"}
 
 # multiprocessing
 main_device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 

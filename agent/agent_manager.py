@@ -23,27 +23,27 @@ class Agents2Env:
         # ['adversary_0', 'adversary_1', 'adversary_2', 'agent_0']
         for name in self.agent_name_list:
             if "adversar" in name:
-                self.adversaries[name] = PPO(self.args, obs_shape[name], self.device, "adversary")
+                self.agents[name] = PPO(self.args, obs_shape[name], self.device, "adversary")
             else:
                 self.agents[name] = PPO(self.args, obs_shape[name], self.device, "agent")
 
     def get_action(self, state, reward, done, agent_index):
         name = self.get_agent_name(agent_index)
-        return self.agents[name].choose_ation(state, reward, done)
+        return self.agents[name].choose_action(state, reward, done)
 
     def load_model(self):
-        for agent in self.agents:
+        for agent in self.agents.values():
             agent.load_model(self.model_load_path)
 
     def save_model(self):
-        self.agents['agent_0'].save(self.model_save_path)
-        self.agents['adversary_0'].save(self.model_save_path)
+        self.agents['agent_0'].save_model(self.model_save_path)
+        self.agents['adversary_0'].save_model(self.model_save_path)
 
     def get_agent_name(self, index):
         return self.agent_name_list[index]
 
     def clear_memory(self):
-        for agent in self.agents:
+        for agent in self.agents.values():
             agent.clear_memory()
 
     def update(self, grads_dict):
@@ -51,11 +51,11 @@ class Agents2Env:
         self.agents['adversary_0'].update(grads_dict)
 
     def compute_loss(self, training_time):
-        for agent in self.agents:
+        for agent in self.agents.values():
             agent.compute_loss(training_time)
 
     def add_gradient(self, shared_model_dict):
-        for agent in self.agents:
+        for agent in self.agents.values():
             agent.add_gradient(shared_model_dict)
 
     def get_loss(self):
@@ -64,7 +64,7 @@ class Agents2Env:
         return loss_dict
 
     def reset_loss(self):
-        for agent in self.agents:
+        for agent in self.agents.values():
             agent.reset_loss()
     
 

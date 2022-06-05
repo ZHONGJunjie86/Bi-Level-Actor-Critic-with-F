@@ -1,6 +1,7 @@
 import torch
 import torch.multiprocessing as mp
 from config.config import agent_type_list
+import sys
 
 class Shared_grad_buffers:
     def __init__(self, models, main_device):
@@ -24,7 +25,7 @@ class Shared_Data:
     def __init__(self, model_dict, load_path, save_path, main_device):
         self.shared_lock = mp.Manager().Lock()
         self.event = mp.Event()
-        self.shared_count = mp.Value("waiting_process", 0)
+        self.shared_count = mp.Value("d", 0)
         self.list_1 = mp.Manager().list()
         self.list_2 = mp.Manager().list()
         self.loss = mp.Manager().dict(
@@ -35,10 +36,8 @@ class Shared_Data:
 
         self.shared_model = {}
         for agent_type in agent_type_list:
+            self.shared_model[agent_type] = {}
             for name in ["leader", "follower"]:
                 self.shared_model[agent_type][name] = \
                     Shared_grad_buffers(model_dict[agent_type][name], main_device)
-
-    def save_model(self):
-        pass
 

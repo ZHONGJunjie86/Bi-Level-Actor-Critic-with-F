@@ -1,6 +1,6 @@
 import torch.multiprocessing as mp
 import sys
-from utils import *
+from system.utils import *
 import os
 from env.step import step
 
@@ -24,10 +24,6 @@ def parallel_trainer(bulider):
                                main_device)
     
     bulider_args = bulider.get_args()
-    # load previous model
-    if bulider_args.load_model:  
-        shared_data.load_model()
-    shared_data.save_model()
 
     processes = []
     for rank in range(bulider.get_args().processes):  # rank 编号

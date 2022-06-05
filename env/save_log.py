@@ -3,7 +3,7 @@ import wandb
 from config.config import agent_type_list
 
 
-wandb.init(project="my-test-project", entity="zhongjunjie")
+wandb.init(project="Bi-Level-Actor-Critic-with-F", entity="zhongjunjie")
 wandb.config = {
 "learning_rate": 0.0003,
 }

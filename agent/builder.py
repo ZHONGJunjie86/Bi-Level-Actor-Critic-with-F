@@ -1,5 +1,5 @@
 from config.config import *
-from agent_manager import Agents2Env
+from agent.agent_manager import Agents2Env
 from algorithm.network import ActorCritic
 
 class Bulider():
@@ -12,13 +12,13 @@ class Bulider():
         return args
 
     @staticmethod
-    def get_model_load_path(agent_type):
-        return model_load_path[agent_type]
+    def get_model_load_path():
+        return model_load_path
 
     @staticmethod
-    def get_model_save_path(agent_type):
-        return model_save_path[agent_type]
-
+    def get_model_save_path():
+        return model_save_path
+        
     @staticmethod
     def get_main_device():
         return main_device
@@ -38,6 +38,7 @@ class Bulider():
     def build_model_dict():
         model_dict = {}
         for agent_type in agent_type_list:
+            model_dict[agent_type] = {}
             for name in ["leader", "follower"]:
                 model_dict[agent_type][name] = ActorCritic(obs_shape_by_type[agent_type], 
                                                            action_dim_by_type[name], 
@@ -47,6 +48,5 @@ class Bulider():
 
     @staticmethod
     def build_env():
-        return simple_tag_v2.parallel_env(args.num_good, 
-                args.num_adversaries, args.num_obstacles, 
-                args.max_cycles, continuous_actions=False)
+        return simple_tag_v2.parallel_env(num_good=args.num_good, num_adversaries=args.num_adversaries,
+                                 num_obstacles=args.num_obstacles, max_cycles=args.max_cycles, continuous_actions=False)
