@@ -29,7 +29,7 @@ parser.add_argument("--load_model_run_episode", default=4000, type=int)
 parser.add_argument("--K_epochs", default=5, type=int)
 
 # Multiprocessing
-parser.add_argument('--processes', default=20, type=int,
+parser.add_argument('--processes', default=15, type=int,
                     help='number of processes to train with')
 
                                 

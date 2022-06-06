@@ -1,9 +1,9 @@
 import wandb
 
-def send_curve_data(loss_dict, reward, total_step_reward, agent_type_list):
+def send_curve_data(loss_dict, total_step_reward, agent_type_list):
     
-    send_dic = {"reward": reward, "relative_reward": total_step_reward,
-                                 "agents all reward": 0, "adversaries all reward": 0}
+    send_dic = {"relative_reward": sum(total_step_reward.values()),
+                "agents all reward": 0, "adversaries all reward": 0}
 
     
     for agent_type in agent_type_list:

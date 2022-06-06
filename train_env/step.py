@@ -85,7 +85,7 @@ def step(rank, shared_data, args, device, builder):
                 loss_dict = K_epochs_PPO_training(rank, args, episode, shared_data, agents)
                 
                 if rank == 0:
-                    send_curve_data(loss_dict, reward, total_step_reward, agent_type_list)
+                    send_curve_data(loss_dict, total_step_reward, agent_type_list)
                     
                 # reset
                 agents.reset()
