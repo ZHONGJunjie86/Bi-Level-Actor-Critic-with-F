@@ -1,6 +1,6 @@
 import numpy as np
 import collections
-# from env.save_log import send_curve_data
+from env.save_log import send_curve_data
 from system.ppo_K_updates import K_epochs_PPO_training
 from env.utils import information_share
 from config.config import *
@@ -67,8 +67,8 @@ def step(rank, shared_data, args, device, builder):
 
                 loss_dict = K_epochs_PPO_training(rank, args, episode, shared_data, agents)
 
-                # if rank == 0:
-                #     send_curve_data(loss_dict, total_step_reward)
+                if rank == 0:
+                    send_curve_data(loss_dict, total_step_reward)
                 
                 # reset
                 agents.clear_memory()

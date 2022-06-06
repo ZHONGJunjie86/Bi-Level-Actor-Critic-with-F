@@ -49,10 +49,11 @@ obs_shape_by_type = {"agent": 4 + 2 * (args.agent_nums - 1 + args.num_adversarie
 action_dim_by_type = {"leader": 5, "follower": 1}
 
 # 定义保存路径
-model_load_path = {"agent": "C:/1Workspace/PythonWork/MARL/Bi-Level-Actor-Critic-with-F/model/", 
-                   "adversary":"C:/1Workspace/PythonWork/MARL/Bi-Level-Actor-Critic-with-F/model/"}
-model_save_path = {"agent": "C:/1Workspace/PythonWork/MARL/Bi-Level-Actor-Critic-with-F/model/", 
-                   "adversary":"C:/1Workspace/PythonWork/MARL/Bi-Level-Actor-Critic-with-F/model/"}
+path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/"
+model_load_path = {"agent": path, 
+                   "adversary":path}
+model_save_path = {"agent": path, 
+                   "adversary":path}
 
 # multiprocessing
 main_device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 

@@ -219,14 +219,9 @@ class PPO:
             self.actor[name].zero_grad()
             actor_loss.backward()
 
-            if main_process:
-                self.loss_dic = [actor_loss, critic_loss]
-            else:
-                self.hidden_state = torch.zeros(1,1,self.hidden_size).to(self.device)
-
             self.loss_dic['a_loss'][name] += float(actor_loss.cpu().detach().numpy())
             self.loss_dic['c_loss'][name] += float(critic_loss.cpu().detach().numpy())
-            return 0, 0
+            # return 0, 0 !!!!!!!!!!!!! return too earily
         
     def compute_GAE(self, compute_rewards, compute_termi, training_time, name):
         if training_time ==0:
@@ -275,8 +270,8 @@ class PPO:
         for name in self.agent_name_list:
             self.actor[name].zero_grad()
             
-            for n, p in self.actor.named_parameters():
-                p.grad = Variable(grads_dict[self.agent_type][name][n + '_grad'])
+            for n, p in self.actor[name].named_parameters():
+                p.grad = Variable(grads_dict[self.agent_type][name].grads[n + '_grad'])
             
             nn.utils.clip_grad_norm_(self.actor[name].parameters(),5)
             self.actor_optimizer[name].step()

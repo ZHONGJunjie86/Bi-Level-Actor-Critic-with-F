@@ -22,8 +22,8 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
             shared_data.shared_lock.release()
 
             # update
-            agents.update(copy.deepcopy(shared_data.shared_model), args.processes)
-            shared_data.shared_model.reset()
+            agents.update(copy.deepcopy(shared_data.shared_model))
+            shared_data.reset()
             loss_dict = agents.get_loss()
             agents.save_model()
 
