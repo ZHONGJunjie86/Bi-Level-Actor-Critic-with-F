@@ -1,10 +1,12 @@
 import torch
+import torch.nn as nn
 import torch.multiprocessing as mp
 from config.config import agent_type_list
 import sys
 
-class Shared_grad_buffers:
+class Shared_grad_buffers(nn.Module):
     def __init__(self, models, main_device):
+        super(Shared_grad_buffers, self).__init__()
         self.device = main_device
         self.grads = {}
         for name, p in models.named_parameters():
@@ -13,8 +15,9 @@ class Shared_grad_buffers:
 
     def add_gradient(self, models):
         for name, p in models.named_parameters():
-            #print("name, p",name,p)
+            print("name, p",name,p)
             self.grads[name + '_grad'] += p.grad.data.to(self.device)
+            print("--------------------------------------------------------")
 
     def reset(self):
         for name, grad in self.grads.items():
@@ -39,5 +42,5 @@ class Shared_Data:
             self.shared_model[agent_type] = {}
             for name in ["leader", "follower"]:
                 self.shared_model[agent_type][name] = \
-                    Shared_grad_buffers(model_dict[agent_type][name], main_device)
+                    Shared_grad_buffers(model_dict[agent_type][name], main_device).share_memory()
 

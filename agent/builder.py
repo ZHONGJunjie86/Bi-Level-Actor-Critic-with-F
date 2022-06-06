@@ -1,6 +1,7 @@
 from config.config import *
 from agent.agent_manager import Agents2Env
 from algorithm.network import ActorCritic
+import copy
 
 class Bulider():
     @staticmethod
@@ -33,6 +34,7 @@ class Bulider():
                           run_device, main_device,
                           model_load_path, model_save_path,
                           args) 
+                          
 
     @staticmethod
     def build_model_dict():
@@ -41,8 +43,8 @@ class Bulider():
             model_dict[agent_type] = {}
             for name in ["leader", "follower"]:
                 model_dict[agent_type][name] = ActorCritic(obs_shape_by_type[agent_type], 
-                                                           action_dim_by_type[name], 
-                                                           action_dim_by_type[name], 
+                                                           action_dim_by_type["leader"], 
+                                                           action_dim_by_type["follower"], 
                                                            name) 
         return model_dict
 

@@ -162,3 +162,20 @@ def observation(self, agent, world):
         print("agent.state.p_vel", [agent.state.p_vel] ,"agent.state.p_pos", [agent.state.p_pos] ,
                                  "entity_pos",entity_pos ,"other_pos", other_pos ,"other_vel", other_vel)
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + other_vel)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            

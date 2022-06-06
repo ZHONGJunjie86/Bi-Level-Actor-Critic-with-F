@@ -1,16 +1,22 @@
+from unicodedata import name
 import torch.cuda
 import torch.nn as nn
 import torch.nn.functional as F
 
 
-class ActorCritic(nn.Module):
+class ActorCritic(nn.Module):        
     def __init__(self, obs_size, leader_action_dim, follower_action_dim, name):  #(n+2p-f)/s + 1 
         super(ActorCritic, self).__init__()
+
         # share info
         self.self_attention = nn.MultiheadAttention(64, 4)        
-        self.gru = nn.GRU(64, 64, 1) 
+        self.gru = nn.GRU(input_size = 64, hidden_size = 64, num_layers = 1, batch_first=True) 
+        self.gru.flatten_parameters()
         self.name = name
         self.leader_action_dim = leader_action_dim
+        self.follower_action_dim = follower_action_dim
+        self.obs_size = obs_size
+        self.softmax = nn.Softmax(dim=-1)
 
         # actor
         if name == "follower":
@@ -21,42 +27,76 @@ class ActorCritic(nn.Module):
             self.linear_beta = nn.Linear(64, follower_action_dim)
             self.beta_dis =  torch.distributions.beta.Beta
             # critic 含两个动作，follower是后算出来的
-            self.linear_critic_1 = nn.Linear(64 + follower_action_dim, 64)
+            self.linear_critic_1 = nn.Linear(64 + self.follower_action_dim * 2, 64)
         elif name == "leader":
             # state 包含 follower的动作，自己的 one-hot（这俩决定SE）
-            self.linear1 = nn.Linear(obs_size + follower_action_dim * 2 + leader_action_dim, 64)
+            self.linear1 = nn.Linear(obs_size + follower_action_dim + leader_action_dim, 64)
             # actor Categorical
-            self.linear_agent = nn.Linear(64, leader_action_dim)
+            self.linear_leader_logits = nn.Linear(64, leader_action_dim)
             self.categorical_dis = torch.distributions.Categorical
             # critic 含两个动作，一开始就有
             self.linear_critic_1 = nn.Linear(64, 64)
 
         # critic == Q
         self.linear_critic_2 = nn.Linear(64, 1)
+
+        self.initialize()
+
+    
+    def initialize(self):
+        torch.nn.init.kaiming_normal_(self.linear1.weight)
+        # torch.nn.init.zeros_(self.linear1.bias)
+        # torch.nn.init.kaiming_uniform_(self.self_attention.weight)
+        # torch.nn.init.kaiming_uniform_(self.gru.weight)
+
+        if self.name == "leader":
+            torch.nn.init.kaiming_normal_(self.linear_leader_logits.weight)
+            # torch.nn.init.zeros_(self.linear_leader_logits.bias)
+        elif self.name == "follower":
+            torch.nn.init.kaiming_normal_(self.linear_alpha.weight)
+            # torch.nn.init.zeros_(self.linear_alpha.bias)
+            torch.nn.init.kaiming_normal_(self.linear_beta.weight)
+            # torch.nn.init.zeros_(self.linear_beta.bias)
+
+        torch.nn.init.kaiming_normal_(self.linear_critic_1.weight)
+        # torch.nn.init.zeros_(self.linear_critic_1.bias)
+        torch.nn.init.kaiming_normal_(self.linear_critic_2.weight)
+        # torch.nn.init.zeros_(self.linear_critic_2.bias)
         
 
-    def forward(self, obs, h_old,  leader_action, follower_action = False): 
+    def forward(self, obs, h_old = None,  leader_action = None, follower_action = False): 
         # share info
         batch_size = obs.size()[0]
+
         if self.name == "follower":
-            obs = torch.cat([obs, leader_action], -1).view(batch_size, 1, -1)
-        else:
-            obs = torch.cat([obs, leader_action, follower_action], -1).view(batch_size, 1, -1)
-        x = torch.relu(self.linear1(obs))
+            obs = torch.cat([obs.view(batch_size, 1, -1), 
+                                         leader_action.reshape(batch_size, 1, self.leader_action_dim)  # + 0.001
+                            ], -1).view(batch_size, -1)
+        elif self.name == "leader":
+            obs = torch.cat([obs.view(batch_size, 1, -1), leader_action.reshape(batch_size, 1, self.leader_action_dim), 
+                                  follower_action.reshape(batch_size, 1, self.follower_action_dim)], -1
+                                  ).view(batch_size, -1)
+        
+        x = F.relu(self.linear1(obs))
+        # print("self.linear1---", x)
+        x = x.view(batch_size, 1, -1)
         x = self.self_attention(x,x,x)[0] + x
-        x,h_state = self.gru(x, h_old)
+        # print("self.self_attention", x)
+        x,h_state = self.gru(x, h_old.detach())
+        # print("self.gru---",x)
 
         # actor
         if self.name == "follower":
-            alpha = torch.relu(self.linear_alpha(x)) + 0.01  # >0
-            beta = torch.relu(self.linear_beta(x)) + 0.01  # >0
-            dis =  self.beta_dis(alpha.reshape(batch_size,1), beta.reshape(batch_size,1)).sample() 
+            # print("follower x----------", x)
+            alpha = F.relu(self.linear_alpha(x)) + 0.01  # >0
+            beta = F.relu(self.linear_beta(x)) + 0.01  # >0
+            dis =  self.beta_dis(alpha.reshape(batch_size,1), beta.reshape(batch_size,1))
             action = dis.sample()
             entropy = dis.entropy().mean()
             selected_log_prob = dis.log_prob(action)
             action += 0.5  # 0 for social reward
-        else:
-            logits = torch.relu(self.linear_agent(x))
+        elif self.name == "leader":
+            logits = self.softmax(self.linear_leader_logits(x))
             dis =  self.categorical_dis(logits.reshape(batch_size, self.leader_action_dim))
             action = dis.sample()
             entropy = dis.entropy().mean()
@@ -68,11 +108,11 @@ class ActorCritic(nn.Module):
                                                  x.view(batch_size, -1), 
                                                  alpha.view(batch_size,-1), 
                                                  beta.view(batch_size,-1)
-                                                 ], -1).view(batch_size, 1, -1)
-            x = torch.relu(self.linear_critic_1(add_follower_act_logits))
+                                                 ], -1).view(batch_size, -1)
+            x = F.relu(self.linear_critic_1(add_follower_act_logits))
             action_value = self.linear_critic_2(x)
-        else:
-            x = torch.relu(self.linear_critic_1(x.view(batch_size, -1)))
+        elif self.name == "leader":
+            x = F.relu(self.linear_critic_1(x.view(batch_size, -1)))
             action_value = self.linear_critic_2(x)
 
-        return selected_log_prob, action_value.reshape(self.batch_size,1,1), action, h_state.data, entropy 
+        return selected_log_prob, action_value.reshape(batch_size,1,1), action, h_state.detach().data, entropy 

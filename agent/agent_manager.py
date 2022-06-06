@@ -1,5 +1,6 @@
 from torch import ctc_loss
 from algorithm.DPPO import PPO
+import copy 
 
 
 class Agents2Env:
@@ -23,13 +24,15 @@ class Agents2Env:
         # ['adversary_0', 'adversary_1', 'adversary_2', 'agent_0']
         for name in self.agent_name_list:
             if "adversar" in name:
-                self.agents[name] = PPO(self.args, obs_shape[name], self.device, "adversary")
+                self.agents[name] = copy.deepcopy(PPO(self.args, 
+                                                    obs_shape[name], self.device, 
+                                                    "adversary"))
             else:
-                self.agents[name] = PPO(self.args, obs_shape[name], self.device, "agent")
+                self.agents[name] = copy.deepcopy(PPO(self.args, obs_shape[name], 
+                                                      self.device, "agent"))
 
-    def get_action(self, state, reward, done, agent_index):
-        name = self.get_agent_name(agent_index)
-        return self.agents[name].choose_action(state, reward, done)
+    def get_action(self, state, reward, done, agent_name):
+        return self.agents[agent_name].choose_action(state, reward, done)
 
     def load_model(self):
         for agent in self.agents.values():

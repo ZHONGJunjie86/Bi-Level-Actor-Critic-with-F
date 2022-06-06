@@ -56,7 +56,7 @@ model_save_path = {"agent": "C:/1Workspace/PythonWork/MARL/Bi-Level-Actor-Critic
 
 # multiprocessing
 main_device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
-device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu") 
+device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
 
 
 

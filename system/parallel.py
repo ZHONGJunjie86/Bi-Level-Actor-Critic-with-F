@@ -27,16 +27,14 @@ def parallel_trainer(bulider):
 
     processes = []
     for rank in range(bulider.get_args().processes):  # rank 编号
-        
+
         if rank < bulider.get_args().processes//2 or rank==0:  
             print("start", rank)
-            p = mp.Process(target=step, args=(rank, shared_data, bulider_args, 
-                                              bulider.build_agents(main_device), 
-                                              bulider.build_env()))
+            p = mp.Process(target=step, args=(rank, shared_data, bulider_args, main_device,
+                                              bulider))
         else:
-            p = mp.Process(target=step, args=(rank, shared_data, bulider_args, 
-                                              bulider.build_agents(device), 
-                                              bulider.build_env()))
+            p = mp.Process(target=step, args=(rank, shared_data, bulider_args, device,
+                                              bulider))
 
         p.start()
         processes.append(p)
