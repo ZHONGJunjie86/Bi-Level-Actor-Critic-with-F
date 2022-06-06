@@ -1,0 +1,45 @@
+
+-----------------Episode:  0
+/home/j-zhong/anaconda3/lib/python3.8/site-packages/torch/nn/modules/rnn.py:739: UserWarning: RNN module weights are not part of single contiguous chunk of memory. This means they need to be compacted at every call, possibly greatly increasing memory usage. To compact weights again call flatten_parameters(). (Triggered internally at  /pytorch/aten/src/ATen/native/cudnn/RNN.cpp:775.)
+  result = _VF.gru(input, hx, self._flat_weights, self.bias, self.num_layers,
+/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/algorithm/DPPO.py:90: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(follower_action).detach().to(self.device))
+Episode:  0
+---------------------------training!
+send_dic
+loss_dict {'agent': {'a_loss': {'leader': -0.8644313991156776, 'follower': 1.9920689590724245}, 'c_loss': {'leader': 3.780030063721528, 'follower': 1.1490341250904048}}, 'adversary': {'a_loss': {'leader': -0.8057987618154354, 'follower': 2.255433552877144}, 'c_loss': {'leader': 3.7366992799358716, 'follower': 1.8541387381575192}}}
+agent_type agent
+loss_name a_loss
+name leader
+name follower
+loss_name c_loss
+name leader
+name follower
+agent_type adversary
+loss_name a_loss
+name leader
+name follower
+loss_name c_loss
+name leader
+name follower
+-----------------Episode:  1
+Episode:  1
+---------------------------training!
+send_dic
+loss_dict {'agent': {'a_loss': {'leader': -2.759543293315952, 'follower': 1.8086040722470278}, 'c_loss': {'leader': 3.244484765306792, 'follower': 1.9829306391191217}}, 'adversary': {'a_loss': {'leader': -3.225159922705039, 'follower': 0.30058238389090497}, 'c_loss': {'leader': 2.343412499583767, 'follower': 0.9904019624156815}}}
+agent_type agent
+loss_name a_loss
+name leader
+name follower
+loss_name c_loss
+name leader
+name follower
+agent_type adversary
+loss_name a_loss
+name leader
+name follower
+loss_name c_loss
+name leader
+name follower
+-----------------Episode:  2
+Episode:  2

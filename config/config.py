@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 import torch
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', default=0.99, type=float)  # 0.95
 parser.add_argument('--a_lr', default=0.0003, type=float)  # 0.0001
@@ -20,7 +19,7 @@ parser.add_argument("--num_good",  default=1, type=int)
 parser.add_argument("--num_adversaries",  default=2, type=int)  
 parser.add_argument("--num_obstacles",  default=2, type=int) 
 parser.add_argument("--agent_nums", default=2, type=int)
-parser.add_argument("--max_cycles", default=25, type=int)  # Agent Environment Cycle 等于游戏步
+parser.add_argument("--max_cycles", default=50, type=int)  # Agent Environment Cycle 等于游戏步
 parser.add_argument("--max_episodes", default=10000000, type=int)
 
 # PPO
@@ -30,7 +29,7 @@ parser.add_argument("--load_model_run_episode", default=4000, type=int)
 parser.add_argument("--K_epochs", default=5, type=int)
 
 # Multiprocessing
-parser.add_argument('--processes', default=1, type=int,
+parser.add_argument('--processes', default=20, type=int,
                     help='number of processes to train with')
 
                                 
@@ -56,8 +55,8 @@ model_save_path = {"agent": path,
                    "adversary":path}
 
 # multiprocessing
-main_device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
-device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
+main_device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu") 
+device = torch.device("cuda:3") if torch.cuda.is_available() else torch.device("cpu") 
 
 
 

@@ -1,0 +1,24 @@
+/home/j-zhong/anaconda3/lib/python3.8/site-packages/torch/nn/modules/rnn.py:739: UserWarning: RNN module weights are not part of single contiguous chunk of memory. This means they need to be compacted at every call, possibly greatly increasing memory usage. To compact weights again call flatten_parameters(). (Triggered internally at  /pytorch/aten/src/ATen/native/cudnn/RNN.cpp:775.)
+  result = _VF.gru(input, hx, self._flat_weights, self.bias, self.num_layers,
+/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/algorithm/DPPO.py:90: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(follower_action).detach().to(self.device))
+-----------------Episode:  0
+Episode:  0
+---------------------------training!
+loss_dict!````````````````````````````` {'agent': {'a_loss': {'leader': -3.065008654749115, 'follower': 1.326846144204691}, 'c_loss': {'leader': 2.1615210075663405, 'follower': 0.8468443941149849}}, 'adversary': {'a_loss': {'leader': -1.5211930676156549, 'follower': 1.222273862643591}, 'c_loss': {'leader': 3.642976354294599, 'follower': 2.8524790653495473}}}
+loss_dict {'agent': {'a_loss': {'leader': -3.065008654749115, 'follower': 1.326846144204691}, 'c_loss': {'leader': 2.1615210075663405, 'follower': 0.8468443941149849}}, 'adversary': {'a_loss': {'leader': -1.5211930676156549, 'follower': 1.222273862643591}, 'c_loss': {'leader': 3.642976354294599, 'follower': 2.8524790653495473}}}
+agent_type agent
+loss_name a_loss
+name leader
+name follower
+loss_name c_loss
+name leader
+name follower
+agent_type adversary
+loss_name a_loss
+name leader
+name follower
+loss_name c_loss
+name leader
+name follower
+send!`````````````````````````````

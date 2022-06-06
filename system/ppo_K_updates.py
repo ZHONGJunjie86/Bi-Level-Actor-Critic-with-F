@@ -19,21 +19,22 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
             shared_data.shared_lock.acquire()
             agents.add_gradient(shared_data.shared_model)
             shared_data.shared_count.value = 0
-            shared_data.shared_lock.release()
-
             # update
             agents.update(copy.deepcopy(shared_data.shared_model))
+            shared_data.save(agents.get_actor())
+            agents.quick_load_model(copy.deepcopy(shared_data.model_dict))
+            shared_data.shared_lock.release()
+
+
             shared_data.reset()
-            loss_dict = agents.get_loss()
-            agents.save_model()
+            
 
             shared_data.event.set()
             shared_data.event.clear()
             training_time += 1
 
         # return data 
-        agents.reset_loss()
-        agents.clear_memory()
+        loss_dict = agents.get_loss()
         return loss_dict
 
     else:
@@ -43,7 +44,7 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
             agents.compute_loss(training_time)
 
             # add
-            shared_data.acquire()
+            shared_data.shared_lock.acquire()
             agents.add_gradient(shared_data.shared_model)
             shared_data.shared_count.value += 1
             shared_data.shared_lock.release()
@@ -52,8 +53,10 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
             shared_data.event.wait()
 
             # load new model
-            agents.load_model()
+            shared_data.shared_lock.acquire()
+            agents.quick_load_model(copy.deepcopy(shared_data.model_dict))
+            shared_data.shared_lock.release()
 
             training_time += 1
 
-        return 0, 0
+        return 0

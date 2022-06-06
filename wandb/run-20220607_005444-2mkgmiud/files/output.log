@@ -1,0 +1,38 @@
+
+-----------------Episode:  0
+/home/j-zhong/anaconda3/lib/python3.8/site-packages/torch/nn/modules/rnn.py:739: UserWarning: RNN module weights are not part of single contiguous chunk of memory. This means they need to be compacted at every call, possibly greatly increasing memory usage. To compact weights again call flatten_parameters(). (Triggered internally at  /pytorch/aten/src/ATen/native/cudnn/RNN.cpp:775.)
+  result = _VF.gru(input, hx, self._flat_weights, self.bias, self.num_layers,
+/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/algorithm/DPPO.py:90: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(follower_action).detach().to(self.device))
+Episode:  0
+---------------------------training!
+actor_loss tensor(-0.1292, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.9714, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.2673, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.8984, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(108.0157, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.4687, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(-0.1931, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.3847, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(-0.1226, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.5808, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(99.5828, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.6753, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.2410, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.5676, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(-0.2748, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.6633, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(81.9326, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.3308, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(-0.1316, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.7638, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.2620, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.8097, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(93.3983, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.1201, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(-0.3191, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.6387, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(-0.3941, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.6647, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(90.6633, device='cuda:0', grad_fn=<AddBackward0>)
+actor_loss tensor(0.4904, device='cuda:0', grad_fn=<AddBackward0>)

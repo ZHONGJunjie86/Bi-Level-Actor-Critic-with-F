@@ -38,6 +38,11 @@ class Agents2Env:
         for agent in self.agents.values():
             agent.load_model(self.model_load_path)
 
+    def quick_load_model(self, model_dic):
+        for agent in self.agents.values():
+            agent.quick_load_model(model_dic)
+                
+
     def save_model(self):
         self.agents['agent_0'].save_model(self.model_save_path)
         self.agents['adversary_0'].save_model(self.model_save_path)
@@ -45,9 +50,9 @@ class Agents2Env:
     def get_agent_name(self, index):
         return self.agent_name_list[index]
 
-    def clear_memory(self):
+    def reset(self):
         for agent in self.agents.values():
-            agent.clear_memory()
+            agent.reset()
 
     def update(self, grads_dict):
         self.agents['agent_0'].update(grads_dict)
@@ -62,12 +67,16 @@ class Agents2Env:
             agent.add_gradient(shared_model_dict)
 
     def get_loss(self):
-        loss_dict = {"agent":self.agents['agent_0'].loss_dic,
-                     "adversary":self.agents['adversary_0'].loss_dic}
+        loss_dict = {"agent":copy.deepcopy(self.agents['agent_0'].loss_dic),
+                     "adversary":copy.deepcopy(self.agents['adversary_0'].loss_dic)}
         return loss_dict
 
     def reset_loss(self):
         for agent in self.agents.values():
             agent.reset_loss()
+
+    def get_actor(self):
+        return {"agent":copy.deepcopy(self.agents['agent_0'].get_actor()),
+                "adversary": copy.deepcopy(self.agents['adversary_0'].get_actor())}
     
 

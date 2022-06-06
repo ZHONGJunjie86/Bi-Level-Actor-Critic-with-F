@@ -2,7 +2,7 @@ import torch.multiprocessing as mp
 import sys
 from system.utils import *
 import os
-from env.step import step
+from train_env.step import step
 
 os.environ['OMP_NUM_THREADS'] = '1'
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'

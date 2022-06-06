@@ -48,8 +48,19 @@ class Shared_Data:
                     Shared_grad_buffers(model_dict[agent_type][name], 
                     main_device, agent_type, name).share_memory()
 
+        self.model_dict = model_dict
+
     def reset(self):
         for agent_type in agent_type_list:
             for name in ["leader", "follower"]:
                 self.shared_model[agent_type][name].reset()
+
+    def save(self, new_model_dict):
+        for agent_type in agent_type_list:
+            for name in ["leader", "follower"]:
+                self.model_dict[agent_type][name].load_state_dict(
+                new_model_dict[agent_type][name].state_dict())
+
+
+
 

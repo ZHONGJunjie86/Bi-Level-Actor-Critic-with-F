@@ -68,7 +68,7 @@ class PPO:
                 self.loss_dic[loss_name][agent_name] = 0 
 
         #
-        self.clear_memory()
+        self.reset()
 
 
     def bilevel_compare_action(self, obs_tensor, reward):
@@ -214,15 +214,17 @@ class PPO:
             # critic_loss = torch.nn.SmoothL1Loss()(action_value, target_value) 
 
             actor_loss = -surr3.mean() - self.entropy_coef * entropy + 0.5 * critic_loss
-            
+
             # do the back-propagation...
             self.actor[name].zero_grad()
             actor_loss.backward()
 
             self.loss_dic['a_loss'][name] += float(actor_loss.cpu().detach().numpy())
             self.loss_dic['c_loss'][name] += float(critic_loss.cpu().detach().numpy())
+            
             # return 0, 0 !!!!!!!!!!!!! return too earily
         
+
     def compute_GAE(self, compute_rewards, compute_termi, training_time, name):
         if training_time ==0:
             # Monte Carlo estimate of rewards:
@@ -277,19 +279,11 @@ class PPO:
             self.actor_optimizer[name].step()
 
 
-    def get_loss(self):
-        return self.a_loss, self.c_loss
-
-
     def get_actor(self):
         return self.actor
 
-
-    def reset_loss(self):
-        self.a_loss = 0
-        self.c_loss = 0
     
-    def clear_memory(self):
+    def reset(self):
         
         for name in self.agent_name_list:
             self.memory[name].clear_memory()
@@ -298,29 +292,36 @@ class PPO:
             for name in self.agent_name_list:
                 with torch.no_grad():
                     self.memory[name].hidden_states.append(self.hidden_state_zero.cpu().numpy())
-                    
+        
+        for loss_name in self.loss_name_list:
+            self.loss_dic[loss_name] = {}
+            for agent_name in self.agent_name_list:
+                self.loss_dic[loss_name][agent_name] = 0 
 
     def load_model(self, model_load_path):
 
         # "path + agent/adversary + leader/follower + .pth"
         for name in self.agent_name_list:
             model_actor_path = model_load_path[self.agent_type]+ self.agent_type  + name + ".pth"
-            print(f'Actor path: {model_actor_path}')
+            #print(f'Actor path: {model_actor_path}')
             if  os.path.exists(model_actor_path):
                 actor = torch.load(model_actor_path, map_location=self.device)
                 self.actor[name].load_state_dict(actor)
-                print("Model loaded!")
+                #print("Model loaded!")
             else:
                 sys.exit(f'Model not founded!')
 
     def save_model(self, model_save_path):
-        print("---------------save-------------------")
-        print("new_lr: ",self.a_lr)
+        # print("---------------save-------------------")
+        # print("new_lr: ",self.a_lr)
 
         # "path + agent/adversary + leader/follower + .pth"
         for name in self.agent_name_list:
             model_actor_path = model_save_path[self.agent_type]+ self.agent_type  + name + ".pth"
             torch.save(self.actor[name].state_dict(), model_actor_path)
 
-
+    def quick_load_model(self, new_model_dict):
+        for name in self.agent_name_list:
+            self.actor[name].load_state_dict(
+                                             new_model_dict[self.agent_type][name].state_dict())
 
