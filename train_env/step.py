@@ -63,7 +63,7 @@ def step(rank, shared_data, args, device, builder):
             
             for agent_name in agents.agents.keys():
                 
-                reward = rewards[agent_name]
+                reward = rewards[agent_name]/100
                 total_step_reward[agent_name] += reward
 
                 if True not in dones.values():
