@@ -94,7 +94,9 @@ class PPO:
             
             data_dict_list.append({"action_value":{"leader":leader_action_value, "follower": follower_action_value},
                                     "action":{"leader":leader_action_behaviour_numpy, "follower": follower_action,
-                                              "leader_index":leader_action_behaviour},
+                                              "leader_index":leader_action_index
+                                                             #leader_action_behaviour
+                                                             },
                                     "action_logprob":{"leader":leader_logprob, "follower": follower_logprob},
                                      "h_s":{"leader": leader_hidden_state, "follower": follower_hidden_state}
                                 })
@@ -225,7 +227,7 @@ class PPO:
             self.loss_dic['a_loss'][name] += float(actor_loss.cpu().detach().numpy())
             self.loss_dic['c_loss'][name] += float(critic_loss.cpu().detach().numpy())
             
-            # return 0, 0 !!!!!!!!!!!!! return too earily
+        # return 0, 0 !!!!!!!!!!!!! return too earily
         
 
     def compute_GAE(self, compute_rewards, compute_termi, training_time, name):
