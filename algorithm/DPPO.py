@@ -129,6 +129,7 @@ class PPO:
         with torch.no_grad():
             self.memory["leader"].states.append(state)
             self.memory["leader"].is_terminals.append(done)
+            self.memory["leader"].leader_action_behaviour.append(data_dict["action"]["leader_index"])
             for name in self.agent_name_list:
                 self.memory[name].actions.append(data_dict["action"][name])
                 self.memory[name].logprobs.append(data_dict["action_logprob"][name].cpu().numpy()) 
@@ -153,6 +154,7 @@ class PPO:
                 self.old_states = torch.tensor(np.array(self.memory["leader"].states)
                                             ).view(-1,1,self.obs_shape).to(self.device)
                 self.old_compute_termi = torch.tensor(self.memory["leader"].is_terminals).to(self.device).detach() 
+                self.leader_action_behaviour = torch.tensor(self.memory["leader"].leader_action_behaviour).to(self.device).detach() 
                 self.old_logprobs = {}
                 self.old_actions = {}
                 self.old_values = {}
@@ -196,7 +198,8 @@ class PPO:
 
             logprobs, action_value, _, _, entropy = self.actor[name](old_states, old_hidden, 
                                                             self.old_actions["leader"][indices], 
-                                                            self.old_actions["follower"][indices])
+                                                            self.old_actions["follower"][indices],
+                                                            self.leader_action_behaviour[indices], train = True)
     
             ratios = torch.exp(logprobs - old_logprobs.detach())
 
@@ -230,7 +233,7 @@ class PPO:
             # Monte Carlo estimate of rewards:
             rewards = []
             GAE_advantage = [self.memory[name].action_values[-1]]
-            target_value = [self.memory[name].action_values[-1]]  # 补一个最后的?
+            target_value = [self.memory[name].values[-1]]  # 补一个最后的?
             #
             discounted_reward = 0
             action_value_pre = None
@@ -274,7 +277,7 @@ class PPO:
             
             for n, p in self.actor[name].named_parameters():
                 p.grad = Variable(grads_dict[self.agent_type][name].grads[n + '_grad'])
-            
+                
             nn.utils.clip_grad_norm_(self.actor[name].parameters(),5)
             self.actor_optimizer[name].step()
 

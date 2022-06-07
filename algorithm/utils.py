@@ -9,6 +9,8 @@ class Memory:
         self.num_vectors = []
         self.values = []
         self.action_values = []
+        self.leader_action_behaviour = []
+    
     
     def clear_memory(self):
         del self.actions[:]
@@ -20,4 +22,5 @@ class Memory:
         del self.num_vectors[:]
         del self.values[:]
         del self.action_values[:]
+        del self.leader_action_behaviour[:]
 

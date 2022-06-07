@@ -1,4 +1,5 @@
 from unicodedata import name
+from numpy import tri
 import torch.cuda
 import torch.nn as nn
 import torch.nn.functional as F
@@ -64,7 +65,9 @@ class ActorCritic(nn.Module):
         # torch.nn.init.zeros_(self.linear_critic_2.bias)
         
 
-    def forward(self, obs, h_old = None,  leader_action = None, follower_action = False): 
+    def forward(self, obs, h_old = None,  
+                leader_action = None, follower_action = False, 
+                leader_behaviour = None, train = False): 
         # share info
         batch_size = obs.size()[0]
 
@@ -91,14 +94,20 @@ class ActorCritic(nn.Module):
             alpha = F.relu(self.linear_alpha(x)) + 0.01  # >0
             beta = F.relu(self.linear_beta(x)) + 0.01  # >0
             dis =  self.beta_dis(alpha.reshape(batch_size,1), beta.reshape(batch_size,1))
-            action = dis.sample()
+            if train:
+                action = follower_action.view(batch_size,-1)
+            else:
+                action = dis.sample()
             entropy = dis.entropy().mean()
             selected_log_prob = dis.log_prob(action)
-            action += 0.5  # 0 for social reward
+            
         elif self.name == "leader":
             logits = self.softmax(self.linear_leader_logits(x))
             dis =  self.categorical_dis(logits.reshape(batch_size, self.leader_action_dim))
-            action = dis.sample()
+            if train:
+                action = leader_behaviour.view(batch_size,-1)
+            else:
+                action = dis.sample()
             entropy = dis.entropy().mean()
             selected_log_prob = dis.log_prob(action)
 
