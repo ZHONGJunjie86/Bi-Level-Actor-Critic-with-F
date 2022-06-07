@@ -1,14 +1,14 @@
 import math
-max_reward = 0.1
+max_reward = 0.01
 
 
 def compute_dis(my_pos, other_pos):
-    return (my_pos[0] - other_pos[0])**2 + (my_pos[1] - other_pos[1])**2
+    return other_pos[0]**2 + other_pos[1]**2# (my_pos[0] - other_pos[0])**2 + (my_pos[1] - other_pos[1])**2
 
 
 def compute_dis_reward(distance_agent_dict, distance_reward_dict, agent_pos):
     for adv_name, pos in distance_agent_dict.items():
-        reward_dis = min(math.exp(-compute_dis(pos,  agent_pos)*10), max_reward)
+        reward_dis = min(math.exp(-compute_dis(pos,  agent_pos)*15), max_reward)
         if reward_dis > distance_reward_dict[adv_name]:
             distance_reward_dict[adv_name] = reward_dis
 

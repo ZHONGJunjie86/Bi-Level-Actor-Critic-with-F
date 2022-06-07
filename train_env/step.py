@@ -1,4 +1,3 @@
-from turtle import distance
 import numpy as np
 import collections
 from train_env.save_log import send_curve_data

@@ -20,15 +20,15 @@ class Agents2Env:
 
         self.construct_agent(obs_shape)
 
-    def construct_agent(self, obs_shape):
+    def construct_agent(self, obs_shape_by_type):
         # ['adversary_0', 'adversary_1', 'adversary_2', 'agent_0']
         for name in self.agent_name_list:
             if "adversar" in name:
                 self.agents[name] = copy.deepcopy(PPO(self.args, 
-                                                    obs_shape[name], self.device, 
+                                                    obs_shape_by_type["adversary"], self.device, 
                                                     "adversary"))
             else:
-                self.agents[name] = copy.deepcopy(PPO(self.args, obs_shape[name], 
+                self.agents[name] = copy.deepcopy(PPO(self.args, obs_shape_by_type["agent"], 
                                                       self.device, "agent"))
 
     def get_action(self, state, reward, done, agent_name):

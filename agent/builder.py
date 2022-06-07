@@ -30,7 +30,7 @@ class Bulider():
 
     @staticmethod
     def build_agents(run_device):
-        return Agents2Env(agent_name_list, obs_shape, 
+        return Agents2Env(agent_name_list, obs_shape_by_type, 
                           run_device, main_device,
                           model_load_path, model_save_path,
                           args) 
