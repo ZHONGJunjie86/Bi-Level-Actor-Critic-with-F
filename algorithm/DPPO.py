@@ -25,7 +25,7 @@ class PPO:
 
         #
         self.obs_shape = obs_shape
-        self.eps_clip = 0.2
+        self.eps_clip = 0.1
         self.vf_clip_param = 0.2
         self.lam = 0.95
         self.K_epochs = args.K_epochs
@@ -179,7 +179,7 @@ class PPO:
             self.compute_GAE(self.compute_rewards[name], self.old_compute_termi, training_time, name)
             #compute
             batch_size = self.old_hiddens[name].size()[0]
-            batch_sample = batch_size#int(batch_size / self.K_epochs) # 
+            batch_sample = int(batch_size / self.K_epochs) # batch_size#
             indices = torch.randint(batch_size, size=(batch_sample,), requires_grad=False)#, device=self.device
 
             # print(self.old_states.size(),
@@ -260,8 +260,8 @@ class PPO:
 
                 if action_value_pre == None:   #  最后补一个
                     action_value_pre = action_value
-                delta = reward + (1-is_terminal)*self.gamma*action_value_pre - value  
-                advatage = delta + self.gamma*self.lam*advatage * (1-is_terminal)
+                delta = reward + self.gamma*action_value_pre - value   # (1-is_terminal)*
+                advatage = delta + self.gamma*self.lam*advatage # * (1-is_terminal)
                 GAE_advantage.insert(0, advatage) #插入列表
                 target_value.insert(0,float(value + advatage))
                 action_value_pre = action_value
@@ -309,7 +309,9 @@ class PPO:
         for loss_name in self.loss_name_list:
             self.loss_dic[loss_name] = {}
             for agent_name in self.agent_name_list:
-                self.loss_dic[loss_name][agent_name] = 0 
+                self.loss_dic[loss_name][agent_name] = 0
+        
+        self.reward_follower_last = 0
 
     def load_model(self, model_load_path):
 

@@ -29,7 +29,7 @@ parser.add_argument("--load_model_run_episode", default=4000, type=int)
 parser.add_argument("--K_epochs", default=3, type=int)
 
 # Multiprocessing
-parser.add_argument('--processes', default=15, type=int,
+parser.add_argument('--processes', default=1, type=int,
                     help='number of processes to train with')
 
                                 
@@ -48,15 +48,15 @@ obs_shape_by_type = {"agent": 4 + 2 * (args.agent_nums - 1 + args.num_adversarie
 action_dim_by_type = {"leader": 5, "follower": 1}
 
 # 定义保存路径
-path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/"
+path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/"#model1/
 model_load_path = {"agent": path, 
                    "adversary":path}
 model_save_path = {"agent": path, 
                    "adversary":path}
 
 # multiprocessing
-main_device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu") 
-device = torch.device("cuda:3") if torch.cuda.is_available() else torch.device("cpu") 
+main_device = torch.device("cuda:3") if torch.cuda.is_available() else torch.device("cpu") 
+device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu") 
 
 
 

@@ -1,3 +1,4 @@
+from turtle import distance
 import numpy as np
 import collections
 from train_env.save_log import send_curve_data
@@ -59,21 +60,22 @@ def step(rank, shared_data, args, device, builder):
             actions = {}
             
             # pass hidden states between agents who can see each other
-            information_share(states, agents, args)
+            distance_reward_dict = information_share(states, agents, args)
             
             for agent_name in agents.agents.keys():
                 
-                reward = rewards[agent_name]/100
+                if "agent" in agent_name:reward = rewards[agent_name]/100
+                else: reward = rewards[agent_name]/100 + distance_reward_dict[agent_name]
                 total_step_reward[agent_name] += reward
 
                 if True not in dones.values():
                     action = agents.get_action(states[agent_name], 
                                                reward, dones[agent_name], agent_name)
-                    if "agent" not in agent_name:
-                        actions[agent_name] = action
-                    else:
-                        actions[agent_name] = 0
-                    # actions[agent_name] = action
+                    # if "agent" not in agent_name:
+                    #     actions[agent_name] = action
+                    # else:
+                    #     actions[agent_name] = 0
+                    actions[agent_name] = action
             
             states, rewards, dones, infos = env.step(actions)
             step += 1
