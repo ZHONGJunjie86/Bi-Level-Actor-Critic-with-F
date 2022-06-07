@@ -94,8 +94,9 @@ class PPO:
             
             data_dict_list.append({"action_value":{"leader":leader_action_value, "follower": follower_action_value},
                                     "action":{"leader":leader_action_behaviour_numpy, "follower": follower_action,
-                                              "leader_index":leader_action_index
-                                                             #leader_action_behaviour
+                                              "leader_index":
+                                                            #  leader_action_index
+                                                             leader_action_behaviour
                                                              },
                                     "action_logprob":{"leader":leader_logprob, "follower": follower_logprob},
                                      "h_s":{"leader": leader_hidden_state, "follower": follower_hidden_state}
@@ -217,9 +218,14 @@ class PPO:
             critic_loss2 = (value_pred_clip - target_value.detach()).pow(2)
             critic_loss = 0.5 * torch.max(critic_loss1 , critic_loss2).mean()
             # critic_loss = torch.nn.SmoothL1Loss()(action_value, target_value) 
-
+            
+            # if name == "leader":
+            #     actor_loss = -surr3.mean()  - self.entropy_coef * entropy  + 0.5 * critic_loss
+            # else:
+            #     actor_loss = -surr3.mean() - self.entropy_coef * entropy + 0.5 * critic_loss
             actor_loss = -surr3.mean() - self.entropy_coef * entropy + 0.5 * critic_loss
-
+            
+            
             # do the back-propagation...
             self.actor[name].zero_grad()
             actor_loss.backward()

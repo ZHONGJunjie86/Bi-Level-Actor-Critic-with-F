@@ -35,6 +35,7 @@ class ActorCritic(nn.Module):
             # actor Categorical
             self.linear_leader_logits = nn.Linear(64, leader_action_dim)
             self.categorical_dis = torch.distributions.Categorical
+            self.normal_dis = torch.distributions.Normal
             # critic 含两个动作，一开始就有
             self.linear_critic_1 = nn.Linear(64, 64)
 
@@ -91,11 +92,11 @@ class ActorCritic(nn.Module):
         # actor
         if self.name == "follower":
             # print("follower x----------", x)
-            alpha = F.relu(self.linear_alpha(x)) + 0.01  # >0
-            beta = F.relu(self.linear_beta(x)) + 0.01  # >0
-            dis =  self.beta_dis(alpha.reshape(batch_size,1), beta.reshape(batch_size,1))
+            mu = torch.sigmoid(self.linear_alpha(x))   # >0
+            sigma = torch.sigmoid(self.linear_beta(x)) + 1e-5  # >0
+            dis =  self.normal_dis(mu.reshape(batch_size,1), sigma.reshape(batch_size,1))
             if train:
-                action = follower_action.view(batch_size,-1)
+                action = follower_action.view(batch_size,1)
             else:
                 action = dis.sample()
             entropy = dis.entropy().mean()
@@ -103,7 +104,7 @@ class ActorCritic(nn.Module):
             
         elif self.name == "leader":
             logits = self.softmax(self.linear_leader_logits(x))
-            dis =  self.categorical_dis(logits.reshape(batch_size, self.leader_action_dim))
+            dis =  self.categorical_dis(logits.reshape(batch_size, 1, self.leader_action_dim))
             if train:
                 action = leader_behaviour.view(batch_size,-1)
             else:
