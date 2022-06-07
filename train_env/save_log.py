@@ -7,7 +7,7 @@ def send_curve_data(loss_dict, total_step_reward, agent_type_list):
 
     
     for agent_type in agent_type_list:
-        for loss_name in ["a_loss", "c_loss"]:
+        for loss_name in ["a_loss", "c_loss", "entropy"]:
             for name in ["leader", "follower"]:     
                 send_dic[loss_name + " " + agent_type + " " + name] = loss_dict[agent_type][loss_name][name]
 

@@ -60,7 +60,7 @@ class PPO:
 
         #
         self.memory ={name: Memory() for name in self.agent_name_list}
-        self.loss_name_list = ["a_loss", "c_loss"]
+        self.loss_name_list = ["a_loss", "c_loss", "entropy"]
         self.loss_dic = {}
         for loss_name in self.loss_name_list:
             self.loss_dic[loss_name] = {}
@@ -234,7 +234,7 @@ class PPO:
 
             self.loss_dic['a_loss'][name] += float(actor_loss.cpu().detach().numpy())
             self.loss_dic['c_loss'][name] += float(critic_loss.cpu().detach().numpy())
-            
+            self.loss_dic['entropy'][name] += float(entropy.cpu().detach().numpy())
         # return 0, 0 !!!!!!!!!!!!! return too earily
         
 
