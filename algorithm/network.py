@@ -27,6 +27,7 @@ class ActorCritic(nn.Module):
             self.linear_alpha = nn.Linear(64, follower_action_dim)
             self.linear_beta = nn.Linear(64, follower_action_dim)
             self.beta_dis =  torch.distributions.beta.Beta
+            self.normal_dis = torch.distributions.Normal
             # critic 含两个动作，follower是后算出来的
             self.linear_critic_1 = nn.Linear(64 + self.follower_action_dim * 2, 64)
         elif name == "leader":
@@ -35,7 +36,6 @@ class ActorCritic(nn.Module):
             # actor Categorical
             self.linear_leader_logits = nn.Linear(64, leader_action_dim)
             self.categorical_dis = torch.distributions.Categorical
-            self.normal_dis = torch.distributions.Normal
             # critic 含两个动作，一开始就有
             self.linear_critic_1 = nn.Linear(64, 64)
 
@@ -116,8 +116,8 @@ class ActorCritic(nn.Module):
         if self.name == "follower":
             add_follower_act_logits = torch.cat([
                                                  x.view(batch_size, -1), 
-                                                 alpha.view(batch_size,-1), 
-                                                 beta.view(batch_size,-1)
+                                                 mu.view(batch_size,-1), 
+                                                 sigma.view(batch_size,-1)
                                                  ], -1).view(batch_size, -1)
             x = F.relu(self.linear_critic_1(add_follower_act_logits))
             action_value = self.linear_critic_2(x)

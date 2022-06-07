@@ -204,7 +204,7 @@ class PPO:
                                                             self.old_actions["follower"][indices],
                                                             self.leader_action_behaviour[indices], train = True)
     
-            ratios = torch.exp(logprobs - old_logprobs.detach())
+            ratios = torch.exp(logprobs.view(batch_sample,1,-1) - old_logprobs.detach())
 
             surr1 = ratios*advantages
             surr2 = torch.clamp(ratios, 1-self.eps_clip, 1+self.eps_clip)*advantages 
@@ -212,12 +212,14 @@ class PPO:
             surr3 = torch.max(torch.min(surr1, surr2),3*advantages)
             #torch.min(surr1, surr2)#
             
+            
             value_pred_clip = old_value.detach() +\
                 torch.clamp(action_value - old_value.detach(), -self.vf_clip_param, self.vf_clip_param)
             critic_loss1 = (action_value - target_value.detach()).pow(2)
             critic_loss2 = (value_pred_clip - target_value.detach()).pow(2)
             critic_loss = 0.5 * torch.max(critic_loss1 , critic_loss2).mean()
             # critic_loss = torch.nn.SmoothL1Loss()(action_value, target_value) 
+            
             
             # if name == "leader":
             #     actor_loss = -surr3.mean()  - self.entropy_coef * entropy  + 0.5 * critic_loss
