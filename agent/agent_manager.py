@@ -55,7 +55,7 @@ class Agents2Env:
             agent.reset()
 
     def update(self, grads_dict):
-        # self.agents['agent_0'].update(grads_dict)
+        self.agents['agent_0'].update(grads_dict)
         self.agents['adversary_0'].update(grads_dict)
 
     def compute_loss(self, training_time):
