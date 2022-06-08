@@ -83,8 +83,8 @@ class PPO:
                 follower_logprob, follower_action_value, follower_action, follower_hidden_state, _ =\
                                         self.actor["follower"](obs_tensor, torch.tensor(follower_hidden).to(self.device), 
                                                             torch.tensor(leader_action).to(self.device))
-                if self.agent_type == "agent":
-                    follower_action = np.array([0.1])
+                # if self.agent_type == "agent":
+                #     follower_action = np.array([0.1])
                 
                 leader_logprob, leader_action_value, leader_action_behaviour, leader_hidden_state, _ = \
                                         self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
@@ -96,27 +96,37 @@ class PPO:
             
             data_dict_list.append({"action_value":{"leader":leader_action_value, "follower": follower_action_value},
                                     "action":{"leader":leader_action_behaviour_numpy, "follower": follower_action,
-                                              "leader_index":
-                                                            #  leader_action_index
-                                                             leader_action_behaviour
-                                                             },
+                                              "leader_behaviour":leader_action_behaviour,
+                                              "leader_action_index":leader_action_index
+                                            },
                                     "action_logprob":{"leader":leader_logprob, "follower": follower_logprob},
                                      "h_s":{"leader": leader_hidden_state, "follower": follower_hidden_state}
                                 })
 
-        # return
-        value_dic = {"leader": 0, "follower": 0}
-        for i in data_dict_list:
-            value_dic["leader"] += i["action_value"]["leader"]
-            value_dic["follower"] += i["action_value"]["follower"]
-        value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
-        
-        # follower only value
-        #value_dic["follower"] = value_dic["follower"]/self.action_dim["leader"]
 
         # sort
         data_dict_list.sort(key = lambda x: x["action_value"]["leader"], reverse = True)
-        return_dict = data_dict_list[0]
+        return_dict = data_dict_list[0]        
+        
+        # compute leader's state value:
+        # keep follower action fixed and marginalize leader's Q
+        value_dic = {"leader": return_dict["action_value"]["leader"]}  # , "follower": 0
+        follower_action = return_dict["action"]["follower"]
+        for leader_action_index in range(self.action_dim["leader"]):
+            if leader_action_index == return_dict["action"]["leader_action_index"]:
+                continue
+            leader_action = np.zeros(self.action_dim["leader"])
+            leader_action[leader_action_index] = 1
+            with torch.no_grad():
+                _, leader_action_value, _, _, _ = \
+                                            self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
+                                                                torch.tensor(leader_action).detach().to(self.device), 
+                                                                follower_action.detach().to(self.device))
+            value_dic["leader"] += leader_action_value
+        # v = mean(Q)
+        value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
+        
+        # follower only state value
         return_dict["value"] = {"leader": value_dic["leader"], 
                                 "follower": return_dict["action_value"]["follower"]}
 
@@ -137,7 +147,7 @@ class PPO:
         with torch.no_grad():
             self.memory["leader"].states.append(state)
             self.memory["leader"].is_terminals.append(done)
-            self.memory["leader"].leader_action_behaviour.append(data_dict["action"]["leader_index"])
+            self.memory["leader"].leader_action_behaviour.append(data_dict["action"]["leader_behaviour"])
             for name in self.agent_name_list:
                 self.memory[name].actions.append(data_dict["action"][name])
                 self.memory[name].logprobs.append(data_dict["action_logprob"][name].cpu().numpy()) 
@@ -146,7 +156,7 @@ class PPO:
                 self.memory[name].values.append(data_dict["value"][name].cpu().numpy())
                 self.memory[name].rewards.append(data_dict["reward"][name])
         
-        return int(data_dict["action"]["leader_index"])
+        return int(data_dict["action"]["leader_behaviour"])  # leader_index
 
     
     def compute_follower_reward(self, reward, leader_action_value, leader_state_value):
