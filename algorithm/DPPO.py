@@ -110,12 +110,15 @@ class PPO:
             value_dic["leader"] += i["action_value"]["leader"]
             value_dic["follower"] += i["action_value"]["follower"]
         value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
-        value_dic["follower"] = value_dic["follower"]/self.action_dim["leader"]
+        
+        # follower only value
+        #value_dic["follower"] = value_dic["follower"]/self.action_dim["leader"]
 
         # sort
         data_dict_list.sort(key = lambda x: x["action_value"]["leader"], reverse = True)
         return_dict = data_dict_list[0]
-        return_dict["value"] = {"leader": value_dic["leader"], "follower": value_dic["follower"]}
+        return_dict["value"] = {"leader": value_dic["leader"], 
+                                "follower": return_dict["action_value"]["follower"]}
 
         # reward_shaping
         return_dict["reward"] = {"leader": reward, 
