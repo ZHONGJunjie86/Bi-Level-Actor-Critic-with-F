@@ -7,7 +7,7 @@ import torch
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', default=0.99, type=float)  # 0.95
-parser.add_argument('--a_lr', default=0.0003, type=float)  # 0.0001
+parser.add_argument('--a_lr', default=0.0001, type=float)  # 0.0001
 
 parser.add_argument('--render', action='store_true')
 parser.add_argument("--save_interval", default=20, type=int)  # 1000
@@ -47,15 +47,15 @@ obs_shape_by_type = {"agent": 4 + 2 * args.num_obstacles + 2* (args.num_good + a
 action_dim_by_type = {"leader": 5, "follower": 1}
 
 # 定义保存路径
-path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/"#model1/
+path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/model1/"#
 model_load_path = {"agent": path, 
                    "adversary":path}
 model_save_path = {"agent": path, 
                    "adversary":path}
 
 # multiprocessing
-main_device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu") 
-device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu") 
+main_device = torch.device("cuda:3") if torch.cuda.is_available() else torch.device("cpu") 
+device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
 
 
 

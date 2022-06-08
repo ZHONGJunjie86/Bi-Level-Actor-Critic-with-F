@@ -68,7 +68,7 @@ def step(rank, shared_data, args, device, builder):
                 total_step_reward[agent_name] += reward
 
                 if True not in dones.values():
-                    action = agents.get_action(states[agent_name], 
+                    action = agents.get_action(states[agent_name].clip(-2,2), 
                                                reward, dones[agent_name], agent_name)
                     # if "agent" not in agent_name:
                     #     actions[agent_name] = action

@@ -92,13 +92,13 @@ class ActorCritic(nn.Module):
         # actor
         if self.name == "follower":
             # print("follower x----------", x)
-            mu = torch.sigmoid(self.linear_alpha(x))   # >0
+            mu = torch.tanh(self.linear_alpha(x))   
             sigma = torch.sigmoid(self.linear_beta(x)) + 1e-5  # >0
             dis =  self.normal_dis(mu.reshape(batch_size,1), sigma.reshape(batch_size,1))
             if train:
                 action = follower_action.view(batch_size,1)
             else:
-                action = dis.sample()
+                action = dis.sample().clip(-1,1)
             entropy = dis.entropy().mean()
             selected_log_prob = dis.log_prob(action)
             
@@ -123,6 +123,6 @@ class ActorCritic(nn.Module):
             action_value = self.linear_critic_2(x)
         elif self.name == "leader":
             x = F.relu(self.linear_critic_1(x.view(batch_size, -1)))
-            action_value = self.linear_critic_2(x)
+            action_value = torch.tanh(self.linear_critic_2(x)) * 5
 
         return selected_log_prob, action_value.reshape(batch_size,1,1), action, h_state.detach().data, entropy 

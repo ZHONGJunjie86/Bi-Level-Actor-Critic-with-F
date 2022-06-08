@@ -83,8 +83,8 @@ class PPO:
                 follower_logprob, follower_action_value, follower_action, follower_hidden_state, _ =\
                                         self.actor["follower"](obs_tensor, torch.tensor(follower_hidden).to(self.device), 
                                                             torch.tensor(leader_action).to(self.device))
-                # if self.agent_type == "agent":
-                #     follower_action = np.array([0.1])
+                if self.agent_type == "agent":
+                    follower_action = torch.tensor(np.array([0.1]))
                 
                 leader_logprob, leader_action_value, leader_action_behaviour, leader_hidden_state, _ = \
                                         self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
@@ -125,7 +125,7 @@ class PPO:
             value_dic["leader"] += leader_action_value
         # v = mean(Q)
         value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
-        
+        print("value_dic.size()",value_dic["leader"].size())
         # follower only state value
         return_dict["value"] = {"leader": value_dic["leader"], 
                                 "follower": return_dict["action_value"]["follower"]}
