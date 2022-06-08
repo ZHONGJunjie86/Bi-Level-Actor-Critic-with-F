@@ -123,6 +123,6 @@ class ActorCritic(nn.Module):
             action_value = self.linear_critic_2(x)
         elif self.name == "leader":
             x = F.relu(self.linear_critic_1(x.view(batch_size, -1)))
-            action_value = torch.tanh(self.linear_critic_2(x)) * 5
+            action_value = self.linear_critic_2(x).clip(-5, 5)
 
         return selected_log_prob, action_value.reshape(batch_size,1,1), action, h_state.detach().data, entropy 

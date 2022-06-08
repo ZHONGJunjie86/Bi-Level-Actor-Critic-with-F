@@ -1,5 +1,5 @@
 import math
-max_reward = 0.01
+max_reward = 0.001 # max_all_adv_reward = 0.15
 
 
 def compute_dis(my_pos, other_pos):
@@ -8,7 +8,7 @@ def compute_dis(my_pos, other_pos):
 
 def compute_dis_reward(distance_agent_dict, distance_reward_dict, agent_pos):
     for adv_name, pos in distance_agent_dict.items():
-        reward_dis = min(math.exp(-compute_dis(pos,  agent_pos)*15), max_reward)
+        reward_dis = min(math.exp(-compute_dis(pos,  agent_pos)*20), max_reward)
         if reward_dis > distance_reward_dict[adv_name]:
             distance_reward_dict[adv_name] = reward_dis
 
@@ -42,9 +42,9 @@ def information_share(sta, agents, args):
             start_point += 2
             other_adversary_index += 1
         
-        
-        agents.agents["adversary_" + str(i)].memory["follower"].hidden_states[-1] = \
-                 agents.agents["adversary_" + str(min_adversary_index_position[0])].memory["leader"].hidden_states[-1]
+        if min_adversary_index_position[0] != -1:
+            agents.agents["adversary_" + str(i)].memory["follower"].hidden_states[-1] = \
+                    agents.agents["adversary_" + str(min_adversary_index_position[0])].memory["leader"].hidden_states[-1]
 
     # agents
     for i in range(args.num_good):

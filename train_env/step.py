@@ -64,17 +64,17 @@ def step(rank, shared_data, args, device, builder):
             for agent_name in agents.agents.keys():
                 
                 if "agent" in agent_name:reward = rewards[agent_name]/100
-                else: reward = rewards[agent_name]/100 + distance_reward_dict[agent_name]
+                else: reward = rewards[agent_name]/10  #+ distance_reward_dict[agent_name]
                 total_step_reward[agent_name] += reward
 
                 if True not in dones.values():
                     action = agents.get_action(states[agent_name].clip(-2,2), 
                                                reward, dones[agent_name], agent_name)
-                    # if "agent" not in agent_name:
-                    #     actions[agent_name] = action
-                    # else:
-                    #     actions[agent_name] = 0
-                    actions[agent_name] = action
+                    if "agent" in agent_name:
+                        actions[agent_name] = 0
+                    else:
+                        actions[agent_name] = action
+                    # actions[agent_name] = action
             
             states, rewards, dones, infos = env.step(actions)
             step += 1

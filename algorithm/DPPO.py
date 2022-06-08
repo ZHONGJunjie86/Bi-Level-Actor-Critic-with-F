@@ -25,7 +25,7 @@ class PPO:
 
         #
         self.obs_shape = obs_shape
-        self.eps_clip = 0.1
+        self.eps_clip = 0.2
         self.vf_clip_param = 0.2
         self.lam = 0.95
         self.K_epochs = args.K_epochs
@@ -83,8 +83,8 @@ class PPO:
                 follower_logprob, follower_action_value, follower_action, follower_hidden_state, _ =\
                                         self.actor["follower"](obs_tensor, torch.tensor(follower_hidden).to(self.device), 
                                                             torch.tensor(leader_action).to(self.device))
-                if self.agent_type == "agent":
-                    follower_action = torch.tensor(np.array([0.1]))
+                # if self.agent_type == "agent":
+                follower_action = torch.tensor(np.array([0.1]))
                 
                 leader_logprob, leader_action_value, leader_action_behaviour, leader_hidden_state, _ = \
                                         self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
@@ -125,7 +125,7 @@ class PPO:
             value_dic["leader"] += leader_action_value
         # v = mean(Q)
         value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
-        print("value_dic.size()",value_dic["leader"].size())
+        
         # follower only state value
         return_dict["value"] = {"leader": value_dic["leader"], 
                                 "follower": return_dict["action_value"]["follower"]}
@@ -276,7 +276,7 @@ class PPO:
                 if action_value_pre == None:   #  最后补一个
                     action_value_pre = action_value
                 delta = reward + self.gamma*action_value_pre - value   # (1-is_terminal)*
-                advatage = delta + self.gamma*self.lam*advatage # * (1-is_terminal)
+                advatage = delta # + self.gamma*self.lam*advatage # * (1-is_terminal)
                 GAE_advantage.insert(0, advatage) #插入列表
                 target_value.insert(0,float(value + advatage))
                 action_value_pre = action_value
