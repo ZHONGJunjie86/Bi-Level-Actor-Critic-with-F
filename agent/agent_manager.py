@@ -40,7 +40,7 @@ class Agents2Env:
 
     def quick_load_model(self, model_dic):
         for agent in self.agents.values():
-            agent.quick_load_model(copy.deepcopy(model_dic))
+            agent.quick_load_model(model_dic)
                 
 
     def save_model(self):
@@ -55,8 +55,8 @@ class Agents2Env:
             agent.reset()
 
     def update(self, grads_dict):
-        # self.agents['agent_0'].update(copy.deepcopy(grads_dict))
-        self.agents['adversary_0'].update(copy.deepcopy(grads_dict))
+        # self.agents['agent_0'].update(grads_dict)
+        self.agents['adversary_0'].update(grads_dict)
 
     def compute_loss(self, training_time):
         for agent in self.agents.values():
@@ -66,9 +66,6 @@ class Agents2Env:
         for agent in self.agents.values():
             agent.add_gradient(shared_model_dict)
 
-    def get_agents_dict(self):
-        return self.agents
-        
     def get_loss(self):
         loss_dict = {"agent":copy.deepcopy(self.agents['agent_0'].loss_dic),
                      "adversary":copy.deepcopy(self.agents['adversary_0'].loss_dic)}
@@ -81,5 +78,38 @@ class Agents2Env:
     def get_actor(self):
         return {"agent":copy.deepcopy(self.agents['agent_0'].get_actor()),
                 "adversary": copy.deepcopy(self.agents['adversary_0'].get_actor())}
+
+    def get_data_dict(self):
+        share_data_dict = {"agent":{}, "adversary":{}}
+        for name in ["leader", "follower","old_states"]:
+            share_data_dict["agent"][name] = {}
+            share_data_dict["adversary"][name] = {}
+
+        for agent in self.agents.values():
+            agent_dict = agent.get_share_data_dict()  
+            agent_type = agent.agent_type
+
+            if len(share_data_dict[agent_type]["old_states"])!=0:
+                share_data_dict[agent_type]["old_states"].extend(agent_dict["old_states"])
+                for name in ["leader", "follower"]:
+                    for key in share_data_dict[agent_type][name].keys():
+                        if key == "old_states":
+                            continue
+                        else:
+                            share_data_dict[agent_type][name][key].extend(agent_dict[name][key])
+            else:
+                share_data_dict[agent_type]["old_states"] = agent_dict["old_states"]
+                for name in ["leader", "follower"]:
+                    for key in share_data_dict[agent_type][name].keys():
+                        if key == "old_states":
+                            continue
+                        else:
+                            share_data_dict[agent_type][name] = {}
+                            share_data_dict[agent_type][name][key] = agent_dict[name][key]
+
+        return copy.deepcopy(share_data_dict)
     
+    def update_with_share_data(self, data_dict):
+        # self.agents['agent_0'].compute_grad_with_shared_data(data_dict['agent'])
+        self.agents['adversary_0'].compute_grad_with_shared_data(data_dict['adversary'])
 

@@ -18,7 +18,6 @@ class Shared_grad_buffers(nn.Module):
     def add_gradient(self, models):
         for name, p in models.named_parameters():
             # print("name, p",name,p)
-            # print("p.grad",p.grad)
             # print("self.agent_type, self.agent_name",self.agent_type, self.agent_name)
             self.grads[name + '_grad'] += p.grad.data.to(self.device)
             # print("--------------------------------------------------------")
@@ -51,6 +50,21 @@ class Shared_Data:
 
         self.model_dict = model_dict
 
+        # share training data
+        self.share_training_data = {}
+        for agent_type in agent_type_list:
+            self.share_training_data[agent_type] = {}
+            self.share_training_data[agent_type]["old_states"] = mp.Manager().list()
+            for name in ["leader", "follower"]:
+                self.share_training_data[agent_type][name] = {}
+                self.share_training_data[agent_type][name]["old_hiddens"] = mp.Manager().list()
+                self.share_training_data[agent_type][name]["old_logprobs"] = mp.Manager().list()
+                self.share_training_data[agent_type][name]["advantages"] = mp.Manager().list()
+                self.share_training_data[agent_type][name]["target_value"] = mp.Manager().list()
+
+        self.share_training_data = mp.Manager().dict(self.share_training_data)
+
+
     def reset(self):
         for agent_type in agent_type_list:
             for name in ["leader", "follower"]:
@@ -62,12 +76,19 @@ class Shared_Data:
                 self.model_dict[agent_type][name].load_state_dict(
                 new_model_dict[agent_type][name].state_dict())
 
-    def add_agents_grad(self, agents):
-        for name, agent in agents.items():
-            if "adv" in name:
-                for name in ["leader", "follower"]:
-                    self.shared_model["adversary"][name].add_gradient(agent.actor[name])
-            else:
-                for name in ["leader", "follower"]:
-                    self.shared_model["agent"][name].add_gradient(agent.actor[name])
+
+    def update_share_data(self, dict):
+        for agent_type in agent_type_list:
+            self.share_training_data[agent_type]["old_states"].extend(dict[agent_type]["old_states"])
+            for name in ["leader", "follower"]:
+                for list_name in self.share_training_data[agent_type][name].keys():
+                    self.share_training_data[agent_type][name][list_name].extend(dict[agent_type][name][list_name])
+
+
+    def reset_share_data(self):
+        for agent_type in agent_type_list:
+            for name in ["leader", "follower"]:
+                for list_name in self.share_training_data[agent_type][name].keys():
+                    del self.share_training_data[agent_type][name][list_name][:]
+
 

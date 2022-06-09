@@ -22,8 +22,8 @@ class PPO:
         self.a_lr = args.a_lr
         self.gamma = args.gamma
         self.agent_type = agent_type
-        self.processes_num = args.processes
-        
+        self.use_add_grad = True if args.share_grad != 0 else False
+
         #
         self.obs_shape = obs_shape
         self.eps_clip = 0.2
@@ -76,9 +76,9 @@ class PPO:
         data_dict_list = []
         leader_hidden = self.memory["leader"].hidden_states[-1]
         follower_hidden = self.memory["follower"].hidden_states[-1]
-        for leader_action_index in range(1): #self.action_dim["leader"]
+        for leader_action_index in range(self.action_dim["leader"]):
             leader_action = np.zeros(self.action_dim["leader"])
-            leader_action[0] = 1
+            leader_action[leader_action_index] = 1
 
             with torch.no_grad():
                 follower_logprob, follower_action_value, follower_action, follower_hidden_state, _ =\
@@ -110,20 +110,20 @@ class PPO:
         # compute leader's state value:
         # keep follower action fixed and marginalize leader's Q
         value_dic = {"leader": return_dict["action_value"]["leader"]}  # , "follower": 0
-        # follower_action = return_dict["action"]["follower"]
-        # for leader_action_index in range(self.action_dim["leader"]):
-        #     if leader_action_index == return_dict["action"]["leader_action_index"]:
-        #         continue
-        #     leader_action = np.zeros(self.action_dim["leader"])
-        #     leader_action[leader_action_index] = 1
-        #     with torch.no_grad():
-        #         _, leader_action_value, _, _, _ = \
-        #                                     self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
-        #                                                         torch.tensor(leader_action).detach().to(self.device), 
-        #                                                         follower_action.detach().to(self.device))
-        #     value_dic["leader"] += leader_action_value
-        # # v = mean(Q)
-        # value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
+        follower_action = return_dict["action"]["follower"]
+        for leader_action_index in range(self.action_dim["leader"]):
+            if leader_action_index == return_dict["action"]["leader_action_index"]:
+                continue
+            leader_action = np.zeros(self.action_dim["leader"])
+            leader_action[leader_action_index] = 1
+            with torch.no_grad():
+                _, leader_action_value, _, _, _ = \
+                                            self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
+                                                                torch.tensor(leader_action).detach().to(self.device), 
+                                                                follower_action.detach().to(self.device))
+            value_dic["leader"] += leader_action_value
+        # v = mean(Q)
+        value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
         
         # follower only state value
         return_dict["value"] = {"leader": value_dic["leader"], 
@@ -185,16 +185,22 @@ class PPO:
                                                          ).view(-1, 1, self.action_dim[name]).to(self.device)
                     self.old_values[name] = torch.tensor(self.memory[name].values).view(-1, 1, 1).to(self.device)
                     self.old_action_values[name] = torch.tensor(self.memory[name].action_values).view(-1, 1, 1).to(self.device)
-                    self.old_hiddens[name] = torch.tensor(self.memory[name].hidden_states[:-1]).to(self.device).detach() 
+                    self.old_hiddens[name] = torch.tensor(self.memory[name].hidden_states[:-1]).view(1, -1, self.hidden_size).to(self.device).detach() 
                     self.compute_rewards[name] = torch.tensor(self.memory[name].rewards[1:]).to(self.device).detach() 
                     
         
         for name in self.agent_name_list:
             self.compute_GAE(self.compute_rewards[name], self.old_compute_termi, training_time, name)
+        
+        if self.use_add_grad:
+            self.compute_grad()
+
+    def compute_grad(self):
+        for name in self.agent_name_list:
             #compute
             batch_size = self.old_hiddens[name].size()[0]
             batch_sample = int(batch_size / self.K_epochs) # batch_size#
-            indices = torch.randint(batch_size - 1, size=(batch_sample,), requires_grad=False)#, device=self.device
+            indices = torch.randint(batch_size, size=(batch_sample,), requires_grad=False)#, device=self.device
 
             # print(self.old_states.size(),
             #       self.old_hiddens[name].size(),
@@ -234,11 +240,6 @@ class PPO:
             # critic_loss = 0.5 * torch.max(critic_loss1 , critic_loss2).mean()
             critic_loss = torch.nn.SmoothL1Loss()(action_value, target_value) 
             
-            
-            # if name == "leader":
-            #     actor_loss = -surr3.mean()  - self.entropy_coef * entropy  + 0.5 * critic_loss
-            # else:
-            #     actor_loss = -surr3.mean() - self.entropy_coef * entropy + 0.5 * critic_loss
             actor_loss = -surr3.mean() - self.entropy_coef * entropy + 0.5 * critic_loss
             
             
@@ -249,7 +250,6 @@ class PPO:
             self.loss_dic['a_loss'][name] += float(actor_loss.cpu().detach().numpy())
             self.loss_dic['c_loss'][name] += float(critic_loss.cpu().detach().numpy())
             self.loss_dic['entropy'][name] += float(entropy.cpu().detach().numpy())
-        # return 0, 0 !!!!!!!!!!!!! return too earily
         
 
     def compute_GAE(self, compute_rewards, compute_termi, training_time, name):
@@ -285,12 +285,83 @@ class PPO:
             self.advantages[name] = (GAE_advantage- GAE_advantage.mean()) / (GAE_advantage.std() + 1e-6) 
         
         return None
+
+    def compute_grad_with_shared_data(self, share_data_dict):
+        old_states = torch.tensor(share_data_dict["old_state"]).view(-1,1,self.obs_shape).to(self.device)
+        # torch.cat([self.old_states[:-1],
+        #                         torch.tensor(share_data_dict["old_state"]).view(-1,1,self.obs_shape).to(self.device)
+        #                         ], 0)
+
+        for name in self.agent_name_list:
+            self.old_hiddens = torch.tensor(share_data_dict["old_hidden"]).view(-1,1,self.hidden_size).to(self.device)
+            # torch.cat([self.old_hiddens[name][:-1].reshape(-1,1,self.hidden_size),
+            #                        torch.tensor(share_data_dict["old_hidden"]).view(-1,1,self.hidden_size).to(self.device)
+            #                     ], 0)
+            self.old_logprobs = torch.tensor(share_data_dict["old_logprobs"]).view(-1,1,1).to(self.device)
+            # torch.cat([self.old_logprobs[name][:-1],
+            #                           torch.tensor(share_data_dict["old_logprobs"]).view(-1,1,1).to(self.device)
+            #                     ], 0)
+            self.advantages = torch.tensor(share_data_dict["advantages"]).view(-1,1,1).to(self.device)
+            # torch.cat([self.advantages[name].detach(),
+            #                         torch.tensor(share_data_dict["advantages"]).view(-1,1,1).to(self.device)
+            #                     ], 0)
+            self.target_value = torch.tensor(share_data_dict["target_value"]).view(-1,1,1).to(self.device)
+            # torch.cat([self.target_value[name],
+            #                         torch.tensor(share_data_dict["target_value"]).view(-1,1,1).to(self.device)
+            #                     ], 0)
+
+            batch_size = self.old_hiddens[name].size()[0]
+            
+            print("batch_size------------------",batch_size)
+            for _ in range(self.K_epochs):
+                batch_sample = batch_size#int(batch_size / self.K_epochs) # 
+                indices = torch.randint(batch_size, size=(batch_sample,), requires_grad=False)
+                old_states = self.old_states[indices]
+                old_hidden = self.old_hiddens[name].reshape(-1,1,self.hidden_size)[indices].view(1, -1, self.hidden_size)
+                old_logprobs = self.old_logprobs[name][indices]
+                advantages = self.advantages[name][indices].detach()
+                target_value = self.target_value[name][indices]
+
+
+                logprobs, action_value, _, _, entropy = self.actor[name](old_states, old_hidden, 
+                                                                self.old_actions["leader"][indices], 
+                                                                self.old_actions["follower"][indices],
+                                                                self.leader_action_behaviour[indices], train = True)
+        
+                ratios = torch.exp(logprobs.view(batch_sample,1,-1) - old_logprobs.detach())
+
+                surr1 = ratios*advantages
+                surr2 = torch.clamp(ratios, 1-self.eps_clip, 1+self.eps_clip)*advantages 
+                #Dual_Clip
+                surr3 = torch.max(torch.min(surr1, surr2),3*advantages)
+                #torch.min(surr1, surr2)#
+                
+                
+                # value_pred_clip = old_value.detach() +\
+                #     torch.clamp(action_value - old_value.detach(), -self.vf_clip_param, self.vf_clip_param)
+                # critic_loss1 = (action_value - target_value.detach()).pow(2)
+                # critic_loss2 = (value_pred_clip - target_value.detach()).pow(2)
+                # critic_loss = 0.5 * torch.max(critic_loss1 , critic_loss2).mean()
+                critic_loss = torch.nn.SmoothL1Loss()(action_value, target_value) 
+
+                actor_loss = -surr3.mean() - self.entropy_coef * entropy + 0.5 * critic_loss
+                
+                
+                # do the back-propagation...
+                self.actor[name].zero_grad()
+                actor_loss.backward()
+                self.actor_optimizer[name].step()
+
+                self.loss_dic['a_loss'][name] += float(actor_loss.cpu().detach().numpy())
+                self.loss_dic['c_loss'][name] += float(critic_loss.cpu().detach().numpy())
+                self.loss_dic['entropy'][name] += float(entropy.cpu().detach().numpy())
+
             
 
     def add_gradient(self, shared_model_dict):
         # add the gradient to the shared_buffer...
         for name in self.agent_name_list:
-            shared_model_dict[self.agent_type][name].add_gradient(copy.deepcopy(self.actor[name]))
+            shared_model_dict[self.agent_type][name].add_gradient(self.actor[name])
 
 
     def update(self, grads_dict):     
@@ -298,16 +369,31 @@ class PPO:
             self.actor[name].zero_grad()
             
             for n, p in self.actor[name].named_parameters():
-                p.grad = Variable(grads_dict[self.agent_type][name].grads[n + '_grad']/self.processes_num)
-                # print("p",p.grad)
+                p.grad = Variable(grads_dict[self.agent_type][name].grads[n + '_grad'])
+                
             nn.utils.clip_grad_norm_(self.actor[name].parameters(),5)
             self.actor_optimizer[name].step()
 
 
     def get_actor(self):
-        return copy.deepcopy(self.actor)
+        return self.actor
 
-    
+
+    def get_share_data_dict(self):
+        share_data_dict = {
+                    "old_states" : list(self.old_states.cpu().numpy()),
+                    "leader":{},
+                    "follower":{}
+                    }
+
+        for name in self.agent_name_list:
+            share_data_dict[name]["old_hiddens"] = list(self.old_hiddens[name][:-1].cpu().numpy())
+            share_data_dict[name]["old_logprobs"] = list(self.old_logprobs[name][:-1].cpu().numpy())
+            share_data_dict[name]["advantages"] = list(self.advantages[name].cpu().numpy())
+            share_data_dict[name]["target_value"] = list(self.target_value[name].cpu().numpy())
+
+        return share_data_dict
+
     def reset(self):
         
         for name in self.agent_name_list:
