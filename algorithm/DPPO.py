@@ -22,7 +22,8 @@ class PPO:
         self.a_lr = args.a_lr
         self.gamma = args.gamma
         self.agent_type = agent_type
-
+        self.processes_num = args.processes
+        
         #
         self.obs_shape = obs_shape
         self.eps_clip = 0.2
@@ -297,7 +298,7 @@ class PPO:
             self.actor[name].zero_grad()
             
             for n, p in self.actor[name].named_parameters():
-                p.grad = Variable(grads_dict[self.agent_type][name].grads[n + '_grad'])
+                p.grad = Variable(grads_dict[self.agent_type][name].grads[n + '_grad']/self.processes_num)
                 # print("p",p.grad)
             nn.utils.clip_grad_norm_(self.actor[name].parameters(),5)
             self.actor_optimizer[name].step()
