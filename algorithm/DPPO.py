@@ -75,9 +75,9 @@ class PPO:
         data_dict_list = []
         leader_hidden = self.memory["leader"].hidden_states[-1]
         follower_hidden = self.memory["follower"].hidden_states[-1]
-        for leader_action_index in range(self.action_dim["leader"]):
+        for leader_action_index in range(1): #self.action_dim["leader"]
             leader_action = np.zeros(self.action_dim["leader"])
-            leader_action[leader_action_index] = 1
+            leader_action[0] = 1
 
             with torch.no_grad():
                 follower_logprob, follower_action_value, follower_action, follower_hidden_state, _ =\
@@ -91,11 +91,9 @@ class PPO:
                                                             torch.tensor(leader_action).detach().to(self.device), 
                                                             torch.tensor(follower_action).detach().to(self.device))
             
-            leader_action_behaviour_numpy = np.zeros(self.action_dim["leader"])
-            leader_action_behaviour_numpy[leader_action_behaviour] = 1
             
             data_dict_list.append({"action_value":{"leader":leader_action_value, "follower": follower_action_value},
-                                    "action":{"leader":leader_action_behaviour_numpy, "follower": follower_action,
+                                    "action":{"leader":leader_action, "follower": follower_action,
                                               "leader_behaviour":leader_action_behaviour,
                                               "leader_action_index":leader_action_index
                                             },
@@ -111,20 +109,20 @@ class PPO:
         # compute leader's state value:
         # keep follower action fixed and marginalize leader's Q
         value_dic = {"leader": return_dict["action_value"]["leader"]}  # , "follower": 0
-        follower_action = return_dict["action"]["follower"]
-        for leader_action_index in range(self.action_dim["leader"]):
-            if leader_action_index == return_dict["action"]["leader_action_index"]:
-                continue
-            leader_action = np.zeros(self.action_dim["leader"])
-            leader_action[leader_action_index] = 1
-            with torch.no_grad():
-                _, leader_action_value, _, _, _ = \
-                                            self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
-                                                                torch.tensor(leader_action).detach().to(self.device), 
-                                                                follower_action.detach().to(self.device))
-            value_dic["leader"] += leader_action_value
-        # v = mean(Q)
-        value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
+        # follower_action = return_dict["action"]["follower"]
+        # for leader_action_index in range(self.action_dim["leader"]):
+        #     if leader_action_index == return_dict["action"]["leader_action_index"]:
+        #         continue
+        #     leader_action = np.zeros(self.action_dim["leader"])
+        #     leader_action[leader_action_index] = 1
+        #     with torch.no_grad():
+        #         _, leader_action_value, _, _, _ = \
+        #                                     self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
+        #                                                         torch.tensor(leader_action).detach().to(self.device), 
+        #                                                         follower_action.detach().to(self.device))
+        #     value_dic["leader"] += leader_action_value
+        # # v = mean(Q)
+        # value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
         
         # follower only state value
         return_dict["value"] = {"leader": value_dic["leader"], 
@@ -195,7 +193,7 @@ class PPO:
             #compute
             batch_size = self.old_hiddens[name].size()[0]
             batch_sample = int(batch_size / self.K_epochs) # batch_size#
-            indices = torch.randint(batch_size, size=(batch_sample,), requires_grad=False)#, device=self.device
+            indices = torch.randint(batch_size - 1, size=(batch_sample,), requires_grad=False)#, device=self.device
 
             # print(self.old_states.size(),
             #       self.old_hiddens[name].size(),
@@ -228,12 +226,12 @@ class PPO:
             #torch.min(surr1, surr2)#
             
             
-            value_pred_clip = old_value.detach() +\
-                torch.clamp(action_value - old_value.detach(), -self.vf_clip_param, self.vf_clip_param)
-            critic_loss1 = (action_value - target_value.detach()).pow(2)
-            critic_loss2 = (value_pred_clip - target_value.detach()).pow(2)
-            critic_loss = 0.5 * torch.max(critic_loss1 , critic_loss2).mean()
-            # critic_loss = torch.nn.SmoothL1Loss()(action_value, target_value) 
+            # value_pred_clip = old_value.detach() +\
+            #     torch.clamp(action_value - old_value.detach(), -self.vf_clip_param, self.vf_clip_param)
+            # critic_loss1 = (action_value - target_value.detach()).pow(2)
+            # critic_loss2 = (value_pred_clip - target_value.detach()).pow(2)
+            # critic_loss = 0.5 * torch.max(critic_loss1 , critic_loss2).mean()
+            critic_loss = torch.nn.SmoothL1Loss()(action_value, target_value) 
             
             
             # if name == "leader":
@@ -261,11 +259,11 @@ class PPO:
             target_value = [self.memory[name].values[-1]]  # 补一个最后的?
             #
             discounted_reward = 0
-            action_value_pre = None
+            action_value_pre = self.memory[name].action_values[-1]
             advatage = 0
 
-            for reward, is_terminal, value, action_value in zip(reversed(compute_rewards), reversed(compute_termi),
-                                                  reversed(self.memory[name].values), reversed(self.memory[name].action_values)): #反转迭代
+            for reward, is_terminal, value, action_value in zip(reversed(compute_rewards[:-1]), reversed(compute_termi[:-1]),
+                                                  reversed(self.memory[name].values[:-1]), reversed(self.memory[name].action_values[:-1])): #反转迭代
                 
                 reward = reward.cpu().detach().numpy()
                 is_terminal = is_terminal.cpu().detach().numpy()
@@ -273,10 +271,8 @@ class PPO:
                 discounted_reward = reward +  self.gamma *discounted_reward
                 rewards.insert(0, discounted_reward) #插入列表
 
-                if action_value_pre == None:   #  最后补一个
-                    action_value_pre = action_value
                 delta = reward + self.gamma*action_value_pre - value   # (1-is_terminal)*
-                advatage = delta # + self.gamma*self.lam*advatage # * (1-is_terminal)
+                advatage = delta  + self.gamma*self.lam*advatage # * (1-is_terminal)
                 GAE_advantage.insert(0, advatage) #插入列表
                 target_value.insert(0,float(value + advatage))
                 action_value_pre = action_value
@@ -293,7 +289,7 @@ class PPO:
     def add_gradient(self, shared_model_dict):
         # add the gradient to the shared_buffer...
         for name in self.agent_name_list:
-            shared_model_dict[self.agent_type][name].add_gradient(self.actor[name])
+            shared_model_dict[self.agent_type][name].add_gradient(copy.deepcopy(self.actor[name]))
 
 
     def update(self, grads_dict):     
@@ -302,13 +298,13 @@ class PPO:
             
             for n, p in self.actor[name].named_parameters():
                 p.grad = Variable(grads_dict[self.agent_type][name].grads[n + '_grad'])
-                
+                # print("p",p.grad)
             nn.utils.clip_grad_norm_(self.actor[name].parameters(),5)
             self.actor_optimizer[name].step()
 
 
     def get_actor(self):
-        return self.actor
+        return copy.deepcopy(self.actor)
 
     
     def reset(self):

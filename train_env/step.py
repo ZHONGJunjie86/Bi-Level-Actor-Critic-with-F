@@ -6,6 +6,7 @@ from train_env.utils import information_share
 from config.config import *
 import wandb
 import copy
+import time
 
 def step(rank, shared_data, args, device, builder):
 
@@ -31,7 +32,7 @@ def step(rank, shared_data, args, device, builder):
         shared_data.event.wait()
         print("rank ", rank)
 
-    RENDER = False#args.render #
+    RENDER = True#args.render #
 
     total_step_reward = collections.defaultdict(float)
     episode = 0
@@ -53,6 +54,7 @@ def step(rank, shared_data, args, device, builder):
             rewards[name] = 0
         if RENDER and rank == 0 and episode % 10 == 0:
             env.render()
+            time.sleep(0.1)
 
         while True:
             ################################# collect  action #############################
@@ -64,7 +66,7 @@ def step(rank, shared_data, args, device, builder):
             for agent_name in agents.agents.keys():
                 
                 if "agent" in agent_name:reward = rewards[agent_name]/100
-                else: reward = rewards[agent_name]/10  #+ distance_reward_dict[agent_name]
+                else: reward = rewards[agent_name]/10  + distance_reward_dict[agent_name]
                 total_step_reward[agent_name] += reward
 
                 if True not in dones.values():

@@ -40,7 +40,7 @@ class Agents2Env:
 
     def quick_load_model(self, model_dic):
         for agent in self.agents.values():
-            agent.quick_load_model(model_dic)
+            agent.quick_load_model(copy.deepcopy(model_dic))
                 
 
     def save_model(self):
@@ -55,8 +55,8 @@ class Agents2Env:
             agent.reset()
 
     def update(self, grads_dict):
-        # self.agents['agent_0'].update(grads_dict)
-        self.agents['adversary_0'].update(grads_dict)
+        self.agents['agent_0'].update(grads_dict)
+        self.agents['adversary_0'].update(copy.deepcopy(grads_dict))
 
     def compute_loss(self, training_time):
         for agent in self.agents.values():
@@ -66,6 +66,9 @@ class Agents2Env:
         for agent in self.agents.values():
             agent.add_gradient(shared_model_dict)
 
+    def get_agents_dict(self):
+        return self.agents
+        
     def get_loss(self):
         loss_dict = {"agent":copy.deepcopy(self.agents['agent_0'].loss_dic),
                      "adversary":copy.deepcopy(self.agents['adversary_0'].loss_dic)}

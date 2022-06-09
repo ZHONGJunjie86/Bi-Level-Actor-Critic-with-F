@@ -18,6 +18,7 @@ class Shared_grad_buffers(nn.Module):
     def add_gradient(self, models):
         for name, p in models.named_parameters():
             # print("name, p",name,p)
+            # print("p.grad",p.grad)
             # print("self.agent_type, self.agent_name",self.agent_type, self.agent_name)
             self.grads[name + '_grad'] += p.grad.data.to(self.device)
             # print("--------------------------------------------------------")
@@ -61,6 +62,12 @@ class Shared_Data:
                 self.model_dict[agent_type][name].load_state_dict(
                 new_model_dict[agent_type][name].state_dict())
 
-
-
+    def add_agents_grad(self, agents):
+        for name, agent in agents.items():
+            if "adv" in name:
+                for name in ["leader", "follower"]:
+                    self.shared_model["adversary"][name].add_gradient(agent.actor[name])
+            else:
+                for name in ["leader", "follower"]:
+                    self.shared_model["agent"][name].add_gradient(agent.actor[name])
 
