@@ -1,0 +1,9 @@
+
+-----------------Episode:  0
+/home/j-zhong/anaconda3/lib/python3.8/site-packages/torch/nn/modules/rnn.py:739: UserWarning: RNN module weights are not part of single contiguous chunk of memory. This means they need to be compacted at every call, possibly greatly increasing memory usage. To compact weights again call flatten_parameters(). (Triggered internally at  /pytorch/aten/src/ATen/native/cudnn/RNN.cpp:775.)
+  result = _VF.gru(input, hx, self._flat_weights, self.bias, self.num_layers,
+/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/algorithm/DPPO.py:93: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(follower_action).detach().to(self.device))
+Episode:  0
+---------------------------training!
+---------------------------center adding!

@@ -85,7 +85,7 @@ class PPO:
                                         self.actor["follower"](obs_tensor, torch.tensor(follower_hidden).to(self.device), 
                                                             torch.tensor(leader_action).to(self.device))
                 # if self.agent_type == "agent":
-                follower_action = torch.tensor(np.array([0.1]))
+                follower_action = torch.tensor(np.array([[[0.1]]]))
                 
                 leader_logprob, leader_action_value, leader_action_behaviour, leader_hidden_state, _ = \
                                         self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
@@ -171,7 +171,7 @@ class PPO:
                 self.old_states = torch.tensor(np.array(self.memory["leader"].states)
                                             ).view(-1,1,self.obs_shape).to(self.device)
                 self.old_compute_termi = torch.tensor(self.memory["leader"].is_terminals).to(self.device).detach() 
-                self.leader_action_behaviour = torch.tensor(self.memory["leader"].leader_action_behaviour).to(self.device).detach() 
+                self.leader_action_behaviour = torch.tensor(self.memory["leader"].leader_action_behaviour).view(-1,1,1).to(self.device).detach() 
                 self.old_logprobs = {}
                 self.old_actions = {}
                 self.old_values = {}
@@ -184,8 +184,8 @@ class PPO:
                     self.old_actions[name] = torch.tensor(self.memory[name].actions
                                                          ).view(-1, 1, self.action_dim[name]).to(self.device)
                     self.old_values[name] = torch.tensor(self.memory[name].values).view(-1, 1, 1).to(self.device)
-                    self.old_action_values[name] = torch.tensor(self.memory[name].action_values).view(-1, 1, 1).to(self.device)
-                    self.old_hiddens[name] = torch.tensor(self.memory[name].hidden_states[:-1]).view(1, -1, self.hidden_size).to(self.device).detach() 
+                    self.old_action_values[name] = torch.tensor(self.memory[name].action_values).view(-1, 1, self.action_dim[name]).to(self.device)
+                    self.old_hiddens[name] = torch.tensor(self.memory[name].hidden_states[:-1]).view( -1, 1, self.hidden_size).to(self.device).detach() 
                     self.compute_rewards[name] = torch.tensor(self.memory[name].rewards[1:]).to(self.device).detach() 
                     
         
@@ -273,7 +273,7 @@ class PPO:
                 rewards.insert(0, discounted_reward) #插入列表
 
                 delta = reward + self.gamma*action_value_pre - value   # (1-is_terminal)*
-                advatage = delta  + self.gamma*self.lam*advatage # * (1-is_terminal)
+                advatage = delta  # + self.gamma*self.lam*advatage # * (1-is_terminal)
                 GAE_advantage.insert(0, advatage) #插入列表
                 target_value.insert(0,float(value + advatage))
                 action_value_pre = action_value
@@ -287,46 +287,63 @@ class PPO:
         return None
 
     def compute_grad_with_shared_data(self, share_data_dict):
-        old_states = torch.tensor(share_data_dict["old_state"]).view(-1,1,self.obs_shape).to(self.device)
+        # print(".keys-----------------",share_data_dict["leader"].keys())
+        # print("dict_size-----------------",len(share_data_dict["leader"]["old_hiddens"]))
+        self.old_states = torch.tensor(np.array(share_data_dict["old_states"])).view(-1,1,self.obs_shape).to(self.device)
         # torch.cat([self.old_states[:-1],
         #                         torch.tensor(share_data_dict["old_state"]).view(-1,1,self.obs_shape).to(self.device)
         #                         ], 0)
-
+        self.leader_action_behaviour = torch.tensor(np.array(share_data_dict["leader_action_behaviour"])).view(-1,1,1).to(self.device)
+        
         for name in self.agent_name_list:
-            self.old_hiddens = torch.tensor(share_data_dict["old_hidden"]).view(-1,1,self.hidden_size).to(self.device)
+            self.old_hiddens[name] = torch.tensor(np.array(share_data_dict[name]["old_hiddens"])).view(-1,1,self.hidden_size).to(self.device)
             # torch.cat([self.old_hiddens[name][:-1].reshape(-1,1,self.hidden_size),
             #                        torch.tensor(share_data_dict["old_hidden"]).view(-1,1,self.hidden_size).to(self.device)
             #                     ], 0)
-            self.old_logprobs = torch.tensor(share_data_dict["old_logprobs"]).view(-1,1,1).to(self.device)
+            self.old_logprobs[name] = torch.tensor(np.array(share_data_dict[name]["old_logprobs"])).view(-1,1,1).to(self.device)
             # torch.cat([self.old_logprobs[name][:-1],
             #                           torch.tensor(share_data_dict["old_logprobs"]).view(-1,1,1).to(self.device)
             #                     ], 0)
-            self.advantages = torch.tensor(share_data_dict["advantages"]).view(-1,1,1).to(self.device)
+            self.advantages[name] = torch.tensor(np.array(share_data_dict[name]["advantages"])).view(-1,1,1).to(self.device)
             # torch.cat([self.advantages[name].detach(),
             #                         torch.tensor(share_data_dict["advantages"]).view(-1,1,1).to(self.device)
             #                     ], 0)
-            self.target_value = torch.tensor(share_data_dict["target_value"]).view(-1,1,1).to(self.device)
+            self.target_value[name] = torch.tensor(np.array(share_data_dict[name]["target_value"])).view(-1,1,1).to(self.device)
             # torch.cat([self.target_value[name],
             #                         torch.tensor(share_data_dict["target_value"]).view(-1,1,1).to(self.device)
             #                     ], 0)
-
+            # print("share_data_dict[name]key------------------",share_data_dict[name].keys())#["action"]
+            self.old_actions[name] = torch.tensor(np.array(share_data_dict[name]["action"])).view(-1,1,self.action_dim[name]).to(self.device)
             batch_size = self.old_hiddens[name].size()[0]
-            
-            print("batch_size------------------",batch_size)
+            # print("old_actions_size-----------------",self.old_actions[name].size())
+            # print(self.old_states.size(),        
+            #       self.old_hiddens[name].size(),
+            #       self.old_actions[name].size(), #
+            #       self.old_logprobs[name].size(), 
+            #       self.advantages[name].size(), 
+            #       #self.old_values[name].size(),#
+            #       self.target_value[name].size(),
+            #       self.old_actions[name].size(),
+            #       self.leader_action_behaviour.size()
+            #       )
+            print("batch_size------------------",batch_size)#self.old_hiddens[name].size())
+            #return
+        
+        for name in self.agent_name_list:
             for _ in range(self.K_epochs):
                 batch_sample = batch_size#int(batch_size / self.K_epochs) # 
                 indices = torch.randint(batch_size, size=(batch_sample,), requires_grad=False)
-                old_states = self.old_states[indices]
-                old_hidden = self.old_hiddens[name].reshape(-1,1,self.hidden_size)[indices].view(1, -1, self.hidden_size)
-                old_logprobs = self.old_logprobs[name][indices]
-                advantages = self.advantages[name][indices].detach()
-                target_value = self.target_value[name][indices]
+                old_states = self.old_states#[indices]
+                old_hidden = self.old_hiddens[name].view(1, -1, self.hidden_size)#.reshape(-1,1,self.hidden_size)[indices].view(1, -1, self.hidden_size)
+                old_logprobs = self.old_logprobs[name]#[indices]
+                advantages = self.advantages[name]#[indices].detach()
+                target_value = self.target_value[name]#[indices]
 
-
+                # print("start------inference")#self.old_hiddens[name].size())
                 logprobs, action_value, _, _, entropy = self.actor[name](old_states, old_hidden, 
-                                                                self.old_actions["leader"][indices], 
-                                                                self.old_actions["follower"][indices],
-                                                                self.leader_action_behaviour[indices], train = True)
+                                                                self.old_actions["leader"], 
+                                                                self.old_actions["follower"],
+                                                                self.leader_action_behaviour, train = True)
         
                 ratios = torch.exp(logprobs.view(batch_sample,1,-1) - old_logprobs.detach())
 
@@ -381,7 +398,8 @@ class PPO:
 
     def get_share_data_dict(self):
         share_data_dict = {
-                    "old_states" : list(self.old_states.cpu().numpy()),
+                    "old_states" : list(self.old_states[:-1].cpu().numpy()),
+                    "leader_action_behaviour":list(self.leader_action_behaviour[:-1].cpu().numpy()),
                     "leader":{},
                     "follower":{}
                     }
@@ -391,7 +409,8 @@ class PPO:
             share_data_dict[name]["old_logprobs"] = list(self.old_logprobs[name][:-1].cpu().numpy())
             share_data_dict[name]["advantages"] = list(self.advantages[name].cpu().numpy())
             share_data_dict[name]["target_value"] = list(self.target_value[name].cpu().numpy())
-
+            share_data_dict[name]["action"] =  list(self.old_actions[name][:-1].cpu().numpy())
+            # print(name," len(self.old_actions[name]) ",len(share_data_dict[name]["action"]))
         return share_data_dict
 
     def reset(self):

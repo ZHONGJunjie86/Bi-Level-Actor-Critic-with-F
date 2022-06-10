@@ -1,0 +1,57 @@
+2022-06-10 14:34:20,281 INFO    MainThread:20960 [internal.py:wandb_internal():90] W&B internal server running at pid: 20960, started at: 2022-06-10 14:34:20.281336
+2022-06-10 14:34:20,291 INFO    WriterThread:20960 [datastore.py:open_for_write():75] open: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/run-1ovm485o.wandb
+2022-06-10 14:34:20,298 DEBUG   SenderThread:20960 [sender.py:send():232] send: header
+2022-06-10 14:34:20,299 DEBUG   SenderThread:20960 [sender.py:send():232] send: run
+2022-06-10 14:34:20,535 DEBUG   HandlerThread:20960 [handler.py:handle_request():141] handle_request: check_version
+2022-06-10 14:34:20,538 INFO    SenderThread:20960 [dir_watcher.py:__init__():197] watching files in: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files
+2022-06-10 14:34:20,538 INFO    SenderThread:20960 [sender.py:_start_run_threads():811] run started: 1ovm485o with start time 1654839257
+2022-06-10 14:34:20,538 DEBUG   SenderThread:20960 [sender.py:send():232] send: summary
+2022-06-10 14:34:20,539 INFO    SenderThread:20960 [sender.py:_save_file():948] saving file wandb-summary.json with policy end
+2022-06-10 14:34:20,540 DEBUG   SenderThread:20960 [sender.py:send_request():246] send_request: check_version
+2022-06-10 14:34:20,625 DEBUG   HandlerThread:20960 [handler.py:handle_request():141] handle_request: run_start
+2022-06-10 14:34:20,636 DEBUG   HandlerThread:20960 [meta.py:__init__():35] meta init
+2022-06-10 14:34:20,636 DEBUG   HandlerThread:20960 [meta.py:__init__():49] meta init done
+2022-06-10 14:34:20,636 DEBUG   HandlerThread:20960 [meta.py:probe():209] probe
+2022-06-10 14:34:20,644 DEBUG   HandlerThread:20960 [meta.py:_setup_git():199] setup git
+2022-06-10 14:34:20,669 DEBUG   HandlerThread:20960 [meta.py:_setup_git():206] setup git done
+2022-06-10 14:34:20,670 DEBUG   HandlerThread:20960 [meta.py:_save_pip():53] save pip
+2022-06-10 14:34:20,672 DEBUG   HandlerThread:20960 [meta.py:_save_pip():67] save pip done
+2022-06-10 14:34:20,672 DEBUG   HandlerThread:20960 [meta.py:_save_conda():74] save conda
+2022-06-10 14:34:21,552 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/wandb-summary.json
+2022-06-10 14:34:21,553 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/conda-environment.yaml
+2022-06-10 14:34:21,553 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/requirements.txt
+2022-06-10 14:34:23,706 DEBUG   HandlerThread:20960 [meta.py:_save_conda():84] save conda done
+2022-06-10 14:34:23,706 DEBUG   HandlerThread:20960 [meta.py:probe():247] probe done
+2022-06-10 14:34:23,722 DEBUG   SenderThread:20960 [sender.py:send():232] send: files
+2022-06-10 14:34:23,723 INFO    SenderThread:20960 [sender.py:_save_file():948] saving file wandb-metadata.json with policy now
+2022-06-10 14:34:23,749 DEBUG   HandlerThread:20960 [handler.py:handle_request():141] handle_request: stop_status
+2022-06-10 14:34:23,750 DEBUG   SenderThread:20960 [sender.py:send_request():246] send_request: stop_status
+2022-06-10 14:34:23,940 DEBUG   SenderThread:20960 [sender.py:send():232] send: telemetry
+2022-06-10 14:34:24,412 INFO    Thread-17 :20960 [upload_job.py:push():132] Uploaded file /tmp/tmp9fyife22wandb/1zecktwp-wandb-metadata.json
+2022-06-10 14:34:24,558 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/conda-environment.yaml
+2022-06-10 14:34:24,559 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/output.log
+2022-06-10 14:34:24,560 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/wandb-metadata.json
+2022-06-10 14:34:26,560 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/output.log
+2022-06-10 14:34:36,569 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/output.log
+2022-06-10 14:34:38,970 DEBUG   HandlerThread:20960 [handler.py:handle_request():141] handle_request: stop_status
+2022-06-10 14:34:38,971 DEBUG   SenderThread:20960 [sender.py:send_request():246] send_request: stop_status
+2022-06-10 14:34:44,419 DEBUG   HandlerThread:20960 [handler.py:handle_request():141] handle_request: partial_history
+2022-06-10 14:34:44,428 DEBUG   SenderThread:20960 [sender.py:send():232] send: history
+2022-06-10 14:34:44,430 DEBUG   SenderThread:20960 [sender.py:send():232] send: summary
+2022-06-10 14:34:44,452 INFO    SenderThread:20960 [sender.py:_save_file():948] saving file wandb-summary.json with policy end
+2022-06-10 14:34:44,578 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/wandb-summary.json
+2022-06-10 14:34:46,580 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/output.log
+2022-06-10 14:34:50,509 DEBUG   SenderThread:20960 [sender.py:send():232] send: stats
+2022-06-10 14:34:51,584 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/config.yaml
+2022-06-10 14:34:54,158 DEBUG   HandlerThread:20960 [handler.py:handle_request():141] handle_request: stop_status
+2022-06-10 14:34:54,159 DEBUG   SenderThread:20960 [sender.py:send_request():246] send_request: stop_status
+2022-06-10 14:34:56,590 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/output.log
+2022-06-10 14:35:04,470 DEBUG   HandlerThread:20960 [handler.py:handle_request():141] handle_request: partial_history
+2022-06-10 14:35:04,473 DEBUG   SenderThread:20960 [sender.py:send():232] send: history
+2022-06-10 14:35:04,474 DEBUG   SenderThread:20960 [sender.py:send():232] send: summary
+2022-06-10 14:35:04,488 INFO    SenderThread:20960 [sender.py:_save_file():948] saving file wandb-summary.json with policy end
+2022-06-10 14:35:04,597 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/wandb-summary.json
+2022-06-10 14:35:06,599 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/output.log
+2022-06-10 14:35:09,349 DEBUG   HandlerThread:20960 [handler.py:handle_request():141] handle_request: stop_status
+2022-06-10 14:35:09,350 DEBUG   SenderThread:20960 [sender.py:send_request():246] send_request: stop_status
+2022-06-10 14:35:16,609 INFO    Thread-13 :20960 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_143417-1ovm485o/files/output.log

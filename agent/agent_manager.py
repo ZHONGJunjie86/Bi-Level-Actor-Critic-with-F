@@ -1,8 +1,10 @@
 from torch import ctc_loss
 from algorithm.DPPO import PPO
 import copy 
+import collections
 
-
+    
+    
 class Agents2Env:
     def __init__(self, agent_name_list, obs_shape, 
                        device, main_device, 
@@ -40,7 +42,7 @@ class Agents2Env:
 
     def quick_load_model(self, model_dic):
         for agent in self.agents.values():
-            agent.quick_load_model(model_dic)
+            agent.quick_load_model(copy.deepcopy(model_dic))
                 
 
     def save_model(self):
@@ -80,36 +82,29 @@ class Agents2Env:
                 "adversary": copy.deepcopy(self.agents['adversary_0'].get_actor())}
 
     def get_data_dict(self):
-        share_data_dict = {"agent":{}, "adversary":{}}
-        for name in ["leader", "follower","old_states"]:
+        share_data_dict = {"agent":{"old_states":[],"leader_action_behaviour":[]},  
+                           "adversary":{"old_states":[],"leader_action_behaviour":[]}}
+        for name in ["leader", "follower"]:
             share_data_dict["agent"][name] = {}
             share_data_dict["adversary"][name] = {}
-
+        
         for agent in self.agents.values():
             agent_dict = agent.get_share_data_dict()  
             agent_type = agent.agent_type
-
-            if len(share_data_dict[agent_type]["old_states"])!=0:
-                share_data_dict[agent_type]["old_states"].extend(agent_dict["old_states"])
-                for name in ["leader", "follower"]:
-                    for key in share_data_dict[agent_type][name].keys():
-                        if key == "old_states":
-                            continue
-                        else:
-                            share_data_dict[agent_type][name][key].extend(agent_dict[name][key])
-            else:
-                share_data_dict[agent_type]["old_states"] = agent_dict["old_states"]
-                for name in ["leader", "follower"]:
-                    for key in share_data_dict[agent_type][name].keys():
-                        if key == "old_states":
-                            continue
-                        else:
-                            share_data_dict[agent_type][name] = {}
-                            share_data_dict[agent_type][name][key] = agent_dict[name][key]
+            
+            share_data_dict[agent_type]["old_states"].extend(agent_dict["old_states"])
+            share_data_dict[agent_type]["leader_action_behaviour"].extend(agent_dict["leader_action_behaviour"])
+            
+            for name in ["leader", "follower"]:
+                for key in agent_dict[name].keys():
+                    if key not in share_data_dict[agent_type][name]:
+                        share_data_dict[agent_type][name][key] = agent_dict[name][key]
+                    else:
+                        share_data_dict[agent_type][name][key].extend(agent_dict[name][key])
 
         return copy.deepcopy(share_data_dict)
     
-    def update_with_share_data(self, data_dict):
+    def update_with_share_data(self, data_dict):       
         # self.agents['agent_0'].compute_grad_with_shared_data(data_dict['agent'])
-        self.agents['adversary_0'].compute_grad_with_shared_data(data_dict['adversary'])
-
+        self.agents['adversary_0'].compute_grad_with_shared_data(copy.deepcopy(data_dict['adversary']))
+    

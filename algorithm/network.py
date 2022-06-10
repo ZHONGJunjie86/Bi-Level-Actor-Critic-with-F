@@ -71,7 +71,9 @@ class ActorCritic(nn.Module):
                 leader_behaviour = None, train = False): 
         # share info
         batch_size = obs.size()[0]
-
+        
+        # if train:
+        #     print("obs.size(),leader_action.size(),follower_action.size()--------",obs.size(),leader_action.size(),follower_action.size())
         if self.name == "follower":
             obs = torch.cat([obs.view(batch_size, 1, -1), 
                                          leader_action.reshape(batch_size, 1, self.leader_action_dim)  # + 0.001
@@ -80,15 +82,21 @@ class ActorCritic(nn.Module):
             obs = torch.cat([obs.view(batch_size, 1, -1), leader_action.reshape(batch_size, 1, self.leader_action_dim), 
                                   follower_action.reshape(batch_size, 1, self.follower_action_dim)], -1
                                   ).view(batch_size, -1)
-        
+        # if train:
+        #     print("after cat---------")
         x = F.relu(self.linear1(obs))
         # print("self.linear1---", x)
         x = x.view(batch_size, 1, -1)
+        # if train:
+        #     print("after fc---------")
         x = self.self_attention(x,x,x)[0] + x
         # print("self.self_attention", x)
+        # if train:
+        #     print("after attebtion---------")
         x,h_state = self.gru(x, h_old.detach())
         # print("self.gru---",x)
-
+        # if train:
+        #     print("after gru---------")
         # actor
         if self.name == "follower":
             # print("follower x----------", x)
@@ -105,6 +113,9 @@ class ActorCritic(nn.Module):
         elif self.name == "leader":
             logits = self.softmax(self.linear_leader_logits(x))
             dis =  self.categorical_dis(logits.reshape(batch_size, 1, self.leader_action_dim))
+            
+            # if train:
+            #     print("after categorical---------")
             if train:
                 action = leader_behaviour.view(batch_size,-1)
             else:
@@ -123,6 +134,6 @@ class ActorCritic(nn.Module):
             action_value = self.linear_critic_2(x)
         elif self.name == "leader":
             x = F.relu(self.linear_critic_1(x.view(batch_size, -1)))
-            action_value = self.linear_critic_2(x).clip(-5, 5)
+            action_value = self.linear_critic_2(x)
 
         return selected_log_prob, action_value.reshape(batch_size,1,1), action, h_state.detach().data, entropy 

@@ -1,0 +1,41 @@
+2022-06-10 14:19:25,707 INFO    MainThread:9593 [internal.py:wandb_internal():90] W&B internal server running at pid: 9593, started at: 2022-06-10 14:19:25.706289
+2022-06-10 14:19:25,721 INFO    WriterThread:9593 [datastore.py:open_for_write():75] open: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/run-3ksiexpk.wandb
+2022-06-10 14:19:25,727 DEBUG   SenderThread:9593 [sender.py:send():232] send: header
+2022-06-10 14:19:25,727 DEBUG   SenderThread:9593 [sender.py:send():232] send: run
+2022-06-10 14:19:26,065 DEBUG   HandlerThread:9593 [handler.py:handle_request():141] handle_request: check_version
+2022-06-10 14:19:26,072 INFO    SenderThread:9593 [dir_watcher.py:__init__():197] watching files in: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files
+2022-06-10 14:19:26,072 INFO    SenderThread:9593 [sender.py:_start_run_threads():811] run started: 3ksiexpk with start time 1654838363
+2022-06-10 14:19:26,072 DEBUG   SenderThread:9593 [sender.py:send():232] send: summary
+2022-06-10 14:19:26,073 INFO    SenderThread:9593 [sender.py:_save_file():948] saving file wandb-summary.json with policy end
+2022-06-10 14:19:26,074 DEBUG   SenderThread:9593 [sender.py:send_request():246] send_request: check_version
+2022-06-10 14:19:26,147 DEBUG   HandlerThread:9593 [handler.py:handle_request():141] handle_request: run_start
+2022-06-10 14:19:26,165 DEBUG   HandlerThread:9593 [meta.py:__init__():35] meta init
+2022-06-10 14:19:26,165 DEBUG   HandlerThread:9593 [meta.py:__init__():49] meta init done
+2022-06-10 14:19:26,166 DEBUG   HandlerThread:9593 [meta.py:probe():209] probe
+2022-06-10 14:19:26,177 DEBUG   HandlerThread:9593 [meta.py:_setup_git():199] setup git
+2022-06-10 14:19:26,207 DEBUG   HandlerThread:9593 [meta.py:_setup_git():206] setup git done
+2022-06-10 14:19:26,207 DEBUG   HandlerThread:9593 [meta.py:_save_pip():53] save pip
+2022-06-10 14:19:26,210 DEBUG   HandlerThread:9593 [meta.py:_save_pip():67] save pip done
+2022-06-10 14:19:26,210 DEBUG   HandlerThread:9593 [meta.py:_save_conda():74] save conda
+2022-06-10 14:19:27,085 INFO    Thread-13 :9593 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files/requirements.txt
+2022-06-10 14:19:27,086 INFO    Thread-13 :9593 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files/wandb-summary.json
+2022-06-10 14:19:27,086 INFO    Thread-13 :9593 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files/conda-environment.yaml
+2022-06-10 14:19:29,429 DEBUG   HandlerThread:9593 [meta.py:_save_conda():84] save conda done
+2022-06-10 14:19:29,430 DEBUG   HandlerThread:9593 [meta.py:probe():247] probe done
+2022-06-10 14:19:29,446 DEBUG   SenderThread:9593 [sender.py:send():232] send: files
+2022-06-10 14:19:29,447 INFO    SenderThread:9593 [sender.py:_save_file():948] saving file wandb-metadata.json with policy now
+2022-06-10 14:19:29,472 DEBUG   HandlerThread:9593 [handler.py:handle_request():141] handle_request: stop_status
+2022-06-10 14:19:29,473 DEBUG   SenderThread:9593 [sender.py:send_request():246] send_request: stop_status
+2022-06-10 14:19:29,675 DEBUG   SenderThread:9593 [sender.py:send():232] send: telemetry
+2022-06-10 14:19:30,076 INFO    Thread-13 :9593 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files/conda-environment.yaml
+2022-06-10 14:19:30,077 INFO    Thread-13 :9593 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files/output.log
+2022-06-10 14:19:30,078 INFO    Thread-13 :9593 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files/wandb-metadata.json
+2022-06-10 14:19:30,092 INFO    Thread-17 :9593 [upload_job.py:push():132] Uploaded file /tmp/tmpm7nh4gb_wandb/1g4ia2ac-wandb-metadata.json
+2022-06-10 14:19:32,078 INFO    Thread-13 :9593 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files/output.log
+2022-06-10 14:19:40,086 INFO    Thread-13 :9593 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files/output.log
+2022-06-10 14:19:44,677 DEBUG   HandlerThread:9593 [handler.py:handle_request():141] handle_request: stop_status
+2022-06-10 14:19:44,678 DEBUG   SenderThread:9593 [sender.py:send_request():246] send_request: stop_status
+2022-06-10 14:19:50,097 INFO    Thread-13 :9593 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files/output.log
+2022-06-10 14:19:56,109 DEBUG   SenderThread:9593 [sender.py:send():232] send: stats
+2022-06-10 14:19:56,127 INFO    Thread-13 :9593 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220610_141923-3ksiexpk/files/config.yaml
+2022-06-10 14:20:27,663 DEBUG   SenderThread:9593 [sender.py:send():232] send: stats
