@@ -18,20 +18,26 @@ def step(rank, shared_data, args, device, builder):
     if rank == 0:
         print("rank ", rank)
         if args.load_model:
-            agents.load_model()
-        agents.save_model()
-        shared_data.save(agents.get_actor())
+            shared_data.load()
+        
+        shared_data.shared_lock.acquire()
+        agents.quick_load_model(shared_data.model_dict)
+        shared_data.shared_lock.release()
+        
+        shared_data.event.set()
+        shared_data.event.clear()
         
         wandb.init(project="Bi-Level-Actor-Critic-with-F", entity="zhongjunjie")
         wandb.config = {
         "learning_rate": 0.0003,
         }
-        shared_data.event.set()
-        shared_data.event.clear()
     else:
         shared_data.event.wait()
+        shared_data.shared_lock.acquire()
+        agents.quick_load_model(shared_data.model_dict)
+        shared_data.shared_lock.release()
         print("rank ", rank)
-
+        
     RENDER = True#args.render #
 
     total_step_reward = collections.defaultdict(float)
@@ -40,10 +46,6 @@ def step(rank, shared_data, args, device, builder):
     while episode < args.max_episodes:
         if rank == 0:
             print("-----------------Episode: ", episode)
-        
-        shared_data.shared_lock.acquire()
-        agents.quick_load_model(copy.deepcopy(shared_data.model_dict))
-        shared_data.shared_lock.release()
         
         step = 0
         states = env.reset()
@@ -100,8 +102,7 @@ def step(rank, shared_data, args, device, builder):
                 episode += 1
                 if rank == 0:
                     if episode % 10 == 0:
-                        agents.save_model()
-                    shared_data.save(agents.get_actor())
+                        shared_data.save()
                     
                 break
 

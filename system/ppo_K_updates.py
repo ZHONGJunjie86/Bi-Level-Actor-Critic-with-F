@@ -33,7 +33,7 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
                 training_time = args.K_epochs
             
             shared_data.shared_count.value = 0
-            agents.quick_load_model(copy.deepcopy(shared_data.model_dict))
+            agents.quick_load_model(shared_data.model_dict) # must shallow copy
             shared_data.shared_lock.release()
             
             
@@ -69,7 +69,7 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
 
             # load new model
             shared_data.shared_lock.acquire()
-            agents.quick_load_model(copy.deepcopy(shared_data.model_dict))
+            agents.quick_load_model(shared_data.model_dict) # must shallow copy
             shared_data.shared_lock.release()
 
             training_time += 1

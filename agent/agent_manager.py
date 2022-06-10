@@ -42,7 +42,7 @@ class Agents2Env:
 
     def quick_load_model(self, model_dic):
         for agent in self.agents.values():
-            agent.quick_load_model(copy.deepcopy(model_dic))
+            agent.quick_load_model(model_dic) # must shallow copy
                 
 
     def save_model(self):

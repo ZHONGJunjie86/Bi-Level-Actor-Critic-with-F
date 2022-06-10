@@ -1,10 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.multiprocessing as mp
-from wandb import agent
 from config.config import agent_type_list, obs_shape_by_type, args
 import copy
 import numpy as np
+import os
+import sys
+
+
 
 
 class Shared_grad_buffers(nn.Module):
@@ -88,13 +91,24 @@ class Shared_Data(): #nn.Module
             for name in ["leader", "follower"]:
                 self.shared_model[agent_type][name].reset()
 
-    def save(self, new_model_dict):
+    def save(self):
         for agent_type in agent_type_list:
             for name in ["leader", "follower"]:
-                self.model_dict[agent_type][name].load_state_dict(
-                new_model_dict[agent_type][name].state_dict())
+                model_actor_path = self.save_path[agent_type] + agent_type  + name + ".pth"
+                torch.save(self.model_dict[agent_type][name].state_dict(), model_actor_path)
 
-
+    def load(self):
+        for agent_type in agent_type_list:
+            for name in self.agent_name_list:
+                model_actor_path = self.load_path[agent_type]+ agent_type  + name + ".pth"
+                #print(f'Actor path: {model_actor_path}')
+                if  os.path.exists(model_actor_path):
+                    actor = torch.load(model_actor_path, map_location=self.device)
+                    self.model_dict[agent_type][name].load_state_dict(actor)
+                    #print("Model loaded!")
+                else:
+                    sys.exit(f'Model not founded!')    
+    
     def update_share_data(self, dict):
         for agent_type in agent_type_list:
             self.share_training_data[agent_type]["leader_action_behaviour"].extend(dict[agent_type]["leader_action_behaviour"])
