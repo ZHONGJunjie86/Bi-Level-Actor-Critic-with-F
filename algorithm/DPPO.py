@@ -13,7 +13,7 @@ from algorithm.network import ActorCritic
 from algorithm.utils import Memory
 import torch.nn.functional as F
 import copy
-torch.set_default_tensor_type(torch.DoubleTensor)
+# torch.set_default_tensor_type(torch.DoubleTensor)
 
 
 class PPO:
@@ -121,7 +121,7 @@ class PPO:
                                             self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
                                                                 torch.tensor(leader_action).detach().to(self.device), 
                                                                 follower_action.detach().to(self.device))
-            value_dic["leader"] += leader_action_value
+            value_dic["leader"] =  value_dic["leader"] + leader_action_value
         # v = mean(Q)
         value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
         
@@ -273,7 +273,7 @@ class PPO:
                 rewards.insert(0, discounted_reward) #插入列表
 
                 delta = reward + self.gamma*action_value_pre - value   # (1-is_terminal)*
-                advatage = delta  # + self.gamma*self.lam*advatage # * (1-is_terminal)
+                advatage = delta # + self.gamma*self.lam*advatage # * (1-is_terminal)
                 GAE_advantage.insert(0, advatage) #插入列表
                 target_value.insert(0,float(value + advatage))
                 action_value_pre = action_value

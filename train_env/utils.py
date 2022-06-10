@@ -1,6 +1,6 @@
 import math
-min_dis = 0.5 # max_all_adv_reward = 0.15
-max_reward = 0.01
+min_dis = 0.8 # max_all_adv_reward = 0.15
+max_reward = 0.02
 
 def compute_dis(my_pos, other_pos):
     return other_pos[0]**2 + other_pos[1]**2# (my_pos[0] - other_pos[0])**2 + (my_pos[1] - other_pos[1])**2

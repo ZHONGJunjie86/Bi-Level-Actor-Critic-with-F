@@ -6,7 +6,7 @@ import copy
 import numpy as np
 import os
 import sys
-
+# torch.set_default_tensor_type(torch.DoubleTensor)
 
 
 
@@ -39,15 +39,12 @@ class Shared_Data(): #nn.Module
         self.shared_lock = mp.Manager().Lock()
         self.event = mp.Event()
         self.shared_count = mp.Value("d", 0)
-        self.list_1 = mp.Manager().list()
-        self.list_2 = mp.Manager().list()
-        self.loss = mp.Manager().dict(
-            {"a_loss": self.list_1, "c_loss": self.list_2})
         self.agent_name_list = ["leader", "follower"]
         self.device = main_device
         self.obs_shape = obs_shape_by_type
         self.hidden_size = 64
         self.action_dim = {"leader":5, "follower":1}
+        self.clip = 0.2
         
         
         
@@ -81,7 +78,7 @@ class Shared_Data(): #nn.Module
                 self.share_training_data[agent_type][name]["old_hiddens"] = mp.Manager().list([])
                 self.share_training_data[agent_type][name]["old_logprobs"] = mp.Manager().list([])
                 self.share_training_data[agent_type][name]["advantages"] = mp.Manager().list([])
-                self.share_training_data[agent_type][name]["target_value"] = mp.Manager().list([])
+                self.share_training_data[agent_type][name]["target_value"] =  mp.Manager().list([])
                 self.share_training_data[agent_type][name]["action"] = mp.Manager().list([])
         # self.share_training_data = mp.Manager().dict(self.share_training_data)
         # print("self.share_training_data",self.share_training_data)
@@ -238,7 +235,7 @@ class Shared_Data(): #nn.Module
                     ratios = torch.exp(logprobs.view(batch_sample,1,-1) - old_logprobs.detach())
 
                     surr1 = ratios*advantages
-                    surr2 = torch.clamp(ratios, 1-0.1, 1+0.1)*advantages 
+                    surr2 = torch.clamp(ratios, 1-self.clip, 1+self.clip)*advantages 
                     #Dual_Clip
                     surr3 = torch.max(torch.min(surr1, surr2),3*advantages)
                     #torch.min(surr1, surr2)#
@@ -249,7 +246,7 @@ class Shared_Data(): #nn.Module
                     # critic_loss1 = (action_value - target_value.detach()).pow(2)
                     # critic_loss2 = (value_pred_clip - target_value.detach()).pow(2)
                     # critic_loss = 0.5 * torch.max(critic_loss1 , critic_loss2).mean()
-                    critic_loss = torch.nn.SmoothL1Loss()(action_value, target_value) 
+                    critic_loss = torch.nn.SmoothL1Loss()(action_value, target_value) #(action_value - target_value).pow(2).mean()#
 
                     actor_loss = -surr3.mean() - 0.01 * entropy + 0.5 * critic_loss
                     # print("start------actor_loss",actor_loss)
@@ -259,7 +256,7 @@ class Shared_Data(): #nn.Module
                     actor_loss.backward()
                     self.actor_optimizer[agent_type][name].step()
 
-                    self.loss_dic[agent_type]['a_loss'][name] += float(actor_loss.cpu().detach().numpy())
+                    self.loss_dic[agent_type]['a_loss'][name] += float(surr3.mean().cpu().detach().numpy())
                     self.loss_dic[agent_type]['c_loss'][name] += float(critic_loss.cpu().detach().numpy())
                     self.loss_dic[agent_type]['entropy'][name] += float(entropy.cpu().detach().numpy())
 

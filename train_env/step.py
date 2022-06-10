@@ -20,17 +20,14 @@ def step(rank, shared_data, args, device, builder):
         if args.load_model:
             shared_data.load()
         
-        shared_data.shared_lock.acquire()
         agents.quick_load_model(shared_data.model_dict)
-        shared_data.shared_lock.release()
-        
-        shared_data.event.set()
-        shared_data.event.clear()
-        
         wandb.init(project="Bi-Level-Actor-Critic-with-F", entity="zhongjunjie")
         wandb.config = {
         "learning_rate": 0.0003,
-        }
+        }  # waiting for all event.wait() and start them
+        shared_data.event.set()
+        shared_data.event.clear()
+        
     else:
         shared_data.event.wait()
         shared_data.shared_lock.acquire()
@@ -84,15 +81,15 @@ def step(rank, shared_data, args, device, builder):
             step += 1
             if RENDER and rank == 0 and episode % 10 == 0:
                 env.render()
+                time.sleep(0.1)
             ################################# env rollout ##########################################
             # ================================== collect data & update ========================================
             if True in dones.values():
                 if rank == 0:
-                    print("Episode: ", episode)
+                    print("Episode ", episode, " over ")
 
                 loss_dict = K_epochs_PPO_training(rank, args, episode, shared_data, agents)
                 
-                # print("loss_dict",loss_dict)
                 if rank == 0:
                     send_curve_data(loss_dict, total_step_reward, agent_type_list)
                 

@@ -27,7 +27,9 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
                 # add
                 shared_data.update_share_data(copy.deepcopy(agents.get_data_dict()))
                 # update
+                # print("---------------------------center training!") 
                 loss_dict = shared_data.train()
+                # print("---------------------------center training over!")
                 # agents.update_with_share_data(copy.deepcopy(shared_data.share_training_data))
                 shared_data.reset_share_data()
                 training_time = args.K_epochs
@@ -35,6 +37,7 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
             shared_data.shared_count.value = 0
             agents.quick_load_model(shared_data.model_dict) # must shallow copy
             shared_data.shared_lock.release()
+            # print("---------------------------center loading over!")
             
             
             shared_data.event.set()
@@ -50,8 +53,9 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
         # workers
         training_time = 0
         while training_time < args.K_epochs:
+            # print("---------------------------worker computing!")
             agents.compute_loss(training_time)
-
+            # print("---------------------------worker computing over!")
             # add
             if args.share_grad == 1:
                 shared_data.shared_lock.acquire()
@@ -60,6 +64,7 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
                 shared_data.shared_lock.acquire()
                 shared_data.update_share_data(copy.deepcopy(agents.get_data_dict()))
                 training_time = args.K_epochs
+                # print("---------------------------worker updating over!")
                 
             shared_data.shared_count.value += 1
             shared_data.shared_lock.release()
@@ -71,6 +76,7 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
             shared_data.shared_lock.acquire()
             agents.quick_load_model(shared_data.model_dict) # must shallow copy
             shared_data.shared_lock.release()
+            # print("---------------------------worker loading over!")
 
             training_time += 1
-        return 0
+        return {}

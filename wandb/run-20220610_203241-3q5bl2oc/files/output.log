@@ -1,0 +1,132 @@
+
+-----------------Episode:  0
+/home/j-zhong/anaconda3/lib/python3.8/site-packages/pyglet/window/__init__.py:667: UserWarning:
+Your graphics drivers do not support OpenGL 2.0.
+You may experience rendering issues or crashes.
+Mesa project: www.mesa3d.org
+Mesa GLX Indirect
+1.3 Mesa 4.0.4
+  warnings.warn(message)
+/home/j-zhong/anaconda3/lib/python3.8/site-packages/torch/nn/modules/rnn.py:739: UserWarning: RNN module weights are not part of single contiguous chunk of memory. This means they need to be compacted at every call, possibly greatly increasing memory usage. To compact weights again call flatten_parameters(). (Triggered internally at  /pytorch/aten/src/ATen/native/cudnn/RNN.cpp:775.)
+  result = _VF.gru(input, hx, self._flat_weights, self.bias, self.num_layers,
+/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/algorithm/DPPO.py:93: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  torch.tensor(follower_action).detach().to(self.device))
+Episode  0  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  1
+Episode  1  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  2
+Episode  2  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  3
+Episode  3  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  4
+Episode  4  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  5
+Episode  5  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  6
+Episode  6  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  7
+Episode  7  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  8
+Episode  8  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  9
+Episode  9  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  10
+Episode  10  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  11
+Episode  11  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  12
+Episode  12  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  13
+Episode  13  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  14
+Episode  14  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  15
+Episode  15  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  16
+Episode  16  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  17
+Episode  17  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  18
+Episode  18  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  19
+Episode  19  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  20
+Episode  20  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  21
+Episode  21  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  22
+Episode  22  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  23
+Episode  23  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  24
+Episode  24  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  25
+Episode  25  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  26
+Episode  26  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  27
+Episode  27  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  28
+Episode  28  over
+---------------------------training!
+batch_size------------------ 149
+-----------------Episode:  29
+Episode  29  over
+---------------------------training!
+batch_size------------------ 149
