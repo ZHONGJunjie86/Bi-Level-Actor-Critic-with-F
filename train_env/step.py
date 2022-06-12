@@ -68,15 +68,14 @@ def step(rank, shared_data, args, device, builder):
                 else: reward = rewards[agent_name]/10  + distance_reward_dict[agent_name]
                 total_step_reward[agent_name] += reward
 
-                if True not in dones.values():
-                    action = agents.get_action(states[agent_name], 
-                                               reward, dones[agent_name], agent_name)
-                    if "agent" in agent_name:
-                        actions[agent_name] = 0
-                    else:
-                        actions[agent_name] = action
-                    # actions[agent_name] = action
-            
+                action = agents.get_action(states[agent_name], 
+                                            reward, dones[agent_name], agent_name)
+                if "agent" in agent_name:
+                    actions[agent_name] = 0
+                else:
+                    actions[agent_name] = action
+                # actions[agent_name] = action
+        
             states, rewards, dones, infos = env.step(actions)
             step += 1
             if RENDER and rank == 0 and episode % 10 == 0:
@@ -85,6 +84,14 @@ def step(rank, shared_data, args, device, builder):
             ################################# env rollout ##########################################
             # ================================== collect data & update ========================================
             if True in dones.values():
+                # last_reward
+                for agent_name in agents.agents.keys():
+                    if "agent" in agent_name:reward = rewards[agent_name]/100
+                    else: reward = rewards[agent_name]/10  + distance_reward_dict[agent_name]
+                    total_step_reward[agent_name] += reward
+                    agents.last_reward(reward, dones[agent_name], agent_name)
+                
+                # train
                 if rank == 0:
                     print("Episode ", episode, " over ")
 

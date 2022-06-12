@@ -260,7 +260,7 @@ class PPO:
             GAE_advantage = [] #self.memory[name].action_values[-1] - self.memory[name].values[-1]
             target_value = []  
             #
-            discounted_reward = compute_rewards[-1]
+            discounted_reward = float(compute_rewards[-1])
             action_value_pre = self.memory[name].action_values[-1]
             value_pre = self.memory[name].values[-1]
             advatage = self.memory[name].action_values[-1] - self.memory[name].values[-1]
@@ -276,7 +276,7 @@ class PPO:
                 reward = reward.numpy()
                 is_terminal = is_terminal.numpy()
 
-                discounted_reward = reward +  self.gamma *discounted_reward
+                discounted_reward = float(reward) +  self.gamma *discounted_reward
                 rewards.insert(0, discounted_reward) #插入列表
 
                 delta = reward + self.gamma*action_value_pre - value   # (1-is_terminal)*
@@ -431,6 +431,12 @@ class PPO:
             share_data_dict[name]["action"] =  list(self.old_actions[name][:-1].numpy())
             # print(name," len(self.old_actions[name]) ",len(share_data_dict[name]["action"]))
         return share_data_dict
+
+    def last_reward(self, reward, done):
+        self.memory["leader"].is_terminals.append(done)
+        self.memory["leader"].rewards.append(reward)
+        self.memory["follower"].rewards.append(self.compute_follower_reward(reward,0,0))
+            
 
     def reset(self):
         

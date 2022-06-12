@@ -35,6 +35,9 @@ class Agents2Env:
 
     def get_action(self, state, reward, done, agent_name):
         return self.agents[agent_name].choose_action(state, reward, done)
+    
+    def last_reward(self, reward, done, agent_name):
+        self.agents[agent_name].last_reward(reward, done)
 
     def load_model(self):
         for agent in self.agents.values():
