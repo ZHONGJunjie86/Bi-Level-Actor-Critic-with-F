@@ -44,8 +44,11 @@ class Shared_Data(): #nn.Module
         self.obs_shape = obs_shape_by_type
         self.hidden_size = 64
         self.action_dim = {"leader":5, "follower":1}
-        self.clip = 0.2
-        
+        self.clip = args.clip
+        self.a_lr = args.a_lr
+        self.episode = 1
+        self.min_lr = args.min_lr
+        self.lr_decay = args.lr_decay
         
         
         self.model_dict = model_dict
@@ -64,7 +67,7 @@ class Shared_Data(): #nn.Module
                     main_device, agent_type, name).share_memory()
                 self.actor_optimizer[agent_type][name] = \
                     torch.optim.Adam(self.model_dict[agent_type][name].parameters(),
-                                                          lr=args.a_lr)
+                                                          lr=self.a_lr)
         
 
         # share training data
@@ -108,6 +111,8 @@ class Shared_Data(): #nn.Module
     
     def update_share_data(self, dict):
         for agent_type in agent_type_list:
+            # if agent_type=="adversary":
+            #     print("sum in center-----------",sum(dict[agent_type]["old_states"]))
             self.share_training_data[agent_type]["leader_action_behaviour"].extend(dict[agent_type]["leader_action_behaviour"])
             self.share_training_data[agent_type]["old_states"].extend(dict[agent_type]["old_states"])
             for name in ["leader", "follower"]:
@@ -131,7 +136,16 @@ class Shared_Data(): #nn.Module
         return return_dict
 
     
-
+    def update_lr(self):
+        if self.episode % 10 == 0 and self.a_lr>self.min_lr:
+            self.a_lr = max(self.a_lr  * self.lr_decay, self.min_lr)
+            for agent_type in agent_type_list:
+                for name in ["leader", "follower"]:
+                    self.actor_optimizer[agent_type][name] = \
+                        torch.optim.Adam(self.model_dict[agent_type][name].parameters(),
+                                                            lr=self.a_lr)
+    
+    
     def reset_share_data(self):
         for agent_type in agent_type_list:
             del self.share_training_data[agent_type]["old_states"][:]
@@ -178,11 +192,13 @@ class Shared_Data(): #nn.Module
                 #                     ], 0)
                 # print("old_log!!!!!!!!!!!!")
                 self.advantages[name] = torch.tensor(np.array(share_data_dict[name]["advantages"])).view(-1,1,1).to(self.device)
+                self.advantages[name] = (self.advantages[name]- self.advantages[name].mean()) / (self.advantages[name].std() + 1e-6) 
                 # torch.cat([self.advantages[name].detach(),
                 #                         torch.tensor(share_data_dict["advantages"]).view(-1,1,1).to(self.device)
                 #                     ], 0)
                 # print("old_adv!!!!!!!!!!!!")
                 self.target_value[name] = torch.tensor(np.array(share_data_dict[name]["target_value"])).view(-1,1,1).to(self.device)
+                #self.target_value[name] = (self.target_value[name]- self.target_value[name].mean()) / (self.target_value[name].std() + 1e-6) 
                 # torch.cat([self.target_value[name],
                 #                         torch.tensor(share_data_dict["target_value"]).view(-1,1,1).to(self.device)
                 #                     ], 0)
@@ -202,35 +218,37 @@ class Shared_Data(): #nn.Module
                     #   self.old_actions[name].size(),
                     #   self.leader_action_behaviour.size()
                     #   )
-            print("batch_size------------------",batch_size)#self.old_hiddens[name].size())
+            print("batch_size------",batch_size, "------------lr",self.a_lr)#self.old_hiddens[name].size())
                 #return
-        
+            index = [i for i in range(batch_size)]
+            np.random.shuffle(index)
+            index_start = 0
+            batch_sample = batch_size // args.K_epochs
             for name in ["leader"]: #self.agent_name_list
-                for _ in range(args.K_epochs):
-                    batch_sample = batch_size#int(batch_size / self.K_epochs) # 
-                    indices = torch.randint(batch_size, size=(batch_sample,), requires_grad=False)
-                    old_states = self.old_states#[indices]
-                    old_hidden = self.old_hiddens[name].view(1, -1, self.hidden_size)#.reshape(-1,1,self.hidden_size)[indices].view(1, -1, self.hidden_size)
-                    old_logprobs = self.old_logprobs[name]#[indices]
-                    advantages = self.advantages[name]#[indices].detach()
-                    target_value = self.target_value[name]#[indices]
+                for _ in range(args.K_epochs): # batch_size#
+                    indices = torch.tensor(index[index_start:index_start+batch_sample],requires_grad=False)# torch.randint(batch_size, size=(batch_sample,), requires_grad=False)
+                    old_states = self.old_states[indices]
+                    old_hidden = self.old_hiddens[name].view(-1,1,self.hidden_size)[indices].view(1, -1, self.hidden_size)#.view(1, -1, self.hidden_size)#
+                    old_logprobs = self.old_logprobs[name][indices]
+                    advantages = self.advantages[name][indices].detach()
+                    target_value = self.target_value[name][indices]
 # print("old_actions_size-----------------",self.old_actions[name].size())
                     # print(old_states.size(),        
                     #   old_hidden.size(),
-                    #   self.old_actions["leader"].size(), #
+                    #   self.old_actions["leader"][indices].size(), #
                     #   old_logprobs.size(), 
                     #   advantages.size(), 
                     #   #self.old_values[name].size(),#
                     #   target_value.size(),
-                    #   self.old_actions["follower"].size(),
-                    #   self.leader_action_behaviour.size()
+                    #   self.old_actions["follower"][indices].size(),
+                    #   self.leader_action_behaviour[indices].size()
                     #   )
                     # print("start------inference")
                     # print("start------self.model_dict[agent_type][name]",self.model_dict[agent_type][name])#self.old_hiddens[name].size())
                     logprobs, action_value, _, _, entropy = self.model_dict[agent_type][name](old_states, old_hidden, 
-                                                                    self.old_actions["leader"], 
-                                                                    self.old_actions["follower"],
-                                                                    self.leader_action_behaviour, train = True)
+                                                                    self.old_actions["leader"][indices], #
+                                                                    self.old_actions["follower"][indices], #[indices]
+                                                                    self.leader_action_behaviour[indices], train = True) #[indices]
             
                     ratios = torch.exp(logprobs.view(batch_sample,1,-1) - old_logprobs.detach())
 
@@ -248,7 +266,7 @@ class Shared_Data(): #nn.Module
                     # critic_loss = 0.5 * torch.max(critic_loss1 , critic_loss2).mean()
                     critic_loss = torch.nn.SmoothL1Loss()(action_value, target_value) #(action_value - target_value).pow(2).mean()#
 
-                    actor_loss = -surr3.mean() - 0.01 * entropy + 0.5 * critic_loss
+                    actor_loss = -surr3.mean() - 0.015 * entropy + critic_loss #0.5 * 
                     # print("start------actor_loss",actor_loss)
                     
                     # # do the back-propagation...
@@ -259,5 +277,8 @@ class Shared_Data(): #nn.Module
                     self.loss_dic[agent_type]['a_loss'][name] += float(surr3.mean().cpu().detach().numpy())
                     self.loss_dic[agent_type]['c_loss'][name] += float(critic_loss.cpu().detach().numpy())
                     self.loss_dic[agent_type]['entropy'][name] += float(entropy.cpu().detach().numpy())
-
+                    index_start += batch_sample
+        
+        self.update_lr()
+        self.episode += 1
         return self.loss_dic

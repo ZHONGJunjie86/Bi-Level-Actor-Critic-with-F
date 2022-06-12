@@ -7,7 +7,10 @@ import torch
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', default=0.95, type=float)  # 0.1**(1/50)
-parser.add_argument('--a_lr', default=0.0003, type=float)  # 0.0001
+parser.add_argument('--a_lr', default=1.5e-3, type=float)  # 0.0015
+parser.add_argument('--min_lr', default=2e-5, type=float)  # 0.00002
+parser.add_argument('--lr_decay', default=0.95, type=float)
+
 
 parser.add_argument('--render', action='store_true')
 parser.add_argument("--save_interval", default=20, type=int)  # 1000
@@ -26,6 +29,7 @@ parser.add_argument("--load_model", action='store_true')  # 加是true；不加�
 parser.add_argument("--load_model_run", default=8, type=int)
 parser.add_argument("--load_model_run_episode", default=4000, type=int)
 parser.add_argument("--K_epochs", default=3, type=int)
+parser.add_argument("--clip", default=0.2, type=float)
 
 # Multiprocessing
 parser.add_argument('--processes', default=1, type=int,
@@ -47,7 +51,7 @@ obs_shape_by_type = {"agent": 4 + 2 * args.num_obstacles + 2* (args.num_good + a
 action_dim_by_type = {"leader": 5, "follower": 1}
 
 # 定义保存路径
-path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/"#model1/
+path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/model1/"#
 model_load_path = {"agent": path, 
                    "adversary":path}
 model_save_path = {"agent": path, 

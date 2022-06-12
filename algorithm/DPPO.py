@@ -23,7 +23,8 @@ class PPO:
         self.gamma = args.gamma
         self.agent_type = agent_type
         self.use_add_grad = True if args.share_grad != 0 else False
-
+        self.use_upgo = True
+        self.use_gae = False
         #
         self.obs_shape = obs_shape
         self.eps_clip = 0.2
@@ -169,9 +170,9 @@ class PPO:
         if training_time ==0:
             with torch.no_grad():
                 self.old_states = torch.tensor(np.array(self.memory["leader"].states)
-                                            ).view(-1,1,self.obs_shape).to(self.device)
-                self.old_compute_termi = torch.tensor(self.memory["leader"].is_terminals).to(self.device).detach() 
-                self.leader_action_behaviour = torch.tensor(self.memory["leader"].leader_action_behaviour).view(-1,1,1).to(self.device).detach() 
+                                            ).view(-1,1,self.obs_shape)
+                self.old_compute_termi = torch.tensor(self.memory["leader"].is_terminals)
+                self.leader_action_behaviour = torch.tensor(self.memory["leader"].leader_action_behaviour).view(-1,1,1) 
                 self.old_logprobs = {}
                 self.old_actions = {}
                 self.old_values = {}
@@ -180,13 +181,13 @@ class PPO:
                 self.compute_rewards= {}
                 for name in self.agent_name_list:
                     self.old_logprobs[name] = torch.tensor(self.memory[name].logprobs
-                                                            ).view(-1, 1, 1).to(self.device)
+                                                            ).view(-1, 1, 1)
                     self.old_actions[name] = torch.tensor(self.memory[name].actions
-                                                         ).view(-1, 1, self.action_dim[name]).to(self.device)
-                    self.old_values[name] = torch.tensor(self.memory[name].values).view(-1, 1, 1).to(self.device)
-                    self.old_action_values[name] = torch.tensor(self.memory[name].action_values).view(-1, 1, self.action_dim[name]).to(self.device)
-                    self.old_hiddens[name] = torch.tensor(self.memory[name].hidden_states[:-1]).view( -1, 1, self.hidden_size).to(self.device).detach() 
-                    self.compute_rewards[name] = torch.tensor(self.memory[name].rewards[1:]).to(self.device).detach() 
+                                                         ).view(-1, 1, self.action_dim[name])
+                    self.old_values[name] = torch.tensor(self.memory[name].values).view(-1, 1, 1)
+                    self.old_action_values[name] = torch.tensor(self.memory[name].action_values).view(-1, 1, self.action_dim[name])
+                    self.old_hiddens[name] = torch.tensor(self.memory[name].hidden_states[:-1]).view( -1, 1, self.hidden_size)
+                    self.compute_rewards[name] = torch.tensor(self.memory[name].rewards[1:])
                     
         
         for name in self.agent_name_list:
@@ -211,12 +212,12 @@ class PPO:
             #       self.target_value[name].size() 
             #       )
 
-            old_states = self.old_states[indices]
-            old_hidden = self.old_hiddens[name].reshape(-1,1,self.hidden_size)[indices].view(1, -1, self.hidden_size)
-            old_logprobs = self.old_logprobs[name][indices]
-            advantages = self.advantages[name][indices].detach()
-            old_value = self.old_values[name][indices]
-            target_value = self.target_value[name][indices]
+            old_states = self.old_states[indices].to(self.device)
+            old_hidden = self.old_hiddens[name].reshape(-1,1,self.hidden_size)[indices].view(1, -1, self.hidden_size).to(self.device)
+            old_logprobs = self.old_logprobs[name][indices].to(self.device)
+            advantages = self.advantages[name][indices].detach().to(self.device)
+            old_value = self.old_values[name][indices].to(self.device)
+            target_value = self.target_value[name][indices].to(self.device)
 
 
             logprobs, action_value, _, _, entropy = self.actor[name](old_states, old_hidden, 
@@ -256,33 +257,50 @@ class PPO:
         if training_time ==0:
             # Monte Carlo estimate of rewards:
             rewards = []
-            GAE_advantage = [self.memory[name].action_values[-1]]
-            target_value = [self.memory[name].values[-1]]  # 补一个最后的?
+            GAE_advantage = [] #self.memory[name].action_values[-1] - self.memory[name].values[-1]
+            target_value = []  
             #
-            discounted_reward = 0
+            discounted_reward = compute_rewards[-1]
             action_value_pre = self.memory[name].action_values[-1]
-            advatage = 0
-
+            value_pre = self.memory[name].values[-1]
+            advatage = self.memory[name].action_values[-1] - self.memory[name].values[-1]
+            g_t_pre = action_value_pre if action_value_pre >= value_pre  \
+                                       else value_pre
+            # if self.use_upgo:
+            #     target_value = [action_value_pre] if action_value_pre >= value_pre  \
+            #                             else [value_pre]
+            
             for reward, is_terminal, value, action_value in zip(reversed(compute_rewards[:-1]), reversed(compute_termi[:-1]),
                                                   reversed(self.memory[name].values[:-1]), reversed(self.memory[name].action_values[:-1])): #反转迭代
                 
-                reward = reward.cpu().detach().numpy()
-                is_terminal = is_terminal.cpu().detach().numpy()
+                reward = reward.numpy()
+                is_terminal = is_terminal.numpy()
 
                 discounted_reward = reward +  self.gamma *discounted_reward
                 rewards.insert(0, discounted_reward) #插入列表
 
                 delta = reward + self.gamma*action_value_pre - value   # (1-is_terminal)*
-                advatage = delta # + self.gamma*self.lam*advatage # * (1-is_terminal)
+                if self.use_gae:
+                    advatage = delta + self.gamma*self.lam*advatage #* (1-is_terminal)
+                elif self.use_upgo:
+                    if action_value_pre >= value_pre:
+                        g_t = reward + self.gamma*g_t_pre
+                    else:
+                        g_t = reward + self.gamma*value_pre
+                    advatage = g_t - value
+                    g_t_pre = g_t
+                else:
+                    advatage = delta
                 GAE_advantage.insert(0, advatage) #插入列表
                 target_value.insert(0,float(value + advatage))
                 action_value_pre = action_value
             
             # Normalizing the rewards:
             rewards = torch.tensor(rewards).to(self.device).view(-1,1,1)
-            self.target_value[name] = torch.tensor(target_value).to(self.device).view(-1,1,1)
-            GAE_advantage = torch.tensor(GAE_advantage).to(self.device).view(-1,1,1)
-            self.advantages[name] = (GAE_advantage- GAE_advantage.mean()) / (GAE_advantage.std() + 1e-6) 
+            self.target_value[name] = torch.tensor(target_value).view(-1,1,1)
+            GAE_advantage = torch.tensor(GAE_advantage).view(-1,1,1)
+            self.advantages[name] = GAE_advantage
+            #self.advantages[name] = (GAE_advantage- GAE_advantage.mean()) / (GAE_advantage.std() + 1e-6) 
         
         return None
 
@@ -398,18 +416,19 @@ class PPO:
 
     def get_share_data_dict(self):
         share_data_dict = {
-                    "old_states" : list(self.old_states[:-1].cpu().numpy()),
-                    "leader_action_behaviour":list(self.leader_action_behaviour[:-1].cpu().numpy()),
+                    "old_states" : list(self.old_states[:-1].numpy()),
+                    "leader_action_behaviour":list(self.leader_action_behaviour[:-1].numpy()),
                     "leader":{},
                     "follower":{}
                     }
-
+        
+        # print("self.old_states[:-1].sum()----",self.old_states[:-1].sum())
         for name in self.agent_name_list:
-            share_data_dict[name]["old_hiddens"] = list(self.old_hiddens[name][:-1].cpu().numpy())
-            share_data_dict[name]["old_logprobs"] = list(self.old_logprobs[name][:-1].cpu().numpy())
-            share_data_dict[name]["advantages"] = list(self.advantages[name].cpu().numpy())
-            share_data_dict[name]["target_value"] = list(self.target_value[name].cpu().numpy())
-            share_data_dict[name]["action"] =  list(self.old_actions[name][:-1].cpu().numpy())
+            share_data_dict[name]["old_hiddens"] = list(self.old_hiddens[name][:-1].numpy())
+            share_data_dict[name]["old_logprobs"] = list(self.old_logprobs[name][:-1].numpy())
+            share_data_dict[name]["advantages"] = list(self.advantages[name].numpy())
+            share_data_dict[name]["target_value"] = list(self.target_value[name].numpy())
+            share_data_dict[name]["action"] =  list(self.old_actions[name][:-1].numpy())
             # print(name," len(self.old_actions[name]) ",len(share_data_dict[name]["action"]))
         return share_data_dict
 

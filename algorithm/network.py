@@ -13,7 +13,7 @@ class ActorCritic(nn.Module):
         # share info
         self.self_attention = nn.MultiheadAttention(64, 4)        
         self.gru = nn.GRU(input_size = 64, hidden_size = 64, num_layers = 1, batch_first=True) 
-        self.gru.flatten_parameters()
+        #self.gru.flatten_parameters()
         self.name = name
         self.leader_action_dim = leader_action_dim
         self.follower_action_dim = follower_action_dim
@@ -30,21 +30,21 @@ class ActorCritic(nn.Module):
             self.beta_dis =  torch.distributions.beta.Beta
             self.normal_dis = torch.distributions.Normal
             # critic 含两个动作，follower是后算出来的
-            self.linear_critic_1 = nn.Linear(64 + self.follower_action_dim * 2, 64)
+            self.linear_critic_1 = nn.Linear(64 + self.follower_action_dim * 2, 1)
         elif name == "leader":
             # state 
             self.linear1 = nn.Linear(obs_size, 64)
             # actor Categorical
             # 包含 follower的动作，自己的 one-hot（这俩决定SE） 
-            self.linear_actor_combine = nn.Linear(64 + follower_action_dim + leader_action_dim, 64)
-            self.linear_leader_logits = nn.Linear(64, leader_action_dim)
+            self.linear_actor_combine = nn.Linear(64 + follower_action_dim + leader_action_dim, leader_action_dim)
+            # self.linear_leader_logits = nn.Linear(64, leader_action_dim)
             self.categorical_dis = torch.distributions.Categorical
             # critic 含两个动作
-            self.linear_critic_1 = nn.Linear(64 + follower_action_dim + leader_action_dim,  64)
+            self.linear_critic_1 = nn.Linear(64 + follower_action_dim + leader_action_dim,  1)
 
         # critic == Q
-        self.linear_critic_2 = nn.Linear(64, 1)
-
+        #self.linear_critic_2 = nn.Linear(64, 1)
+ 
         self.initialize()
 
     
@@ -55,7 +55,7 @@ class ActorCritic(nn.Module):
         # torch.nn.init.kaiming_uniform_(self.gru.weight)
 
         if self.name == "leader":
-            torch.nn.init.kaiming_normal_(self.linear_leader_logits.weight)
+            torch.nn.init.kaiming_normal_(self.linear_actor_combine.weight)
             # torch.nn.init.zeros_(self.linear_leader_logits.bias)
         elif self.name == "follower":
             torch.nn.init.kaiming_normal_(self.linear_alpha.weight)
@@ -65,7 +65,7 @@ class ActorCritic(nn.Module):
 
         torch.nn.init.kaiming_normal_(self.linear_critic_1.weight)
         # torch.nn.init.zeros_(self.linear_critic_1.bias)
-        torch.nn.init.kaiming_normal_(self.linear_critic_2.weight)
+        #torch.nn.init.kaiming_normal_(self.linear_critic_2.weight)
         # torch.nn.init.zeros_(self.linear_critic_2.bias)
         
 
@@ -116,9 +116,9 @@ class ActorCritic(nn.Module):
             combined_vector =  torch.cat([x.view(batch_size, 1, -1), leader_action.reshape(batch_size, 1, self.leader_action_dim).float(), 
                                   follower_action.reshape(batch_size, 1, self.follower_action_dim).float()], -1
                                   )
-            combined_logits = F.relu(self.linear_actor_combine(combined_vector))
-            logits = self.softmax(self.linear_leader_logits(combined_logits))
-            dis =  self.categorical_dis(logits.reshape(batch_size, 1, self.leader_action_dim))
+            combined_logits = self.softmax(self.linear_actor_combine(combined_vector))
+            #logits = self.softmax(self.linear_leader_logits(combined_logits))
+            dis =  self.categorical_dis(combined_logits.reshape(batch_size, 1, self.leader_action_dim))
             
             # if train:
             #     print("after categorical---------")
@@ -136,14 +136,14 @@ class ActorCritic(nn.Module):
                                                  mu.view(batch_size,-1), 
                                                  sigma.view(batch_size,-1)
                                                  ], -1).view(batch_size, -1)
-            x = F.relu(self.linear_critic_1(add_follower_act_logits))
-            action_value = self.linear_critic_2(x)
+            action_value = self.linear_critic_1(add_follower_act_logits)#F.relu()
+            # action_value = self.linear_critic_2(x)
         elif self.name == "leader":
             c_combined_logits =  torch.cat([x.view(batch_size, 1, -1), leader_action.reshape(batch_size, 1, self.leader_action_dim).float(), 
                                   follower_action.reshape(batch_size, 1, self.follower_action_dim).float()], -1
                                   )
-            x = F.relu(self.linear_critic_1(c_combined_logits.view(batch_size, 1, -1)))
+            action_value = self.linear_critic_1(c_combined_logits.view(batch_size, 1, -1))#F.relu()
             # print("x.size()-------------------------",x.size())
-            action_value = self.linear_critic_2(x)
+            # action_value = self.linear_critic_2(x)
 
         return selected_log_prob, action_value.reshape(batch_size,1,1), action, h_state.detach().data, entropy 

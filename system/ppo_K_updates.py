@@ -25,7 +25,7 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
                 shared_data.save(agents.get_actor())
             else:    # use share data
                 # add
-                shared_data.update_share_data(copy.deepcopy(agents.get_data_dict()))
+                shared_data.update_share_data(agents.get_data_dict())#copy.deepcopy()
                 # update
                 # print("---------------------------center training!") 
                 loss_dict = shared_data.train()
@@ -62,7 +62,7 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
                 agents.add_gradient(shared_data.shared_model)
             else:
                 shared_data.shared_lock.acquire()
-                shared_data.update_share_data(copy.deepcopy(agents.get_data_dict()))
+                shared_data.update_share_data(agents.get_data_dict())#copy.deepcopy()
                 training_time = args.K_epochs
                 # print("---------------------------worker updating over!")
                 

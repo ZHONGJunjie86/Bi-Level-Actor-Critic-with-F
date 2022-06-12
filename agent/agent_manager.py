@@ -102,7 +102,7 @@ class Agents2Env:
                     else:
                         share_data_dict[agent_type][name][key].extend(agent_dict[name][key])
 
-        return copy.deepcopy(share_data_dict)
+        return share_data_dict#copy.deepcopy()
     
     def update_with_share_data(self, data_dict):       
         # self.agents['agent_0'].compute_grad_with_shared_data(data_dict['agent'])
