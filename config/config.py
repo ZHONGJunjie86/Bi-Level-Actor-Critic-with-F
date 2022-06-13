@@ -19,7 +19,7 @@ parser.add_argument(
     '--log_dir', default=datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
 # env
 parser.add_argument("--num_good",  default=1, type=int)  
-parser.add_argument("--num_adversaries",  default=1, type=int)  
+parser.add_argument("--num_adversaries",  default=3, type=int)  
 parser.add_argument("--num_obstacles",  default=0, type=int) 
 parser.add_argument("--max_cycles", default=150, type=int)  # Agent Environment Cycle 等于游戏步
 parser.add_argument("--max_episodes", default=10000000, type=int)
@@ -28,11 +28,11 @@ parser.add_argument("--max_episodes", default=10000000, type=int)
 parser.add_argument("--load_model", action='store_true')  # 加是true；不加为false
 parser.add_argument("--load_model_run", default=8, type=int)
 parser.add_argument("--load_model_run_episode", default=4000, type=int)
-parser.add_argument("--K_epochs", default=3, type=int)
+parser.add_argument("--K_epochs", default=4, type=int)
 parser.add_argument("--clip", default=0.2, type=float)
 
 # Multiprocessing
-parser.add_argument('--processes', default=1, type=int,
+parser.add_argument('--processes', default=14, type=int,
                     help='number of processes to train with')
 parser.add_argument("--share_grad", default=0, type=int)
                                 
@@ -51,14 +51,14 @@ obs_shape_by_type = {"agent": 4 + 2 * args.num_obstacles + 2* (args.num_good + a
 action_dim_by_type = {"leader": 5, "follower": 1}
 
 # 定义保存路径
-path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/model1/"#
+path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/model2/"#
 model_load_path = {"agent": path, 
                    "adversary":path}
 model_save_path = {"agent": path, 
                    "adversary":path}
 
 # multiprocessing
-main_device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu") 
+main_device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu") 
 device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu") 
 
 

@@ -118,7 +118,7 @@ class Shared_Data(): #nn.Module
             for name in ["leader", "follower"]:
                 for list_name in self.share_training_data[agent_type][name].keys():
                     self.share_training_data[agent_type][name][list_name].extend(dict[agent_type][name][list_name])
-
+        # print("adversary follower action ",len(self.share_training_data["adversary"]["follower"]["action"]))
 
     def get_shared_data(self):
         return_dict = {}
@@ -164,7 +164,9 @@ class Shared_Data(): #nn.Module
                 self.loss_dic[agent_type][loss_name] = {}
                 for agent_name in self.agent_name_list:
                     self.loss_dic[agent_type][loss_name][agent_name] = 0 
-        for agent_type in ["adversary"]: # agent_type_list
+        
+        
+        for agent_type in ["adversary","agent"]: # agent_type_list
             self.old_logprobs = {}
             self.old_actions = {}
             self.old_values = {}
@@ -203,10 +205,11 @@ class Shared_Data(): #nn.Module
                 #                         torch.tensor(share_data_dict["target_value"]).view(-1,1,1).to(self.device)
                 #                     ], 0)
                 # print("share_data_dict[name]key------------------",share_data_dict[name].keys())#["action"]
-                # #print("old_target!!!!!!!!!!!!")
+                # print("old_target!!!!!!!!!!!!")
                 self.old_actions[name] = torch.tensor(np.array(share_data_dict[name]["action"])).view(-1,1,self.action_dim[name]).to(self.device)
                 # print("old_action!!!!!!!!!!!!")
                 batch_size = self.old_hiddens[name].size()[0]
+                # print("batch_size!!!!!!!!!!!!")
                 # print("old_actions_size-----------------",self.old_actions[name].size())
                 # print(self.old_states.size(),        
                     #   self.old_hiddens[name].size(),
@@ -220,17 +223,19 @@ class Shared_Data(): #nn.Module
                     #   )
             print("batch_size------",batch_size, "------------lr",self.a_lr)#self.old_hiddens[name].size())
                 #return
-            index = [i for i in range(batch_size)]
-            np.random.shuffle(index)
-            index_start = 0
-            batch_sample = batch_size // args.K_epochs
-            for name in ["leader"]: #self.agent_name_list
+            for name in ["leader", "follower"]: #self.agent_name_list
+                index = [i for i in range(batch_size)]
+                np.random.shuffle(index)
+                index_start = 0
+                batch_sample = batch_size // args.K_epochs
+                if name == "follower" and agent_type == "agent":
+                    continue
                 for _ in range(args.K_epochs): # batch_size#
                     indices = torch.tensor(index[index_start:index_start+batch_sample],requires_grad=False)# torch.randint(batch_size, size=(batch_sample,), requires_grad=False)
                     old_states = self.old_states[indices]
-                    old_hidden = self.old_hiddens[name].view(-1,1,self.hidden_size)[indices].view(1, -1, self.hidden_size)#.view(1, -1, self.hidden_size)#
+                    old_hidden = self.old_hiddens[name].view(-1,1,self.hidden_size)[indices].view(1, -1, self.hidden_size).view(1, -1, self.hidden_size)#
                     old_logprobs = self.old_logprobs[name][indices]
-                    advantages = self.advantages[name][indices].detach()
+                    advantages = self.advantages[name][indices].detach()##
                     target_value = self.target_value[name][indices]
 # print("old_actions_size-----------------",self.old_actions[name].size())
                     # print(old_states.size(),        
@@ -246,7 +251,7 @@ class Shared_Data(): #nn.Module
                     # print("start------inference")
                     # print("start------self.model_dict[agent_type][name]",self.model_dict[agent_type][name])#self.old_hiddens[name].size())
                     logprobs, action_value, _, _, entropy = self.model_dict[agent_type][name](old_states, old_hidden, 
-                                                                    self.old_actions["leader"][indices], #
+                                                                    self.old_actions["leader"][indices], #[indices]
                                                                     self.old_actions["follower"][indices], #[indices]
                                                                     self.leader_action_behaviour[indices], train = True) #[indices]
             

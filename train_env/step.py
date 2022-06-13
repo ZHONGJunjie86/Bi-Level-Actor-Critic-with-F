@@ -25,9 +25,9 @@ def step(rank, shared_data, args, device, builder):
         wandb.config = {
         "learning_rate": 0.0003,
         }  # waiting for all event.wait() and start them
+        time.sleep(10)
         shared_data.event.set()
         shared_data.event.clear()
-        
     else:
         shared_data.event.wait()
         shared_data.shared_lock.acquire()
@@ -70,11 +70,11 @@ def step(rank, shared_data, args, device, builder):
 
                 action = agents.get_action(states[agent_name], 
                                             reward, dones[agent_name], agent_name)
-                if "agent" in agent_name:
-                    actions[agent_name] = 0
-                else:
-                    actions[agent_name] = action
-                # actions[agent_name] = action
+                # if "agent" in agent_name:
+                #     actions[agent_name] = 0
+                # else:
+                #     actions[agent_name] = action
+                actions[agent_name] = action
         
             states, rewards, dones, infos = env.step(actions)
             step += 1

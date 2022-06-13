@@ -85,8 +85,8 @@ class PPO:
                 follower_logprob, follower_action_value, follower_action, follower_hidden_state, _ =\
                                         self.actor["follower"](obs_tensor, torch.tensor(follower_hidden).to(self.device), 
                                                             torch.tensor(leader_action).to(self.device))
-                # if self.agent_type == "agent":
-                follower_action = torch.tensor(np.array([[[0.1]]]))
+                if self.agent_type == "agent":
+                    follower_action = torch.tensor(np.array([[[0.1]]]))
                 
                 leader_logprob, leader_action_value, leader_action_behaviour, leader_hidden_state, _ = \
                                         self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
@@ -126,7 +126,7 @@ class PPO:
         # v = mean(Q)
         value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
         
-        # follower only state value
+        # follower only state value, but can have Q = r + V'
         return_dict["value"] = {"leader": value_dic["leader"], 
                                 "follower": return_dict["action_value"]["follower"]}
 
@@ -136,6 +136,12 @@ class PPO:
                                                                         return_dict["action_value"]["leader"],
                                                                         return_dict["value"]["leader"]
                                                                         )}
+                
+        # follower only state value, but can have Q = r + V'
+        if len(self.memory.action_values["follower"])!=0:
+            self.memory.action_values["follower"][-1] = np.array([[[return_dict["reward"]["follower"] 
+                                                                 + return_dict["value"]["follower"] ]]])
+        
         return return_dict
 
 
@@ -163,6 +169,7 @@ class PPO:
         leader_adv =  leader_action_value - leader_state_value
         reward_follower = self.social_coef * self.reward_follower_last + self.entropy_coef * reward 
         self.reward_follower_last = leader_adv
+        
         return reward_follower
 
 
@@ -429,7 +436,7 @@ class PPO:
             share_data_dict[name]["advantages"] = list(self.advantages[name].numpy())
             share_data_dict[name]["target_value"] = list(self.target_value[name].numpy())
             share_data_dict[name]["action"] =  list(self.old_actions[name][:-1].numpy())
-            # print(name," len(self.old_actions[name]) ",len(share_data_dict[name]["action"]))
+        # print(name," len(self.old_logprobs[name]) ",len(share_data_dict["follower"]["action"]))
         return share_data_dict
 
     def last_reward(self, reward, done):

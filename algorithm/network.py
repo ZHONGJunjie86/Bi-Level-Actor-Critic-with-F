@@ -131,12 +131,12 @@ class ActorCritic(nn.Module):
 
         # critic == Q
         if self.name == "follower":
-            add_follower_act_logits = torch.cat([
-                                                 x.view(batch_size, -1), 
-                                                 mu.view(batch_size,-1), 
-                                                 sigma.view(batch_size,-1)
-                                                 ], -1).view(batch_size, -1)
-            action_value = self.linear_critic_1(add_follower_act_logits)#F.relu()
+            # add_follower_act_logits = torch.cat([
+            #                                      x.view(batch_size, -1), 
+            #                                      mu.view(batch_size,-1), 
+            #                                      sigma.view(batch_size,-1)
+            #                                      ], -1).view(batch_size, -1)
+            action_value = self.linear_critic_1(x.view(batch_size, -1))#F.relu()
             # action_value = self.linear_critic_2(x)
         elif self.name == "leader":
             c_combined_logits =  torch.cat([x.view(batch_size, 1, -1), leader_action.reshape(batch_size, 1, self.leader_action_dim).float(), 
