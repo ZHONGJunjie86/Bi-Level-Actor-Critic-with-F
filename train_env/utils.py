@@ -42,8 +42,8 @@ def information_share(sta, agents, args):
             other_adversary_index += 1
         
         if min_adversary_index_position[0] != -1:
-            agents.agents["adversary_" + str(i)].memory["follower"].hidden_states[-1] = \
-                    agents.agents["adversary_" + str(min_adversary_index_position[0])].memory["leader"].hidden_states[-1]
+            agents.agents["adversary_" + str(i)].memory["follower"].follower_share_inform.append(
+                    agents.agents["adversary_" + str(min_adversary_index_position[0])].memory["leader"].hidden_states[-1])
 
     # agents
     for i in range(args.num_good):
@@ -66,7 +66,8 @@ def information_share(sta, agents, args):
             other_agent_index += 1
         
         if min_agent_index_position[0] != -1:
-            agents.agents["agent_" + str(i)].memory["follower"].hidden_states[-1] = \
-                    agents.agents["agent_" + str(min_agent_index_position[0])].memory["leader"].hidden_states[-1]
-        
+            agents.agents["agent_" + str(i)].memory["follower"].follower_share_inform.append(
+                    agents.agents["agent_" + str(min_agent_index_position[0])].memory["leader"].hidden_states[-1])
+        else:
+            agents.agents["agent_" + str(i)].memory["follower"].follower_share_inform.append(agents.agents["agent_" + str(i)].hidden_state_zero.numpy())
     return distance_reward_dict

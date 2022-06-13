@@ -34,7 +34,7 @@ class PPO:
         self.old_value_1, self.old_value_2 = 0,0
         self.entropy_coef = 0.01
         self.hidden_size = 64
-        self.hidden_state_zero = torch.zeros(1,1,self.hidden_size).to(self.device)
+        self.hidden_state_zero = torch.zeros(1,1,self.hidden_size)#.to(self.device)
 
         # social reward coef
         self.env_coef = 0.5
@@ -75,6 +75,7 @@ class PPO:
 
     def bilevel_compare_action(self, obs_tensor, reward):
         data_dict_list = []
+        share_inform = self.memory["follower"].follower_share_inform[-1]
         leader_hidden = self.memory["leader"].hidden_states[-1]
         follower_hidden = self.memory["follower"].hidden_states[-1]
         for leader_action_index in range(self.action_dim["leader"]):
@@ -83,15 +84,17 @@ class PPO:
 
             with torch.no_grad():
                 follower_logprob, follower_action_value, follower_action, follower_hidden_state, _ =\
-                                        self.actor["follower"](obs_tensor, torch.tensor(follower_hidden).to(self.device), 
-                                                            torch.tensor(leader_action).to(self.device))
+                                        self.actor["follower"](obs = obs_tensor, h_old = torch.tensor(follower_hidden).to(self.device), 
+                                                            leader_action =torch.tensor(leader_action).to(self.device),
+                                                            share_inform = torch.tensor(share_inform).to(self.device)
+                                                            )
                 if self.agent_type == "agent":
                     follower_action = torch.tensor(np.array([[[0.1]]]))
                 
                 leader_logprob, leader_action_value, leader_action_behaviour, leader_hidden_state, _ = \
-                                        self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
-                                                            torch.tensor(leader_action).detach().to(self.device), 
-                                                            torch.tensor(follower_action).detach().to(self.device))
+                                        self.actor["leader"](obs = obs_tensor, h_old = torch.tensor(leader_hidden).to(self.device), 
+                                                            leader_action = torch.tensor(leader_action).detach().to(self.device), 
+                                                            follower_action = torch.tensor(follower_action).detach().to(self.device))
             
             
             data_dict_list.append({"action_value":{"leader":leader_action_value, "follower": follower_action_value},
@@ -119,9 +122,9 @@ class PPO:
             leader_action[leader_action_index] = 1
             with torch.no_grad():
                 _, leader_action_value, _, _, _ = \
-                                            self.actor["leader"](obs_tensor, torch.tensor(leader_hidden).to(self.device), 
-                                                                torch.tensor(leader_action).detach().to(self.device), 
-                                                                follower_action.detach().to(self.device))
+                                            self.actor["leader"](obs = obs_tensor, h_old = torch.tensor(leader_hidden).to(self.device), 
+                                                                leader_action = torch.tensor(leader_action).detach().to(self.device), 
+                                                                follower_action = follower_action.detach().to(self.device))
             value_dic["leader"] =  value_dic["leader"] + leader_action_value
         # v = mean(Q)
         value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
@@ -138,9 +141,8 @@ class PPO:
                                                                         )}
                 
         # follower only state value, but can have Q = r + V'
-        if len(self.memory.action_values["follower"])!=0:
-            self.memory.action_values["follower"][-1] = np.array([[[return_dict["reward"]["follower"] 
-                                                                 + return_dict["value"]["follower"] ]]])
+        if len(self.memory["follower"].action_values)!=0:
+            self.memory["follower"].action_values[-1] = (return_dict["reward"]["follower"] + return_dict["value"]["follower"]).cpu().numpy()
         
         return return_dict
 
@@ -180,6 +182,7 @@ class PPO:
                                             ).view(-1,1,self.obs_shape)
                 self.old_compute_termi = torch.tensor(self.memory["leader"].is_terminals)
                 self.leader_action_behaviour = torch.tensor(self.memory["leader"].leader_action_behaviour).view(-1,1,1) 
+                self.follower_share = torch.tensor(self.memory["follower"].follower_share_inform).view(-1,1,self.hidden_size) 
                 self.old_logprobs = {}
                 self.old_actions = {}
                 self.old_values = {}
@@ -225,12 +228,13 @@ class PPO:
             advantages = self.advantages[name][indices].detach().to(self.device)
             old_value = self.old_values[name][indices].to(self.device)
             target_value = self.target_value[name][indices].to(self.device)
+            info_share = self.follower_share[indices]
 
-
-            logprobs, action_value, _, _, entropy = self.actor[name](old_states, old_hidden, 
-                                                            self.old_actions["leader"][indices], 
-                                                            self.old_actions["follower"][indices],
-                                                            self.leader_action_behaviour[indices], train = True)
+            logprobs, action_value, _, _, entropy = self.actor[name](obs = old_states, h_old = old_hidden, 
+                                                            leader_action = self.old_actions["leader"][indices], 
+                                                            follower_action = self.old_actions["follower"][indices],
+                                                            leader_behaviour = self.leader_action_behaviour[indices], 
+                                                            share_inform = info_share,train = True)
     
             ratios = torch.exp(logprobs.view(batch_sample,1,-1) - old_logprobs.detach())
 
@@ -267,8 +271,8 @@ class PPO:
             GAE_advantage = [] #self.memory[name].action_values[-1] - self.memory[name].values[-1]
             target_value = []  
             #
-            discounted_reward = float(compute_rewards[-1])
-            action_value_pre = self.memory[name].action_values[-1]
+            discounted_reward = compute_rewards[-1]#float()
+            action_value_pre = self.memory[name].action_values[-1]#torch.tensor()
             value_pre = self.memory[name].values[-1]
             advatage = self.memory[name].action_values[-1] - self.memory[name].values[-1]
             g_t_pre = action_value_pre if action_value_pre >= value_pre  \
@@ -280,10 +284,10 @@ class PPO:
             for reward, is_terminal, value, action_value in zip(reversed(compute_rewards[:-1]), reversed(compute_termi[:-1]),
                                                   reversed(self.memory[name].values[:-1]), reversed(self.memory[name].action_values[:-1])): #反转迭代
                 
-                reward = reward.numpy()
-                is_terminal = is_terminal.numpy()
+                # reward = reward
+                # is_terminal = is_terminal
 
-                discounted_reward = float(reward) +  self.gamma *discounted_reward
+                discounted_reward = reward +  self.gamma *discounted_reward
                 rewards.insert(0, discounted_reward) #插入列表
 
                 delta = reward + self.gamma*action_value_pre - value   # (1-is_terminal)*
@@ -299,7 +303,7 @@ class PPO:
                 else:
                     advatage = delta
                 GAE_advantage.insert(0, advatage) #插入列表
-                target_value.insert(0,float(value + advatage))
+                target_value.insert(0,float(value) + advatage)#)
                 action_value_pre = action_value
             
             # Normalizing the rewards:
@@ -363,12 +367,14 @@ class PPO:
                 old_logprobs = self.old_logprobs[name]#[indices]
                 advantages = self.advantages[name]#[indices].detach()
                 target_value = self.target_value[name]#[indices]
-
+                info_share = self.follower_share
+                
                 # print("start------inference")#self.old_hiddens[name].size())
-                logprobs, action_value, _, _, entropy = self.actor[name](old_states, old_hidden, 
-                                                                self.old_actions["leader"], 
-                                                                self.old_actions["follower"],
-                                                                self.leader_action_behaviour, train = True)
+                logprobs, action_value, _, _, entropy = self.actor[name](obs = old_states, h_old = old_hidden, 
+                                                                leader_action = self.old_actions["leader"], 
+                                                                follower_action = self.old_actions["follower"],
+                                                                leader_behaviour = self.leader_action_behaviour, 
+                                                                share_info = info_share,train = True)
         
                 ratios = torch.exp(logprobs.view(batch_sample,1,-1) - old_logprobs.detach())
 
@@ -425,6 +431,7 @@ class PPO:
         share_data_dict = {
                     "old_states" : list(self.old_states[:-1].numpy()),
                     "leader_action_behaviour":list(self.leader_action_behaviour[:-1].numpy()),
+                    "follower_share_info":list(self.follower_share[:-1].numpy()),
                     "leader":{},
                     "follower":{}
                     }

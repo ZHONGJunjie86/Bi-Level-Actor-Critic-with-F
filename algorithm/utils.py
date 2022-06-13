@@ -10,6 +10,7 @@ class Memory:
         self.values = []
         self.action_values = []
         self.leader_action_behaviour = []
+        self.follower_share_inform = []
     
     
     def clear_memory(self):
@@ -22,5 +23,6 @@ class Memory:
         del self.num_vectors[:]
         del self.values[:]
         del self.action_values[:]
-        del self.leader_action_behaviour[:]
+        del self.leader_action_behaviour[:] 
+        del self.follower_share_inform [:]
 

@@ -85,8 +85,8 @@ class Agents2Env:
                 "adversary": copy.deepcopy(self.agents['adversary_0'].get_actor())}
 
     def get_data_dict(self):
-        share_data_dict = {"agent":{"old_states":[],"leader_action_behaviour":[]},  
-                           "adversary":{"old_states":[],"leader_action_behaviour":[]}}
+        share_data_dict = {"agent":{"old_states":[],"leader_action_behaviour":[],"follower_share_info":[]},  
+                           "adversary":{"old_states":[],"leader_action_behaviour":[],"follower_share_info":[]}}
         for name in ["leader", "follower"]:
             share_data_dict["agent"][name] = {}
             share_data_dict["adversary"][name] = {}
@@ -97,6 +97,7 @@ class Agents2Env:
             
             share_data_dict[agent_type]["old_states"].extend(agent_dict["old_states"])
             share_data_dict[agent_type]["leader_action_behaviour"].extend(agent_dict["leader_action_behaviour"])
+            share_data_dict[agent_type]["follower_share_info"].extend(agent_dict["follower_share_info"])
             
             for name in ["leader", "follower"]:
                 for key in agent_dict[name].keys():

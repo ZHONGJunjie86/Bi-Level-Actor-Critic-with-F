@@ -1,6 +1,6 @@
 import numpy as np
 import collections
-from train_env.save_log import send_curve_data
+# from train_env.save_log import send_curve_data
 from system.ppo_K_updates import K_epochs_PPO_training
 from train_env.utils import information_share
 from config.config import *
@@ -21,11 +21,11 @@ def step(rank, shared_data, args, device, builder):
             shared_data.load()
         
         agents.quick_load_model(shared_data.model_dict)
-        wandb.init(project="Bi-Level-Actor-Critic-with-F", entity="zhongjunjie")
-        wandb.config = {
-        "learning_rate": 0.0003,
-        }  # waiting for all event.wait() and start them
-        time.sleep(10)
+        # wandb.init(project="Bi-Level-Actor-Critic-with-F", entity="zhongjunjie")
+        # wandb.config = {
+        # "learning_rate": 0.0003,
+        # }  # waiting for all event.wait() and start them
+        # time.sleep(10)
         shared_data.event.set()
         shared_data.event.clear()
     else:
@@ -97,8 +97,8 @@ def step(rank, shared_data, args, device, builder):
 
                 loss_dict = K_epochs_PPO_training(rank, args, episode, shared_data, agents)
                 
-                if rank == 0:
-                    send_curve_data(loss_dict, total_step_reward, agent_type_list)
+                # if rank == 0:
+                #     send_curve_data(loss_dict, total_step_reward, agent_type_list)
                 
                 # reset
                 agents.reset()

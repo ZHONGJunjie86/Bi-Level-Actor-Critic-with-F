@@ -76,6 +76,7 @@ class Shared_Data(): #nn.Module
             self.share_training_data[agent_type] = {}
             self.share_training_data[agent_type]["old_states"] = mp.Manager().list([])
             self.share_training_data[agent_type]["leader_action_behaviour"] = mp.Manager().list([])
+            self.share_training_data[agent_type]["follower_share_info"] = mp.Manager().list([])
             for name in ["leader", "follower"]:
                 self.share_training_data[agent_type][name] = {}
                 self.share_training_data[agent_type][name]["old_hiddens"] = mp.Manager().list([])
@@ -115,6 +116,7 @@ class Shared_Data(): #nn.Module
             #     print("sum in center-----------",sum(dict[agent_type]["old_states"]))
             self.share_training_data[agent_type]["leader_action_behaviour"].extend(dict[agent_type]["leader_action_behaviour"])
             self.share_training_data[agent_type]["old_states"].extend(dict[agent_type]["old_states"])
+            self.share_training_data[agent_type]["follower_share_info"].extend(dict[agent_type]["follower_share_info"])
             for name in ["leader", "follower"]:
                 for list_name in self.share_training_data[agent_type][name].keys():
                     self.share_training_data[agent_type][name][list_name].extend(dict[agent_type][name][list_name])
@@ -126,6 +128,7 @@ class Shared_Data(): #nn.Module
             return_dict[agent_type] = {}
             return_dict[agent_type]["old_states"] = copy.deepcopy(list(self.share_training_data[agent_type]["old_states"]))
             return_dict[agent_type]["leader_action_behaviour"] = list(copy.deepcopy(self.share_training_data[agent_type]["leader_action_behaviour"]))
+            return_dict[agent_type]["follower_share_info"] = list(copy.deepcopy(self.share_training_data[agent_type]["follower_share_info"]))
             for name in ["leader", "follower"]:
                 return_dict[agent_type][name] = {}
                 return_dict[agent_type][name]["old_hiddens"] = list(copy.deepcopy(self.share_training_data[agent_type][name]["old_hiddens"]))
@@ -175,8 +178,9 @@ class Shared_Data(): #nn.Module
             self.target_value = {}
             self.advantages = {}
             share_data_dict = self.share_training_data[agent_type]
-            self.old_states = torch.tensor(np.array(share_data_dict["old_states"])).view(-1,1,self.obs_shape[agent_type]).to(self.device)
             
+            self.old_states = torch.tensor(np.array(share_data_dict["old_states"])).view(-1,1,self.obs_shape[agent_type]).to(self.device)
+            self.follower_share_info = torch.tensor(np.array(share_data_dict["follower_share_info"])).view(-1,1,self.hidden_size).to(self.device)
             # torch.cat([self.old_states[:-1],
             #                         torch.tensor(share_data_dict["old_state"]).view(-1,1,self.obs_shape).to(self.device)
             #                         ], 0)
@@ -237,7 +241,9 @@ class Shared_Data(): #nn.Module
                     old_logprobs = self.old_logprobs[name][indices]
                     advantages = self.advantages[name][indices].detach()##
                     target_value = self.target_value[name][indices]
-# print("old_actions_size-----------------",self.old_actions[name].size())
+                    
+                    
+                    # print("old_actions_size-----------------",self.old_actions[name].size())
                     # print(old_states.size(),        
                     #   old_hidden.size(),
                     #   self.old_actions["leader"][indices].size(), #
@@ -250,10 +256,11 @@ class Shared_Data(): #nn.Module
                     #   )
                     # print("start------inference")
                     # print("start------self.model_dict[agent_type][name]",self.model_dict[agent_type][name])#self.old_hiddens[name].size())
-                    logprobs, action_value, _, _, entropy = self.model_dict[agent_type][name](old_states, old_hidden, 
-                                                                    self.old_actions["leader"][indices], #[indices]
-                                                                    self.old_actions["follower"][indices], #[indices]
-                                                                    self.leader_action_behaviour[indices], train = True) #[indices]
+                    logprobs, action_value, _, _, entropy = self.model_dict[agent_type][name](obs = old_states, h_old = old_hidden, 
+                                                                    leader_action = self.old_actions["leader"][indices], #[indices]
+                                                                    follower_action = self.old_actions["follower"][indices], #[indices]
+                                                                    leader_behaviour = self.leader_action_behaviour[indices], 
+                                                                    share_inform = self.follower_share_info[indices], train = True) #[indices]
             
                     ratios = torch.exp(logprobs.view(batch_sample,1,-1) - old_logprobs.detach())
 
