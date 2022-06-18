@@ -13,7 +13,7 @@ from algorithm.network import ActorCritic
 from algorithm.utils import Memory
 import torch.nn.functional as F
 import copy
-# torch.set_default_tensor_type(torch.DoubleTensor)
+# torch.set_default_tensor_type(torch.FloatTensor)
 
 
 class PPO:
@@ -73,7 +73,7 @@ class PPO:
         self.reset()
 
 
-    def bilevel_compare_action(self, obs_tensor, reward):
+    def bilevel_compare_action(self, obs_tensor, reward, type_reward):
         data_dict_list = []
         share_inform = self.memory["follower"].follower_share_inform[-1]
         leader_hidden = self.memory["leader"].hidden_states[-1]
@@ -88,8 +88,8 @@ class PPO:
                                                             leader_action =torch.tensor(leader_action).to(self.device),
                                                             share_inform = torch.tensor(share_inform).to(self.device)
                                                             )
-                if self.agent_type == "agent":
-                    follower_action = torch.tensor(np.array([[[0.1]]]))
+                # if self.agent_type == "agent":
+                follower_action = torch.tensor(np.array([[[0.1]]]))
                 
                 leader_logprob, leader_action_value, leader_action_behaviour, leader_hidden_state, _ = \
                                         self.actor["leader"](obs = obs_tensor, h_old = torch.tensor(leader_hidden).to(self.device), 
@@ -135,7 +135,7 @@ class PPO:
 
         # reward_shaping
         return_dict["reward"] = {"leader": reward, 
-                                "follower": self.compute_follower_reward(reward, 
+                                "follower": self.compute_follower_reward(reward, type_reward,
                                                                         return_dict["action_value"]["leader"],
                                                                         return_dict["value"]["leader"]
                                                                         )}
@@ -147,10 +147,10 @@ class PPO:
         return return_dict
 
 
-    def choose_action(self, state, reward, done):
+    def choose_action(self, state, reward, type_reward, done):
         
         obs_tensor = torch.Tensor(state).to(self.device).reshape(1,self.obs_shape)        
-        data_dict = self.bilevel_compare_action(obs_tensor, reward)
+        data_dict = self.bilevel_compare_action(obs_tensor, reward, type_reward,)
 
         with torch.no_grad():
             self.memory["leader"].states.append(state)
@@ -167,9 +167,11 @@ class PPO:
         return int(data_dict["action"]["leader_behaviour"])  # leader_index
 
     
-    def compute_follower_reward(self, reward, leader_action_value, leader_state_value):
-        leader_adv =  leader_action_value - leader_state_value
-        reward_follower = self.social_coef * self.reward_follower_last + self.entropy_coef * reward 
+    def compute_follower_reward(self, reward, type_reward, leader_action_value, leader_state_value):
+        leader_adv =  -abs(leader_action_value - leader_state_value)
+        # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward # self.reward_follower_last 
+        # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward 
+        reward_follower = type_reward
         self.reward_follower_last = leader_adv
         
         return reward_follower
@@ -455,12 +457,12 @@ class PPO:
     def reset(self):
         
         for name in self.agent_name_list:
-            self.memory[name].clear_memory()
+            self.memory[name].clear_memory() 
             
         if len(self.memory["leader"].states) ==0:
             for name in self.agent_name_list:
                 with torch.no_grad():
-                    self.memory[name].hidden_states.append(self.hidden_state_zero.cpu().numpy())
+                    self.memory[name].hidden_states.append(self.hidden_state_zero.numpy())
         
         for loss_name in self.loss_name_list:
             self.loss_dic[loss_name] = {}

@@ -1,6 +1,6 @@
 import numpy as np
 import collections
-# from train_env.save_log import send_curve_data
+from train_env.save_log import send_curve_data
 from system.ppo_K_updates import K_epochs_PPO_training
 from train_env.utils import information_share
 from config.config import *
@@ -14,18 +14,13 @@ def step(rank, shared_data, args, device, builder):
     agents = builder.build_agents(device)
     env = builder.build_env()
 
-    
     if rank == 0:
         print("rank ", rank)
         if args.load_model:
             shared_data.load()
         
         agents.quick_load_model(shared_data.model_dict)
-        # wandb.init(project="Bi-Level-Actor-Critic-with-F", entity="zhongjunjie")
-        # wandb.config = {
-        # "learning_rate": 0.0003,
-        # }  # waiting for all event.wait() and start them
-        # time.sleep(10)
+        time.sleep(20)
         shared_data.event.set()
         shared_data.event.clear()
     else:
@@ -35,6 +30,14 @@ def step(rank, shared_data, args, device, builder):
         shared_data.shared_lock.release()
         print("rank ", rank)
         
+    wandb.init(
+    project="Bi-Level-Actor-Critic-with-F", 
+    entity="zhongjunjie",
+    group="IPPO 1"
+    )
+    wandb.config = {
+    "learning_rate": 0.0003,
+    }  # waiting for all event.wait() and start them
     RENDER = True#args.render #
 
     total_step_reward = collections.defaultdict(float)
@@ -60,10 +63,10 @@ def step(rank, shared_data, args, device, builder):
             actions = {}
             
             # pass hidden states between agents who can see each other
-            distance_reward_dict = information_share(states, agents, args)
+            distance_reward_dict, global_reward_dict = information_share(states, rewards, agents, args)
             
             for agent_name in agents.agents.keys():
-                
+                global_reward = global_reward_dict
                 if "agent" in agent_name:reward = rewards[agent_name]/100
                 else: reward = rewards[agent_name]/10  + distance_reward_dict[agent_name]
                 total_step_reward[agent_name] += reward
@@ -98,7 +101,8 @@ def step(rank, shared_data, args, device, builder):
                 loss_dict = K_epochs_PPO_training(rank, args, episode, shared_data, agents)
                 
                 # if rank == 0:
-                #     send_curve_data(loss_dict, total_step_reward, agent_type_list)
+                send_curve_data(loss_dict, total_step_reward, agent_type_list)
+                
                 
                 # reset
                 agents.reset()

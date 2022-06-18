@@ -32,7 +32,7 @@ parser.add_argument("--K_epochs", default=4, type=int)
 parser.add_argument("--clip", default=0.2, type=float)
 
 # Multiprocessing
-parser.add_argument('--processes', default=1, type=int,
+parser.add_argument('--processes', default=14, type=int,
                     help='number of processes to train with')
 parser.add_argument("--share_grad", default=0, type=int)
                                 
@@ -58,8 +58,8 @@ model_save_path = {"agent": path,
                    "adversary":path}
 
 # multiprocessing
-main_device = torch.device("cuda:3") if torch.cuda.is_available() else torch.device("cpu") 
-device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
+main_device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu") 
+device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu") 
 
 
 

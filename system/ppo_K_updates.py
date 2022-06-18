@@ -65,7 +65,6 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
                 shared_data.update_share_data(agents.get_data_dict())#copy.deepcopy()
                 training_time = args.K_epochs
                 # print("---------------------------worker updating over!")
-                
             shared_data.shared_count.value += 1
             shared_data.shared_lock.release()
             
@@ -75,8 +74,10 @@ def K_epochs_PPO_training(rank, args, episode, shared_data, agents):
             # load new model
             shared_data.shared_lock.acquire()
             agents.quick_load_model(shared_data.model_dict) # must shallow copy
+            if args.share_grad == 0:
+                loss_dict = shared_data.get_loss_dict()
             shared_data.shared_lock.release()
             # print("---------------------------worker loading over!")
 
             training_time += 1
-        return {}
+        return loss_dict if args.share_grad == 0 else {}

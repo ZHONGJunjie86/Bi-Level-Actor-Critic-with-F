@@ -86,7 +86,18 @@ class Shared_Data(): #nn.Module
                 self.share_training_data[agent_type][name]["action"] = mp.Manager().list([])
         # self.share_training_data = mp.Manager().dict(self.share_training_data)
         # print("self.share_training_data",self.share_training_data)
-
+        
+        # loss_dict
+        self.loss_name_list = ["a_loss", "c_loss", "entropy"]
+        self.loss_dic = {}
+        for agent_type in agent_type_list:
+            self.loss_dic[agent_type] = {}
+            for loss_name in self.loss_name_list:
+                self.loss_dic[agent_type][loss_name] = {}
+                for agent_name in self.agent_name_list:
+                    self.loss_dic[agent_type][loss_name][agent_name] = mp.Value("d", 0.0)
+    
+    
     def reset(self):
         for agent_type in agent_type_list:
             for name in ["leader", "follower"]:
@@ -153,20 +164,19 @@ class Shared_Data(): #nn.Module
         for agent_type in agent_type_list:
             del self.share_training_data[agent_type]["old_states"][:]
             del self.share_training_data[agent_type]["leader_action_behaviour"][:]
+            del self.share_training_data[agent_type]["follower_share_info"][:]
             for name in ["leader", "follower"]:
                 for list_name in self.share_training_data[agent_type][name].keys():
                     del self.share_training_data[agent_type][name][list_name][:]
 
     
     def train(self):
+        # reset loss
         self.loss_name_list = ["a_loss", "c_loss", "entropy"]
-        self.loss_dic = {}
         for agent_type in agent_type_list:
-            self.loss_dic[agent_type] = {}
             for loss_name in self.loss_name_list:
-                self.loss_dic[agent_type][loss_name] = {}
                 for agent_name in self.agent_name_list:
-                    self.loss_dic[agent_type][loss_name][agent_name] = 0 
+                    self.loss_dic[agent_type][loss_name][agent_name].value = 0 
         
         
         for agent_type in ["adversary","agent"]: # agent_type_list
@@ -227,7 +237,7 @@ class Shared_Data(): #nn.Module
                     #   )
             print("batch_size------",batch_size, "------------lr",self.a_lr)#self.old_hiddens[name].size())
                 #return
-            for name in ["leader", "follower"]: #self.agent_name_list
+            for name in ["leader"]: #  , "follower" self.agent_name_list
                 index = [i for i in range(batch_size)]
                 np.random.shuffle(index)
                 index_start = 0
@@ -286,11 +296,15 @@ class Shared_Data(): #nn.Module
                     actor_loss.backward()
                     self.actor_optimizer[agent_type][name].step()
 
-                    self.loss_dic[agent_type]['a_loss'][name] += float(surr3.mean().cpu().detach().numpy())
-                    self.loss_dic[agent_type]['c_loss'][name] += float(critic_loss.cpu().detach().numpy())
-                    self.loss_dic[agent_type]['entropy'][name] += float(entropy.cpu().detach().numpy())
+                    self.loss_dic[agent_type]['a_loss'][name].value += float(surr3.mean().cpu().detach().numpy())
+                    self.loss_dic[agent_type]['c_loss'][name].value += float(critic_loss.cpu().detach().numpy())
+                    self.loss_dic[agent_type]['entropy'][name].value += float(entropy.cpu().detach().numpy())
                     index_start += batch_sample
         
         self.update_lr()
         self.episode += 1
+        return self.loss_dic
+        
+        
+    def get_loss_dict(self):
         return self.loss_dic

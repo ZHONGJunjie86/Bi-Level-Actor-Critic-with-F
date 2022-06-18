@@ -23,7 +23,7 @@ class ActorCritic(nn.Module):
 
         # actor
         if name == "follower":
-            # state 包含 leader 的动作
+            # state 包含 leader 的动作 and (representation of others)
             self.linear1 = nn.Linear(obs_size + leader_action_dim, 64)
             # combine with other inform
             self.self_attention_with_other_info = nn.MultiheadAttention(64 + self.hidden_size, 4)    
@@ -33,12 +33,12 @@ class ActorCritic(nn.Module):
             self.beta_dis =  torch.distributions.beta.Beta
             self.normal_dis = torch.distributions.Normal
             # critic 含两个动作，follower是后算出来的??? only包含 leader 的动作
-            self.linear_critic_1 = nn.Linear(64 + self.hidden_size , 1) #+ self.follower_action_dim * 2
+            self.linear_critic_1 = nn.Linear(64 + self.hidden_size, 1) #+ self.follower_action_dim * 2
         elif name == "leader":
             # state 包含 follower 的动作(representation of others)
             self.linear1 = nn.Linear(obs_size + leader_action_dim + follower_action_dim, 64)
             # combine with other inform
-            # self.self_attention_with_other_info = nn.MultiheadAttention(64 + leader_action_dim, 4)    #   
+            # self.self_attention_with_other_info = nn.MultiheadAttention(64 + leader_action_dim + follower_action_dim, 2)    #   
             # actor Categorical
             self.linear_actor_combine = nn.Linear(64 , leader_action_dim) # follower_action_dim + 
             # self.linear_leader_logits = nn.Linear(64, leader_action_dim)
@@ -84,11 +84,14 @@ class ActorCritic(nn.Module):
         #     print("obs.size(),leader_action.size(),follower_action.size()--------",obs.size(),leader_action.size(),follower_action.size())
         if self.name == "follower":
             obs = torch.cat([obs.view(batch_size, 1, -1), 
-                            leader_action.reshape(batch_size, 1, self.leader_action_dim)  # + 0.001
+                            leader_action.reshape(batch_size, 1, self.leader_action_dim),  # + 0.001
+                            #share_inform.reshape(batch_size, 1, self.hidden_size)
                             ], -1).view(batch_size, -1)
         elif self.name == "leader":
-            obs = torch.cat([obs.view(batch_size, 1, -1), leader_action.reshape(batch_size, 1, self.leader_action_dim),
-                            follower_action.reshape(batch_size, 1, self.follower_action_dim)], -1).view(batch_size, 1, -1)
+            obs = torch.cat([obs.view(batch_size, 1, -1), 
+                            leader_action.reshape(batch_size, 1, self.leader_action_dim),
+                            follower_action.reshape(batch_size, 1, self.follower_action_dim)
+                           ], -1).view(batch_size, 1, -1)
             
         # if train:
         #     print("after cat---------")
@@ -114,15 +117,16 @@ class ActorCritic(nn.Module):
             # print("follower x----------", x)
             x = self.self_attention_with_other_info(x,x,x)[0] + x
         
-        # elif self.name == "leader":
+        # if self.name == "leader":
         #     x =  torch.cat([x.view(batch_size, 1, -1), 
-        #                    leader_action.reshape(batch_size, 1, self.leader_action_dim).float(), 
-        #                     ], -1).view(batch_size, -1)
-        #     x = self.self_attention_with_other_info(x,x,x)[0] + x
+        #                     leader_action.reshape(batch_size, 1, self.leader_action_dim),
+        #                     follower_action.reshape(batch_size, 1, self.follower_action_dim)
+        #                    ], -1).view(batch_size, 1, -1).to(torch.float32)
+            # x = self.self_attention_with_other_info(x,x,x)[0] + x
         
         # actor
         if self.name == "follower":
-            mu = torch.tanh(self.linear_alpha(x))   
+            mu = torch.tanh(self.linear_alpha(x)) + 1e-5
             sigma = torch.sigmoid(self.linear_beta(x)) + 1e-5  # >0
             dis =  self.normal_dis(mu.reshape(batch_size,1), sigma.reshape(batch_size,1))
             if train:
