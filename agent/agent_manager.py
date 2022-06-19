@@ -33,11 +33,11 @@ class Agents2Env:
                 self.agents[name] = copy.deepcopy(PPO(self.args, obs_shape_by_type["agent"], 
                                                       self.device, "agent"))
 
-    def get_action(self, state, reward, done, agent_name):
-        return self.agents[agent_name].choose_action(state, reward, done)
+    def get_action(self, state, reward, type_reward, done, agent_name):
+        return self.agents[agent_name].choose_action(state, reward, type_reward, done)
     
-    def last_reward(self, reward, done, agent_name):
-        self.agents[agent_name].last_reward(reward, done)
+    def last_reward(self, reward, type_reward, done, agent_name):
+        self.agents[agent_name].last_reward(reward, type_reward, done)
 
     def load_model(self):
         for agent in self.agents.values():

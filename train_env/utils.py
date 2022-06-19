@@ -14,7 +14,17 @@ def compute_dis_reward(distance_agent_dict, distance_reward_dict, agent_pos):
 
 
 
-def information_share(sta, agents, args):
+def information_share(sta, rewards, agents, args):
+    # type reward
+    type_reward_dict = {"adversary":0, "agent":0}
+    for name in rewards.keys():
+        if "adversary" in name:
+            type_reward_dict["adversary"] += rewards[name]
+        else:
+            type_reward_dict["agent"] += rewards[name]
+    
+    
+    
     # 只和最近的互换
     states = [list(i) for i in sta.values()]
     distance_reward_dict = {}
@@ -70,4 +80,4 @@ def information_share(sta, agents, args):
                     agents.agents["agent_" + str(min_agent_index_position[0])].memory["leader"].hidden_states[-1])
         else:
             agents.agents["agent_" + str(i)].memory["follower"].follower_share_inform.append(agents.agents["agent_" + str(i)].hidden_state_zero.numpy())
-    return distance_reward_dict
+    return distance_reward_dict, type_reward_dict

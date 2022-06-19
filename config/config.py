@@ -51,7 +51,7 @@ obs_shape_by_type = {"agent": 4 + 2 * args.num_obstacles + 2* (args.num_good + a
 action_dim_by_type = {"leader": 5, "follower": 1}
 
 # 定义保存路径
-path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/model2/"#
+path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/model1/"#
 model_load_path = {"agent": path, 
                    "adversary":path}
 model_save_path = {"agent": path, 

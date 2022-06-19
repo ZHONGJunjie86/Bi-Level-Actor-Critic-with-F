@@ -237,7 +237,7 @@ class Shared_Data(): #nn.Module
                     #   )
             print("batch_size------",batch_size, "------------lr",self.a_lr)#self.old_hiddens[name].size())
                 #return
-            for name in ["leader"]: #  , "follower" self.agent_name_list
+            for name in ["leader", "follower"]: #   self.agent_name_list
                 index = [i for i in range(batch_size)]
                 np.random.shuffle(index)
                 index_start = 0

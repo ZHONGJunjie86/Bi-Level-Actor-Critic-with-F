@@ -26,19 +26,21 @@ class ActorCritic(nn.Module):
             # state 包含 leader 的动作 and (representation of others)
             self.linear1 = nn.Linear(obs_size + leader_action_dim, 64)
             # combine with other inform
-            self.self_attention_with_other_info = nn.MultiheadAttention(64 + self.hidden_size, 4)    
+            self.self_attention_with_other_info = nn.MultiheadAttention(64 + self.hidden_size, 4)   
+            self.self_linear_with_other_info = nn.Linear(64 + self.hidden_size, 64) 
             # actor beta distribution  
-            self.linear_alpha = nn.Linear(64 + self.hidden_size, follower_action_dim)
-            self.linear_beta = nn.Linear(64 + self.hidden_size, follower_action_dim)
+            self.linear_alpha = nn.Linear(64, follower_action_dim)
+            self.linear_beta = nn.Linear(64, follower_action_dim)
             self.beta_dis =  torch.distributions.beta.Beta
             self.normal_dis = torch.distributions.Normal
             # critic 含两个动作，follower是后算出来的??? only包含 leader 的动作
-            self.linear_critic_1 = nn.Linear(64 + self.hidden_size, 1) #+ self.follower_action_dim * 2
+            self.linear_critic_1 = nn.Linear(64, 1) #+ self.follower_action_dim * 2
         elif name == "leader":
             # state 包含 follower 的动作(representation of others)
             self.linear1 = nn.Linear(obs_size + leader_action_dim + follower_action_dim, 64)
             # combine with other inform
-            # self.self_attention_with_other_info = nn.MultiheadAttention(64 + leader_action_dim + follower_action_dim, 2)    #   
+            self.self_attention_with_other_info = nn.MultiheadAttention(64 + self.hidden_size, 4)   
+            self.self_linear_with_other_info = nn.Linear(64 + self.hidden_size, 64) 
             # actor Categorical
             self.linear_actor_combine = nn.Linear(64 , leader_action_dim) # follower_action_dim + 
             # self.linear_leader_logits = nn.Linear(64, leader_action_dim)
@@ -104,18 +106,30 @@ class ActorCritic(nn.Module):
         # print("self.self_attention", x)
         # if train:
         #     print("after attebtion---------")
+        
+        
+        # combine with other information
+        # if self.name == "follower":
+        x = torch.cat([x.view(batch_size, 1, -1), 
+                        share_inform.reshape(batch_size, 1, self.hidden_size)  # + 0.001
+                        ], -1).view(batch_size, 1, -1)
+        # print("follower x----------", x)
+        x = self.self_attention_with_other_info(x,x,x)[0] + x
+        x = F.relu(self.self_linear_with_other_info(x))
+        
+        
         x,h_state = self.gru(x, h_old.detach())
         # print("self.gru---",x)
         # if train:
         #     print("after gru---------")
         
         # combine with other information
-        if self.name == "follower":
-            x = torch.cat([x.view(batch_size, 1, -1), 
-                           share_inform.reshape(batch_size, 1, self.hidden_size)  # + 0.001
-                            ], -1).view(batch_size, 1, -1)
-            # print("follower x----------", x)
-            x = self.self_attention_with_other_info(x,x,x)[0] + x
+        # if self.name == "follower":
+        #     x = torch.cat([x.view(batch_size, 1, -1), 
+        #                    share_inform.reshape(batch_size, 1, self.hidden_size)  # + 0.001
+        #                     ], -1).view(batch_size, 1, -1)
+        #     # print("follower x----------", x)
+        #     x = self.self_attention_with_other_info(x,x,x)[0] + x
         
         # if self.name == "leader":
         #     x =  torch.cat([x.view(batch_size, 1, -1), 

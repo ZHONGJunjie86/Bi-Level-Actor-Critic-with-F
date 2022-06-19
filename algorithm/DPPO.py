@@ -88,13 +88,14 @@ class PPO:
                                                             leader_action =torch.tensor(leader_action).to(self.device),
                                                             share_inform = torch.tensor(share_inform).to(self.device)
                                                             )
-                # if self.agent_type == "agent":
-                follower_action = torch.tensor(np.array([[[0.1]]]))
+                if self.agent_type == "agent":
+                    follower_action = torch.tensor(np.array([[[0.1]]]))
                 
                 leader_logprob, leader_action_value, leader_action_behaviour, leader_hidden_state, _ = \
                                         self.actor["leader"](obs = obs_tensor, h_old = torch.tensor(leader_hidden).to(self.device), 
                                                             leader_action = torch.tensor(leader_action).detach().to(self.device), 
-                                                            follower_action = torch.tensor(follower_action).detach().to(self.device))
+                                                            follower_action = torch.tensor(follower_action).detach().to(self.device),
+                                                            share_inform = torch.tensor(share_inform).to(self.device))
             
             
             data_dict_list.append({"action_value":{"leader":leader_action_value, "follower": follower_action_value},
@@ -124,7 +125,8 @@ class PPO:
                 _, leader_action_value, _, _, _ = \
                                             self.actor["leader"](obs = obs_tensor, h_old = torch.tensor(leader_hidden).to(self.device), 
                                                                 leader_action = torch.tensor(leader_action).detach().to(self.device), 
-                                                                follower_action = follower_action.detach().to(self.device))
+                                                                follower_action = follower_action.detach().to(self.device),
+                                                                share_inform = torch.tensor(share_inform).to(self.device))
             value_dic["leader"] =  value_dic["leader"] + leader_action_value
         # v = mean(Q)
         value_dic["leader"] = value_dic["leader"]/self.action_dim["leader"]
@@ -171,7 +173,7 @@ class PPO:
         leader_adv =  -abs(leader_action_value - leader_state_value)
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward # self.reward_follower_last 
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward 
-        reward_follower = type_reward
+        reward_follower = type_reward#0.5*type_reward + 0.5*reward
         self.reward_follower_last = leader_adv
         
         return reward_follower
@@ -448,10 +450,10 @@ class PPO:
         # print(name," len(self.old_logprobs[name]) ",len(share_data_dict["follower"]["action"]))
         return share_data_dict
 
-    def last_reward(self, reward, done):
+    def last_reward(self, reward, type_reward, done):
         self.memory["leader"].is_terminals.append(done)
         self.memory["leader"].rewards.append(reward)
-        self.memory["follower"].rewards.append(self.compute_follower_reward(reward,0,0))
+        self.memory["follower"].rewards.append(self.compute_follower_reward(reward,type_reward,0,0))
             
 
     def reset(self):

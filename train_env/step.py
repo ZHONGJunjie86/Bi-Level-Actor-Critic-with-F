@@ -33,7 +33,7 @@ def step(rank, shared_data, args, device, builder):
     wandb.init(
     project="Bi-Level-Actor-Critic-with-F", 
     entity="zhongjunjie",
-    group="IPPO 1"
+    group="SEPPO 5"
     )
     wandb.config = {
     "learning_rate": 0.0003,
@@ -63,16 +63,20 @@ def step(rank, shared_data, args, device, builder):
             actions = {}
             
             # pass hidden states between agents who can see each other
-            distance_reward_dict, global_reward_dict = information_share(states, rewards, agents, args)
+            distance_reward_dict, type_reward_dict = information_share(states, rewards, agents, args)
             
             for agent_name in agents.agents.keys():
-                global_reward = global_reward_dict
-                if "agent" in agent_name:reward = rewards[agent_name]/100
-                else: reward = rewards[agent_name]/10  + distance_reward_dict[agent_name]
+                if "agent" in agent_name:
+                    reward = rewards[agent_name]/100
+                    type_reward = type_reward_dict["agent"]
+                else: 
+                    reward = rewards[agent_name]/10  + distance_reward_dict[agent_name]
+                    type_reward = type_reward_dict["adversary"]
+                
                 total_step_reward[agent_name] += reward
 
                 action = agents.get_action(states[agent_name], 
-                                            reward, dones[agent_name], agent_name)
+                                            reward, type_reward, dones[agent_name], agent_name)
                 # if "agent" in agent_name:
                 #     actions[agent_name] = 0
                 # else:
@@ -87,12 +91,15 @@ def step(rank, shared_data, args, device, builder):
             ################################# env rollout ##########################################
             # ================================== collect data & update ========================================
             if True in dones.values():
-                # last_reward
+                # last_reward   type_reward_dict
                 for agent_name in agents.agents.keys():
-                    if "agent" in agent_name:reward = rewards[agent_name]/100
-                    else: reward = rewards[agent_name]/10  + distance_reward_dict[agent_name]
+                    if "agent" in agent_name:
+                        reward = rewards[agent_name]/100
+                        agents.last_reward(reward, type_reward_dict["agent"], dones[agent_name], agent_name)
+                    else: 
+                        reward = rewards[agent_name]/10  + distance_reward_dict[agent_name]
+                        agents.last_reward(reward, type_reward_dict["adversary"], dones[agent_name], agent_name)
                     total_step_reward[agent_name] += reward
-                    agents.last_reward(reward, dones[agent_name], agent_name)
                 
                 # train
                 if rank == 0:
