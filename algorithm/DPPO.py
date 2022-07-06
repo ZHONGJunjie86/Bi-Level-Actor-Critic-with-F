@@ -136,7 +136,7 @@ class PPO:
                                 "follower": return_dict["action_value"]["follower"]}
 
         # reward_shaping
-        return_dict["reward"] = {"leader": reward, 
+        return_dict["reward"] = {"leader": reward,#type_reward/10,# 
                                 "follower": self.compute_follower_reward(reward, type_reward,
                                                                         return_dict["action_value"]["leader"],
                                                                         return_dict["value"]["leader"]
@@ -144,7 +144,7 @@ class PPO:
                 
         # follower only state value, but can have Q = r + V'
         if len(self.memory["follower"].action_values)!=0:
-            self.memory["follower"].action_values[-1] = (return_dict["reward"]["follower"] + return_dict["value"]["follower"]).cpu().numpy()
+            self.memory["follower"].action_values[-1] = (return_dict["reward"]["follower"] + self.gamma * return_dict["value"]["follower"]).cpu().numpy()
         
         return return_dict
 
@@ -173,9 +173,10 @@ class PPO:
         leader_adv =  -abs(leader_action_value - leader_state_value)
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward # self.reward_follower_last 
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward 
-        reward_follower = type_reward#0.5*type_reward + 0.5*reward
+        reward_follower = 0.5 * reward + 0.5*self.reward_follower_last
+        ##0.5*type_reward + 0.5*reward
+        #0.5*type_reward/10 + 
         self.reward_follower_last = leader_adv
-        
         return reward_follower
 
 
