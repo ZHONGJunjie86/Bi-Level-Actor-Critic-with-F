@@ -36,9 +36,9 @@ class ActorCritic(nn.Module):
             self.linear_critic_1 = nn.Linear(64 + self.hidden_size, 1) #+ self.follower_action_dim * 2
         elif name == "leader":
             # state 包含 follower 的动作(representation of others)
-            self.linear1 = nn.Linear(obs_size + leader_action_dim , 64) # + follower_action_dim
+            self.linear1 = nn.Linear(obs_size + leader_action_dim + follower_action_dim, 64) # 
             # combine with other inform
-            self.linear_with_other_info = nn.Linear(64 + follower_action_dim, 64)    #   
+            # self.linear_with_other_info = nn.Linear(64 + follower_action_dim, 64)    #   
             # self.self_attention_with_other_info = nn.MultiheadAttention(64 + leader_action_dim + follower_action_dim, 2)    #   
             # actor Categorical
             self.linear_actor_combine = nn.Linear(64 , leader_action_dim) # follower_action_dim + 
@@ -91,7 +91,7 @@ class ActorCritic(nn.Module):
         elif self.name == "leader":
             obs = torch.cat([obs.view(batch_size, 1, -1), 
                             leader_action.reshape(batch_size, 1, self.leader_action_dim),
-                            #follower_action.reshape(batch_size, 1, self.follower_action_dim)
+                            follower_action.reshape(batch_size, 1, self.follower_action_dim)
                            ], -1).view(batch_size, 1, -1)
             
         # if train:
@@ -118,11 +118,11 @@ class ActorCritic(nn.Module):
             # print("follower x----------", x)
             x = self.self_attention_with_other_info(x,x,x)[0] + x
         
-        if self.name == "leader":
-            x =  torch.cat([x.view(batch_size, 1, -1), 
-                            follower_action.reshape(batch_size, 1, self.follower_action_dim)
-                           ], -1).view(batch_size, 1, -1).to(torch.float32)
-            x = self.linear_with_other_info(x)
+        # if self.name == "leader":
+        #     x =  torch.cat([x.view(batch_size, 1, -1), 
+        #                     follower_action.reshape(batch_size, 1, self.follower_action_dim)
+        #                    ], -1).view(batch_size, 1, -1).to(torch.float32)
+        #     x = self.linear_with_other_info(x)
         
         # actor
         if self.name == "follower":

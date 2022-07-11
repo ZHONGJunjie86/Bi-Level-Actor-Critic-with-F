@@ -142,9 +142,12 @@ class PPO:
                                                                         return_dict["value"]["leader"]
                                                                         )}
                 
-        # follower only state value, but can have Q = r + V'
+        # follower only state value, but can have Q = r + gamma * V'   
         if len(self.memory["follower"].action_values)!=0:
-            self.memory["follower"].action_values[-1] = (return_dict["reward"]["follower"] + self.gamma * return_dict["value"]["follower"]).cpu().numpy()
+            self.memory["follower"].action_values[-1] +=  self.gamma *(return_dict["value"]["follower"]).cpu().numpy()
+            self.memory["follower"].action_values.append(return_dict["reward"]["follower"])
+        else:
+            self.memory["follower"].action_values.append(return_dict["reward"]["follower"])
         
         return return_dict
 
@@ -158,11 +161,11 @@ class PPO:
             self.memory["leader"].states.append(state)
             self.memory["leader"].is_terminals.append(done)
             self.memory["leader"].leader_action_behaviour.append(data_dict["action"]["leader_behaviour"])
+            self.memory["leader"].action_values.append(data_dict["action_value"]["leader"].cpu().numpy())
             for name in self.agent_name_list:
                 self.memory[name].actions.append(data_dict["action"][name])
                 self.memory[name].logprobs.append(data_dict["action_logprob"][name].cpu().numpy()) 
                 self.memory[name].hidden_states.append(data_dict["h_s"][name].cpu().numpy())
-                self.memory[name].action_values.append(data_dict["action_value"][name].cpu().numpy())
                 self.memory[name].values.append(data_dict["value"][name].cpu().numpy())
                 self.memory[name].rewards.append(data_dict["reward"][name])
         
@@ -170,12 +173,12 @@ class PPO:
 
     
     def compute_follower_reward(self, reward, type_reward, leader_action_value, leader_state_value):
-        leader_adv =  -abs(leader_action_value - leader_state_value)
+        leader_adv = -(leader_action_value - leader_state_value)#0.5 * reward + 0.5*)
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward # self.reward_follower_last 
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward 
-        reward_follower = 0.5 * reward + 0.5*self.reward_follower_last
+        reward_follower = type_reward/10#0.5 * reward + 0.5 * self.reward_follower_last #  
         ##0.5*type_reward + 0.5*reward
-        #0.5*type_reward/10 + 
+        #0.5*type_reward/10 +  
         self.reward_follower_last = leader_adv
         return reward_follower
 

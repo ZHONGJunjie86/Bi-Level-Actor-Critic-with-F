@@ -58,8 +58,8 @@ model_save_path = {"agent": path,
                    "adversary":path}
 
 # multiprocessing
-main_device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu") 
-device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu") 
+main_device = torch.device("cuda:3") if torch.cuda.is_available() else torch.device("cpu") 
+device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
 
 
 

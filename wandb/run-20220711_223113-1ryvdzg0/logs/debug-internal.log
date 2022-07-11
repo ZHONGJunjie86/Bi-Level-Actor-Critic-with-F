@@ -1,0 +1,78 @@
+2022-07-11 22:31:16,393 INFO    MainThread:4917 [internal.py:wandb_internal():90] W&B internal server running at pid: 4917, started at: 2022-07-11 22:31:16.392538
+2022-07-11 22:31:16,402 INFO    WriterThread:4917 [datastore.py:open_for_write():75] open: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_223113-1ryvdzg0/run-1ryvdzg0.wandb
+2022-07-11 22:31:16,412 DEBUG   SenderThread:4917 [sender.py:send():232] send: header
+2022-07-11 22:31:16,413 DEBUG   SenderThread:4917 [sender.py:send():232] send: run
+2022-07-11 22:31:16,708 DEBUG   HandlerThread:4917 [handler.py:handle_request():141] handle_request: check_version
+2022-07-11 22:31:16,716 INFO    SenderThread:4917 [dir_watcher.py:__init__():197] watching files in: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_223113-1ryvdzg0/files
+2022-07-11 22:31:16,717 INFO    SenderThread:4917 [sender.py:_start_run_threads():811] run started: 1ryvdzg0 with start time 1657546273
+2022-07-11 22:31:16,717 DEBUG   SenderThread:4917 [sender.py:send():232] send: summary
+2022-07-11 22:31:16,718 INFO    SenderThread:4917 [sender.py:_save_file():948] saving file wandb-summary.json with policy end
+2022-07-11 22:31:16,718 DEBUG   SenderThread:4917 [sender.py:send_request():246] send_request: check_version
+2022-07-11 22:31:16,788 DEBUG   HandlerThread:4917 [handler.py:handle_request():141] handle_request: run_start
+2022-07-11 22:31:16,802 DEBUG   HandlerThread:4917 [meta.py:__init__():35] meta init
+2022-07-11 22:31:16,802 DEBUG   HandlerThread:4917 [meta.py:__init__():49] meta init done
+2022-07-11 22:31:16,802 DEBUG   HandlerThread:4917 [meta.py:probe():209] probe
+2022-07-11 22:31:16,990 DEBUG   HandlerThread:4917 [meta.py:_setup_git():199] setup git
+2022-07-11 22:31:17,023 DEBUG   HandlerThread:4917 [meta.py:_setup_git():206] setup git done
+2022-07-11 22:31:17,024 DEBUG   HandlerThread:4917 [meta.py:_save_pip():53] save pip
+2022-07-11 22:31:17,027 DEBUG   HandlerThread:4917 [meta.py:_save_pip():67] save pip done
+2022-07-11 22:31:17,027 DEBUG   HandlerThread:4917 [meta.py:_save_conda():74] save conda
+2022-07-11 22:31:17,727 INFO    Thread-13 :4917 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_223113-1ryvdzg0/files/conda-environment.yaml
+2022-07-11 22:31:17,728 INFO    Thread-13 :4917 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_223113-1ryvdzg0/files/wandb-summary.json
+2022-07-11 22:31:17,728 INFO    Thread-13 :4917 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_223113-1ryvdzg0/files/requirements.txt
+2022-07-11 22:31:21,720 INFO    Thread-13 :4917 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_223113-1ryvdzg0/files/conda-environment.yaml
+2022-07-11 22:31:21,943 DEBUG   HandlerThread:4917 [meta.py:_save_conda():84] save conda done
+2022-07-11 22:31:21,943 DEBUG   HandlerThread:4917 [meta.py:probe():247] probe done
+2022-07-11 22:31:21,955 DEBUG   HandlerThread:4917 [handler.py:handle_request():141] handle_request: stop_status
+2022-07-11 22:31:21,955 DEBUG   SenderThread:4917 [sender.py:send_request():246] send_request: stop_status
+2022-07-11 22:31:22,392 DEBUG   SenderThread:4917 [sender.py:send():232] send: telemetry
+2022-07-11 22:31:22,393 DEBUG   SenderThread:4917 [sender.py:send():232] send: files
+2022-07-11 22:31:22,394 INFO    SenderThread:4917 [sender.py:_save_file():948] saving file wandb-metadata.json with policy now
+2022-07-11 22:31:22,721 INFO    Thread-13 :4917 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_223113-1ryvdzg0/files/wandb-metadata.json
+2022-07-11 22:31:22,722 INFO    Thread-13 :4917 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_223113-1ryvdzg0/files/output.log
+2022-07-11 22:31:23,016 INFO    Thread-17 :4917 [upload_job.py:push():132] Uploaded file /tmp/tmpluk6st_5wandb/3tjh612c-wandb-metadata.json
+2022-07-11 22:31:24,722 INFO    Thread-13 :4917 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_223113-1ryvdzg0/files/output.log
+2022-07-11 22:31:37,397 DEBUG   HandlerThread:4917 [handler.py:handle_request():141] handle_request: stop_status
+2022-07-11 22:31:37,397 DEBUG   SenderThread:4917 [sender.py:send_request():246] send_request: stop_status
+2022-07-11 22:31:47,739 INFO    Thread-13 :4917 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_223113-1ryvdzg0/files/config.yaml
+2022-07-11 22:31:52,646 DEBUG   HandlerThread:4917 [handler.py:handle_request():141] handle_request: stop_status
+2022-07-11 22:31:52,646 DEBUG   SenderThread:4917 [sender.py:send_request():246] send_request: stop_status
+2022-07-11 22:32:04,483 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:32:07,856 DEBUG   HandlerThread:4917 [handler.py:handle_request():141] handle_request: stop_status
+2022-07-11 22:32:07,857 DEBUG   SenderThread:4917 [sender.py:send_request():246] send_request: stop_status
+2022-07-11 22:32:51,754 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:33:40,736 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:34:26,377 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:35:12,058 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:35:59,174 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:36:46,979 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:37:34,902 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:38:24,419 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:39:10,431 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:40:01,463 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:41:01,077 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:41:53,690 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:43:00,330 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:43:52,046 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:44:39,613 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:45:30,602 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:46:20,057 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:47:10,486 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:48:00,637 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:48:49,163 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:49:38,894 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:50:26,818 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:51:20,325 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:52:08,517 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:52:57,986 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:53:45,252 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:54:35,011 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:55:33,943 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:56:35,700 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:57:29,718 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:58:28,437 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 22:59:18,681 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 23:00:18,086 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 23:01:07,976 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 23:02:06,931 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
+2022-07-11 23:02:56,919 DEBUG   SenderThread:4917 [sender.py:send():232] send: stats
