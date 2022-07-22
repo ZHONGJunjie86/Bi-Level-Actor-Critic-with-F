@@ -1,0 +1,42 @@
+2022-07-11 23:08:18,073 INFO    MainThread:38122 [internal.py:wandb_internal():90] W&B internal server running at pid: 38122, started at: 2022-07-11 23:08:18.072392
+2022-07-11 23:08:18,085 INFO    WriterThread:38122 [datastore.py:open_for_write():75] open: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_230814-1wswoinf/run-1wswoinf.wandb
+2022-07-11 23:08:18,092 DEBUG   SenderThread:38122 [sender.py:send():232] send: header
+2022-07-11 23:08:18,092 DEBUG   SenderThread:38122 [sender.py:send():232] send: run
+2022-07-11 23:08:18,359 DEBUG   HandlerThread:38122 [handler.py:handle_request():141] handle_request: check_version
+2022-07-11 23:08:18,366 INFO    SenderThread:38122 [dir_watcher.py:__init__():197] watching files in: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_230814-1wswoinf/files
+2022-07-11 23:08:18,366 INFO    SenderThread:38122 [sender.py:_start_run_threads():811] run started: 1wswoinf with start time 1657548494
+2022-07-11 23:08:18,367 DEBUG   SenderThread:38122 [sender.py:send():232] send: summary
+2022-07-11 23:08:18,368 INFO    SenderThread:38122 [sender.py:_save_file():948] saving file wandb-summary.json with policy end
+2022-07-11 23:08:18,369 DEBUG   SenderThread:38122 [sender.py:send_request():246] send_request: check_version
+2022-07-11 23:08:18,435 DEBUG   HandlerThread:38122 [handler.py:handle_request():141] handle_request: run_start
+2022-07-11 23:08:18,525 DEBUG   HandlerThread:38122 [meta.py:__init__():35] meta init
+2022-07-11 23:08:18,526 DEBUG   HandlerThread:38122 [meta.py:__init__():49] meta init done
+2022-07-11 23:08:18,526 DEBUG   HandlerThread:38122 [meta.py:probe():209] probe
+2022-07-11 23:08:18,535 DEBUG   HandlerThread:38122 [meta.py:_setup_git():199] setup git
+2022-07-11 23:08:18,566 DEBUG   HandlerThread:38122 [meta.py:_setup_git():206] setup git done
+2022-07-11 23:08:18,567 DEBUG   HandlerThread:38122 [meta.py:_save_pip():53] save pip
+2022-07-11 23:08:18,570 DEBUG   HandlerThread:38122 [meta.py:_save_pip():67] save pip done
+2022-07-11 23:08:18,570 DEBUG   HandlerThread:38122 [meta.py:_save_conda():74] save conda
+2022-07-11 23:08:19,376 INFO    Thread-13 :38122 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_230814-1wswoinf/files/requirements.txt
+2022-07-11 23:08:19,377 INFO    Thread-13 :38122 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_230814-1wswoinf/files/conda-environment.yaml
+2022-07-11 23:08:19,378 INFO    Thread-13 :38122 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_230814-1wswoinf/files/wandb-summary.json
+2022-07-11 23:08:22,633 DEBUG   HandlerThread:38122 [meta.py:_save_conda():84] save conda done
+2022-07-11 23:08:22,634 DEBUG   HandlerThread:38122 [meta.py:probe():247] probe done
+2022-07-11 23:08:22,647 DEBUG   SenderThread:38122 [sender.py:send():232] send: files
+2022-07-11 23:08:22,647 INFO    SenderThread:38122 [sender.py:_save_file():948] saving file wandb-metadata.json with policy now
+2022-07-11 23:08:22,672 DEBUG   HandlerThread:38122 [handler.py:handle_request():141] handle_request: stop_status
+2022-07-11 23:08:22,673 DEBUG   SenderThread:38122 [sender.py:send_request():246] send_request: stop_status
+2022-07-11 23:08:22,879 DEBUG   SenderThread:38122 [sender.py:send():232] send: telemetry
+2022-07-11 23:08:23,267 INFO    Thread-17 :38122 [upload_job.py:push():132] Uploaded file /tmp/tmp748_13p3wandb/1pviw339-wandb-metadata.json
+2022-07-11 23:08:23,370 INFO    Thread-13 :38122 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_230814-1wswoinf/files/conda-environment.yaml
+2022-07-11 23:08:23,371 INFO    Thread-13 :38122 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_230814-1wswoinf/files/output.log
+2022-07-11 23:08:23,371 INFO    Thread-13 :38122 [dir_watcher.py:_on_file_created():244] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_230814-1wswoinf/files/wandb-metadata.json
+2022-07-11 23:08:25,372 INFO    Thread-13 :38122 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_230814-1wswoinf/files/output.log
+2022-07-11 23:08:37,882 DEBUG   HandlerThread:38122 [handler.py:handle_request():141] handle_request: stop_status
+2022-07-11 23:08:37,883 DEBUG   SenderThread:38122 [sender.py:send_request():246] send_request: stop_status
+2022-07-11 23:08:48,389 INFO    Thread-13 :38122 [dir_watcher.py:_on_file_modified():257] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20220711_230814-1wswoinf/files/config.yaml
+2022-07-11 23:08:53,093 DEBUG   HandlerThread:38122 [handler.py:handle_request():141] handle_request: stop_status
+2022-07-11 23:08:53,094 DEBUG   SenderThread:38122 [sender.py:send_request():246] send_request: stop_status
+2022-07-11 23:09:06,079 DEBUG   SenderThread:38122 [sender.py:send():232] send: stats
+2022-07-11 23:09:08,316 DEBUG   HandlerThread:38122 [handler.py:handle_request():141] handle_request: stop_status
+2022-07-11 23:09:08,317 DEBUG   SenderThread:38122 [sender.py:send_request():246] send_request: stop_status
