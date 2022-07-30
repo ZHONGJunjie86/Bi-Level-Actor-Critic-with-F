@@ -242,8 +242,8 @@ class Shared_Data(): #nn.Module
                 np.random.shuffle(index)
                 index_start = 0
                 batch_sample = batch_size // args.K_epochs
-                if self.episode > 2000 and agent_type == "agent":
-                    continue
+                # if self.episode > 2000 and agent_type == "agent":
+                #     continue
                 if name == "follower" and agent_type == "agent":
                     continue
                 for _ in range(args.K_epochs): # batch_size#
