@@ -8,8 +8,8 @@ import torch
 parser = argparse.ArgumentParser()
 parser.add_argument('--gamma', default=0.95, type=float)  # 0.1**(1/50)
 parser.add_argument('--a_lr', default=1.5e-3, type=float)  # 0.0015
-parser.add_argument('--min_lr', default=5e-5, type=float)  # 0.00002
-parser.add_argument('--lr_decay', default=0.99, type=float)
+parser.add_argument('--min_lr', default=1.2e-5, type=float)  # 0.00002
+parser.add_argument('--lr_decay', default=0.95, type=float)
 
 
 parser.add_argument('--render', action='store_true')
@@ -58,8 +58,8 @@ model_save_path = {"agent": path,
                    "adversary":path}
 
 # multiprocessing
-main_device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu") 
-device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu") 
+main_device = torch.device("cuda:3") if torch.cuda.is_available() else torch.device("cpu") 
+device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
 
 
 

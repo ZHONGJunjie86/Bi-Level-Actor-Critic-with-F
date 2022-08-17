@@ -35,6 +35,7 @@ class PPO:
         self.entropy_coef = 0.01
         self.hidden_size = 64
         self.hidden_state_zero = torch.zeros(1,1,self.hidden_size)#.to(self.device)
+        self.last_follower_action_value = 0.0
 
         # social reward coef
         self.env_coef = 0.5
@@ -149,6 +150,7 @@ class PPO:
         else:
             self.memory["follower"].action_values.append(return_dict["reward"]["follower"])
         
+        self.last_follower_action_value = float(return_dict["value"]["follower"].cpu().numpy())
         return return_dict
 
 
@@ -176,9 +178,9 @@ class PPO:
         leader_adv = -(leader_action_value - leader_state_value)#0.5 * reward + 0.5*)
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward # self.reward_follower_last 
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward 
-        reward_follower = 0.5 * reward  + 0.5 * self.reward_follower_last #  
+        reward_follower = 0.5 * type_reward/10 + 0.5 * self.reward_follower_last #  
         ##0.5*type_reward + 0.5*reward
-        #0.5*type_reward/10 +  type_reward/10# type_reward/10
+        #0.5*type_reward/10 +  # reward
         self.reward_follower_last = leader_adv
         return reward_follower
 
@@ -455,6 +457,8 @@ class PPO:
         return share_data_dict
 
     def last_reward(self, reward, type_reward, done):
+        self.memory["follower"].action_values[-1] +=  self.last_follower_action_value
+        self.last_follower_action_value = 0.0
         self.memory["leader"].is_terminals.append(done)
         self.memory["leader"].rewards.append(reward)
         self.memory["follower"].rewards.append(self.compute_follower_reward(reward,type_reward,0,0))
