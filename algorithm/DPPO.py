@@ -144,13 +144,10 @@ class PPO:
                                                                         )}
                 
         # follower only state value, but can have Q = r + gamma * V'   self.gamma *
-        if len(self.memory["follower"].action_values)!=0:
-            self.memory["follower"].action_values[-1] +=  float(return_dict["value"]["follower"].cpu().numpy())
-            self.memory["follower"].action_values.append(float(return_dict["reward"]["follower"].cpu().numpy()))
-        else:
-            self.memory["follower"].action_values.append(return_dict["reward"]["follower"])
-        
-        self.last_follower_action_value = float(return_dict["value"]["follower"].cpu().numpy())
+        # last_Q = last time r + current V
+        self.memory["follower"].action_values.append(return_dict["reward"]["follower"] + self.gamma * float(return_dict["value"]["follower"].cpu().numpy()))
+        self.last_follower_action_value = return_dict["reward"]["follower"] + self.gamma * float(return_dict["value"]["follower"].cpu().numpy())
+
         return return_dict
 
 
@@ -199,6 +196,8 @@ class PPO:
                 self.old_action_values = {}
                 self.old_hiddens = {}
                 self.compute_rewards= {}
+                # follower Q
+                self.memory["follower"].action_values.pop(0)
                 for name in self.agent_name_list:
                     self.old_logprobs[name] = torch.tensor(self.memory[name].logprobs
                                                             ).view(-1, 1, 1)
@@ -457,7 +456,7 @@ class PPO:
         return share_data_dict
 
     def last_reward(self, reward, type_reward, done):
-        self.memory["follower"].action_values[-1] +=  self.last_follower_action_value
+        self.memory["follower"].action_values.append(self.last_follower_action_value)
         self.last_follower_action_value = 0.0
         self.memory["leader"].is_terminals.append(done)
         self.memory["leader"].rewards.append(reward)
