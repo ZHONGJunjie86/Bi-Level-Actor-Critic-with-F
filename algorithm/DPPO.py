@@ -139,8 +139,8 @@ class PPO:
         # reward_shaping
         return_dict["reward"] = {"leader": reward,#type_reward/10,# 
                                 "follower": self.compute_follower_reward(reward, type_reward,
-                                                                        return_dict["action_value"]["leader"],
-                                                                        return_dict["value"]["leader"]
+                                                                        float(return_dict["action_value"]["leader"].cpu().numpy()),
+                                                                        float(return_dict["value"]["leader"].cpu().numpy())
                                                                         )}
                 
         # follower only state value, but can have Q = r + gamma * V'   self.gamma *
@@ -175,15 +175,17 @@ class PPO:
         leader_adv = -(leader_action_value - leader_state_value)#0.5 * reward + 0.5*)
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward # self.reward_follower_last 
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward 
-        reward_follower = 0.5 * type_reward/10 + 0.5 * self.reward_follower_last #  
+        reward_follower = 0.5 * reward + 0.5 * self.reward_follower_last #  
         ##0.5*type_reward + 0.5*reward
-        #0.5*type_reward/10 +  # reward
+        #0.5*type_reward/10 +  # type_reward/10
         self.reward_follower_last = leader_adv
         return reward_follower
 
 
     def compute_loss(self, training_time, main_process = False):
         if training_time ==0:
+            # follower Q
+            self.memory["follower"].action_values = self.memory["follower"].action_values[1:]
             with torch.no_grad():
                 self.old_states = torch.tensor(np.array(self.memory["leader"].states)
                                             ).view(-1,1,self.obs_shape)
@@ -196,8 +198,7 @@ class PPO:
                 self.old_action_values = {}
                 self.old_hiddens = {}
                 self.compute_rewards= {}
-                # follower Q
-                self.memory["follower"].action_values.pop(0)
+                
                 for name in self.agent_name_list:
                     self.old_logprobs[name] = torch.tensor(self.memory[name].logprobs
                                                             ).view(-1, 1, 1)
