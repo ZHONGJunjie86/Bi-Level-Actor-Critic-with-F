@@ -244,7 +244,7 @@ class Shared_Data(): #nn.Module
                 batch_sample = batch_size // args.K_epochs
                 # if self.episode > 2000 and agent_type == "agent":
                 #     continue
-                if name == "follower" and agent_type == "agent":
+                if name == "follower" and agent_type == "agent": #
                     continue
                 for _ in range(args.K_epochs): # batch_size#
                     indices = torch.tensor(index[index_start:index_start+batch_sample],requires_grad=False)# torch.randint(batch_size, size=(batch_sample,), requires_grad=False)

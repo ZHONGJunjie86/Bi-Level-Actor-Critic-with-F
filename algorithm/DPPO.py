@@ -145,8 +145,8 @@ class PPO:
                 
         # follower only state value, but can have Q = r + gamma * V'   self.gamma *
         # last_Q = last time r + current V
-        self.memory["follower"].action_values.append(return_dict["reward"]["follower"] + self.gamma * float(return_dict["value"]["follower"].cpu().numpy()))
-        self.last_follower_action_value = return_dict["reward"]["follower"] + self.gamma * float(return_dict["value"]["follower"].cpu().numpy())
+        self.memory["follower"].action_values.append(return_dict["reward"]["follower"] +  float(return_dict["value"]["follower"].cpu().numpy()))
+        self.last_follower_action_value = return_dict["reward"]["follower"] +  float(return_dict["value"]["follower"].cpu().numpy())
 
         return return_dict
 
@@ -175,9 +175,9 @@ class PPO:
         leader_adv = -(leader_action_value - leader_state_value)#0.5 * reward + 0.5*)
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward # self.reward_follower_last 
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward 
-        reward_follower = 0.5 * reward + 0.5 * self.reward_follower_last #  
-        ##0.5*type_reward + 0.5*reward
-        #0.5*type_reward/10 +  # type_reward/10
+        reward_follower = 0.5 * self.reward_follower_last + 0.5 * reward  #   
+        #+ 0.5 * self.reward_follower_last
+        #0.5*type_reward/10 
         self.reward_follower_last = leader_adv
         return reward_follower
 
@@ -285,6 +285,7 @@ class PPO:
             action_value_pre = self.memory[name].action_values[-1]#torch.tensor()
             value_pre = self.memory[name].values[-1]
             advatage = self.memory[name].action_values[-1] - self.memory[name].values[-1]
+            adv_gae = self.memory[name].action_values[-1] - self.memory[name].values[-1]
             g_t_pre = action_value_pre if action_value_pre >= value_pre  \
                                        else value_pre
             # if self.use_upgo:
@@ -301,17 +302,26 @@ class PPO:
                 rewards.insert(0, discounted_reward) #插入列表
 
                 delta = reward + self.gamma*action_value_pre - value   # (1-is_terminal)*
+                
+                adv_gae = delta + self.gamma*self.lam*adv_gae 
+                
+                if action_value_pre >= value_pre:
+                    g_t = reward + self.gamma*g_t_pre
+                else:
+                    g_t = reward + self.gamma*value_pre
+                adv_upgo = g_t - value
+                g_t_pre = g_t
+
+                if (adv_gae > 0 and adv_upgo<0) or (adv_gae<0 and adv_upgo>0):
+                    adv_upgo = 0.99*adv_upgo
+                
                 if self.use_gae:
-                    advatage = delta + self.gamma*self.lam*advatage #* (1-is_terminal)
+                    advatage = adv_gae 
                 elif self.use_upgo:
-                    if action_value_pre >= value_pre:
-                        g_t = reward + self.gamma*g_t_pre
-                    else:
-                        g_t = reward + self.gamma*value_pre
-                    advatage = g_t - value
-                    g_t_pre = g_t
+                    advatage = adv_upgo
                 else:
                     advatage = delta
+
                 GAE_advantage.insert(0, advatage) #插入列表
                 target_value.insert(0,float(value) + advatage)#)
                 action_value_pre = action_value
