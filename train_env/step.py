@@ -33,7 +33,7 @@ def step(rank, shared_data, args, device, builder):
     wandb.init(
     project="Bi-Level-Actor-Critic-with-F", 
     entity="zhongjunjie",
-    group="SEPPO 63"
+    group="SEPPO 66"
     )
     wandb.config = {
     "learning_rate": 0.0003,

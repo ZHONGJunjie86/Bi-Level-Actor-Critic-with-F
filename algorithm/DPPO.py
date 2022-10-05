@@ -143,10 +143,10 @@ class PPO:
                                                                         float(return_dict["value"]["leader"].cpu().numpy())
                                                                         )}
                 
-        # follower only state value, but can have Q = r + gamma * V'   self.gamma *
+        # follower only state value, but can have Q = r + gamma * V'  self.gamma *
         # last_Q = last time r + current V
-        self.memory["follower"].action_values.append(return_dict["reward"]["follower"] +  float(return_dict["value"]["follower"].cpu().numpy()))
-        self.last_follower_action_value = return_dict["reward"]["follower"] +  float(return_dict["value"]["follower"].cpu().numpy())
+        self.memory["follower"].action_values.append(return_dict["reward"]["follower"] + float(return_dict["value"]["follower"].cpu().numpy()))
+        self.last_follower_action_value = return_dict["reward"]["follower"] + float(return_dict["value"]["follower"].cpu().numpy())
 
         return return_dict
 
@@ -313,7 +313,7 @@ class PPO:
                 g_t_pre = g_t
 
                 if (adv_gae > 0 and adv_upgo<0) or (adv_gae<0 and adv_upgo>0):
-                    adv_upgo = 0.99*adv_upgo
+                    adv_upgo = 0.999*adv_upgo
                 
                 if self.use_gae:
                     advatage = adv_gae 
