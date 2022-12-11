@@ -49,17 +49,19 @@ agent_type_list = ["agent", "adversary"]
 obs_shape_by_type = {"agent": 4 + 2 * args.num_obstacles + 2* (args.num_good + args.num_adversaries - 1) + 2 * (args.num_good - 1), 
                      "adversary": 4 + 2 * args.num_obstacles + 2 * (args.num_good + args.num_adversaries - 1) + 2 * args.num_good}
 action_dim_by_type = {"leader": 5, "follower": 1}
+num_adversaries = args.num_adversaries
+
 
 # 定义保存路径
-path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/model1/"#
+path = "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/model/model2/"#
 model_load_path = {"agent": path, 
                    "adversary":path}
 model_save_path = {"agent": path, 
                    "adversary":path}
 
 # multiprocessing
-main_device = torch.device("cuda:3") if torch.cuda.is_available() else torch.device("cpu") 
-device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
+main_device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
+device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu") 
 
 
 

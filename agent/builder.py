@@ -45,7 +45,7 @@ class Bulider():
                 model_dict[agent_type][name] = copy.deepcopy(ActorCritic(obs_shape_by_type[agent_type], 
                                                            action_dim_by_type["leader"], 
                                                            action_dim_by_type["follower"], 
-                                                           name) )
+                                                           name,num_adversaries) )
         return model_dict
 
     @staticmethod

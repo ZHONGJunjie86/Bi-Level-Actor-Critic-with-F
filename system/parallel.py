@@ -6,7 +6,7 @@ from train_env.step import step
 
 os.environ['OMP_NUM_THREADS'] = '1'
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-
+# os.environ["PYOPENGL_PLATFORM"] = "egl"
 
 def parallel_trainer(bulider):
     if sys.version_info[0] > 2:

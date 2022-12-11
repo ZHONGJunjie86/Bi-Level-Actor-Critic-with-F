@@ -36,6 +36,7 @@ class PPO:
         self.hidden_size = 64
         self.hidden_state_zero = torch.zeros(1,1,self.hidden_size)#.to(self.device)
         self.last_follower_action_value = 0.0
+        self.num_adversaries = args.num_adversaries
 
         # social reward coef
         self.env_coef = 0.5
@@ -53,7 +54,7 @@ class PPO:
         
         self.actor = {name: copy.deepcopy(ActorCritic(self.obs_shape, self.action_dim["leader"], 
                                        self.action_dim["follower"], 
-                                       name)).to(self.device) 
+                                       name, self.num_adversaries)).to(self.device) 
                                        for name in self.agent_name_list}
 
         
@@ -89,8 +90,8 @@ class PPO:
                                                             leader_action =torch.tensor(leader_action).to(self.device),
                                                             share_inform = torch.tensor(share_inform).to(self.device)
                                                             )
-                if self.agent_type == "agent":
-                    follower_action = torch.tensor(np.array([[[0.1]]]))
+                # if self.agent_type == "agent":
+                follower_action = torch.tensor(np.array([[[0.1]]]))
                 
                 leader_logprob, leader_action_value, leader_action_behaviour, leader_hidden_state, _ = \
                                         self.actor["leader"](obs = obs_tensor, h_old = torch.tensor(leader_hidden).to(self.device), 
@@ -145,8 +146,8 @@ class PPO:
                 
         # follower only state value, but can have Q = r + gamma * V'  self.gamma *
         # last_Q = last time r + current V
-        self.memory["follower"].action_values.append(return_dict["reward"]["follower"] + float(return_dict["value"]["follower"].cpu().numpy()))
-        self.last_follower_action_value = return_dict["reward"]["follower"] + float(return_dict["value"]["follower"].cpu().numpy())
+        self.memory["follower"].action_values.append(return_dict["reward"]["follower"] + self.gamma * float(return_dict["value"]["follower"].cpu().numpy()))
+        self.last_follower_action_value = return_dict["reward"]["follower"] + self.gamma * float(return_dict["value"]["follower"].cpu().numpy())
 
         return return_dict
 
@@ -161,8 +162,9 @@ class PPO:
             self.memory["leader"].is_terminals.append(done)
             self.memory["leader"].leader_action_behaviour.append(data_dict["action"]["leader_behaviour"])
             self.memory["leader"].action_values.append(data_dict["action_value"]["leader"].cpu().numpy())
+            self.memory["leader"].actions.append(data_dict["action"]["leader"])
+            self.memory["follower"].actions.append(data_dict["action"]["follower"].cpu().numpy())
             for name in self.agent_name_list:
-                self.memory[name].actions.append(data_dict["action"][name])
                 self.memory[name].logprobs.append(data_dict["action_logprob"][name].cpu().numpy()) 
                 self.memory[name].hidden_states.append(data_dict["h_s"][name].cpu().numpy())
                 self.memory[name].values.append(data_dict["value"][name].cpu().numpy())
@@ -191,7 +193,7 @@ class PPO:
                                             ).view(-1,1,self.obs_shape)
                 self.old_compute_termi = torch.tensor(self.memory["leader"].is_terminals)
                 self.leader_action_behaviour = torch.tensor(self.memory["leader"].leader_action_behaviour).view(-1,1,1) 
-                self.follower_share = torch.tensor(self.memory["follower"].follower_share_inform).view(-1,1,self.hidden_size) 
+                self.follower_share = torch.tensor(np.array(self.memory["follower"].follower_share_inform)).view(-1,1,self.hidden_size) 
                 self.old_logprobs = {}
                 self.old_actions = {}
                 self.old_values = {}
@@ -200,14 +202,14 @@ class PPO:
                 self.compute_rewards= {}
                 
                 for name in self.agent_name_list:
-                    self.old_logprobs[name] = torch.tensor(self.memory[name].logprobs
+                    self.old_logprobs[name] = torch.tensor(np.array(self.memory[name].logprobs)
                                                             ).view(-1, 1, 1)
-                    self.old_actions[name] = torch.tensor(self.memory[name].actions
+                    self.old_actions[name] = torch.tensor(np.array(self.memory[name].actions)
                                                          ).view(-1, 1, self.action_dim[name])
-                    self.old_values[name] = torch.tensor(self.memory[name].values).view(-1, 1, 1)
-                    self.old_action_values[name] = torch.tensor(self.memory[name].action_values).view(-1, 1, self.action_dim[name])
-                    self.old_hiddens[name] = torch.tensor(self.memory[name].hidden_states[:-1]).view( -1, 1, self.hidden_size)
-                    self.compute_rewards[name] = torch.tensor(self.memory[name].rewards[1:])
+                    self.old_values[name] = torch.tensor(np.array(self.memory[name].values)).view(-1, 1, 1)
+                    self.old_action_values[name] = torch.tensor(np.array(self.memory[name].action_values)).view(-1, 1, self.action_dim[name])
+                    self.old_hiddens[name] = torch.tensor(np.array(self.memory[name].hidden_states[:-1])).view( -1, 1, self.hidden_size)
+                    self.compute_rewards[name] = torch.tensor(np.array(self.memory[name].rewards[1:]))
                     
         
         for name in self.agent_name_list:
@@ -318,7 +320,7 @@ class PPO:
                 if self.use_gae:
                     advatage = adv_gae 
                 elif self.use_upgo:
-                    advatage = adv_upgo
+                    advatage = adv_upgo #0.2 * adv_upgo + 0.8 * adv_gae # 
                 else:
                     advatage = delta
 
@@ -490,6 +492,8 @@ class PPO:
                 self.loss_dic[loss_name][agent_name] = 0
         
         self.reward_follower_last = 0
+        self.hidden_state_zero = torch.zeros(1,1,self.hidden_size)#.to(self.device)
+        
 
     def load_model(self, model_load_path):
 

@@ -33,7 +33,7 @@ def step(rank, shared_data, args, device, builder):
     wandb.init(
     project="Bi-Level-Actor-Critic-with-F", 
     entity="zhongjunjie",
-    group="SEPPO 66"
+    group="SEPPO 82"
     )
     wandb.config = {
     "learning_rate": 0.0003,
@@ -54,9 +54,9 @@ def step(rank, shared_data, args, device, builder):
         for name in agents.agent_name_list:
             dones[name] = False
             rewards[name] = 0
-        if RENDER and rank == 0 and episode % 10 == 0:
-            env.render()
-            time.sleep(0.1)
+        # if RENDER and rank == 0 and episode % 10 == 0:
+        #     env.render()
+        #     time.sleep(0.1)
 
         while True:
             ################################# collect  action #############################
@@ -82,12 +82,12 @@ def step(rank, shared_data, args, device, builder):
                 # else:
                 #     actions[agent_name] = action
                 actions[agent_name] = action
-        
+                
             states, rewards, dones, infos = env.step(actions)
             step += 1
-            if RENDER and rank == 0 and episode % 10 == 0:
-                env.render()
-                time.sleep(0.1)
+            # if RENDER and rank == 0 and episode % 10 == 0:
+            #     env.render()
+            #     time.sleep(0.1)
             ################################# env rollout ##########################################
             # ================================== collect data & update ========================================
             if True in dones.values():
@@ -107,7 +107,6 @@ def step(rank, shared_data, args, device, builder):
 
                 loss_dict = K_epochs_PPO_training(rank, args, episode, shared_data, agents)
                 
-                # if rank == 0:
                 send_curve_data(loss_dict, total_step_reward, agent_type_list)
                 
                 

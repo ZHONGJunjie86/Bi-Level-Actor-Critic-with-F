@@ -1,0 +1,49 @@
+2022-11-11 22:03:35,775 INFO    StreamThr :1040 [internal.py:wandb_internal():88] W&B internal server running at pid: 1040, started at: 2022-11-11 22:03:35.773647
+2022-11-11 22:03:35,784 DEBUG   HandlerThread:1040 [handler.py:handle_request():138] handle_request: status
+2022-11-11 22:03:35,790 DEBUG   SenderThread:1040 [sender.py:send_request():317] send_request: status
+2022-11-11 22:03:35,795 DEBUG   SenderThread:1040 [sender.py:send():303] send: header
+2022-11-11 22:03:35,796 INFO    WriterThread:1040 [datastore.py:open_for_write():75] open: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220335-3i2ez1kt/run-3i2ez1kt.wandb
+2022-11-11 22:03:35,856 DEBUG   SenderThread:1040 [sender.py:send():303] send: run
+2022-11-11 22:03:36,335 DEBUG   HandlerThread:1040 [handler.py:handle_request():138] handle_request: check_version
+2022-11-11 22:03:36,339 INFO    SenderThread:1040 [dir_watcher.py:__init__():216] watching files in: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220335-3i2ez1kt/files
+2022-11-11 22:03:36,340 INFO    SenderThread:1040 [sender.py:_start_run_threads():928] run started: 3i2ez1kt with start time 1668171815.761624
+2022-11-11 22:03:36,340 DEBUG   SenderThread:1040 [sender.py:send():303] send: summary
+2022-11-11 22:03:36,341 INFO    SenderThread:1040 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-11 22:03:36,343 DEBUG   SenderThread:1040 [sender.py:send_request():317] send_request: check_version
+2022-11-11 22:03:36,428 DEBUG   HandlerThread:1040 [handler.py:handle_request():138] handle_request: run_start
+2022-11-11 22:03:36,446 DEBUG   HandlerThread:1040 [meta.py:__init__():34] meta init
+2022-11-11 22:03:36,447 DEBUG   HandlerThread:1040 [meta.py:__init__():49] meta init done
+2022-11-11 22:03:36,447 DEBUG   HandlerThread:1040 [meta.py:probe():215] probe
+2022-11-11 22:03:36,465 DEBUG   HandlerThread:1040 [meta.py:_setup_git():205] setup git
+2022-11-11 22:03:36,492 DEBUG   HandlerThread:1040 [meta.py:_setup_git():212] setup git done
+2022-11-11 22:03:36,493 DEBUG   HandlerThread:1040 [meta.py:_save_pip():53] save pip
+2022-11-11 22:03:36,496 DEBUG   HandlerThread:1040 [meta.py:_save_pip():67] save pip done
+2022-11-11 22:03:36,496 DEBUG   HandlerThread:1040 [meta.py:_save_conda():74] save conda
+2022-11-11 22:03:37,353 INFO    Thread-19 :1040 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220335-3i2ez1kt/files/requirements.txt
+2022-11-11 22:03:37,354 INFO    Thread-19 :1040 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220335-3i2ez1kt/files/conda-environment.yaml
+2022-11-11 22:03:37,354 INFO    Thread-19 :1040 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220335-3i2ez1kt/files/wandb-summary.json
+2022-11-11 22:03:40,994 DEBUG   HandlerThread:1040 [meta.py:_save_conda():84] save conda done
+2022-11-11 22:03:40,994 DEBUG   HandlerThread:1040 [meta.py:probe():253] probe done
+2022-11-11 22:03:41,009 DEBUG   SenderThread:1040 [sender.py:send():303] send: files
+2022-11-11 22:03:41,010 INFO    SenderThread:1040 [sender.py:_save_file():1171] saving file wandb-metadata.json with policy now
+2022-11-11 22:03:41,036 DEBUG   HandlerThread:1040 [handler.py:handle_request():138] handle_request: stop_status
+2022-11-11 22:03:41,037 DEBUG   SenderThread:1040 [sender.py:send_request():317] send_request: stop_status
+2022-11-11 22:03:41,235 DEBUG   SenderThread:1040 [sender.py:send():303] send: telemetry
+2022-11-11 22:03:41,345 INFO    Thread-19 :1040 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220335-3i2ez1kt/files/conda-environment.yaml
+2022-11-11 22:03:41,346 INFO    Thread-19 :1040 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220335-3i2ez1kt/files/wandb-metadata.json
+2022-11-11 22:03:41,346 INFO    Thread-19 :1040 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220335-3i2ez1kt/files/output.log
+2022-11-11 22:03:42,377 INFO    Thread-23 :1040 [upload_job.py:push():143] Uploaded file /tmp/tmpqsreiy6zwandb/1f1qkq9d-wandb-metadata.json
+2022-11-11 22:03:43,347 INFO    Thread-19 :1040 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220335-3i2ez1kt/files/output.log
+2022-11-11 22:03:56,245 DEBUG   HandlerThread:1040 [handler.py:handle_request():138] handle_request: stop_status
+2022-11-11 22:03:56,245 DEBUG   SenderThread:1040 [sender.py:send_request():317] send_request: stop_status
+2022-11-11 22:04:06,954 DEBUG   SenderThread:1040 [sender.py:send():303] send: stats
+2022-11-11 22:04:07,371 INFO    Thread-19 :1040 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220335-3i2ez1kt/files/config.yaml
+2022-11-11 22:04:11,459 DEBUG   HandlerThread:1040 [handler.py:handle_request():138] handle_request: stop_status
+2022-11-11 22:04:11,460 DEBUG   SenderThread:1040 [sender.py:send_request():317] send_request: stop_status
+2022-11-11 22:04:26,663 DEBUG   HandlerThread:1040 [handler.py:handle_request():138] handle_request: stop_status
+2022-11-11 22:04:26,664 DEBUG   SenderThread:1040 [sender.py:send_request():317] send_request: stop_status
+2022-11-11 22:04:39,827 DEBUG   SenderThread:1040 [sender.py:send():303] send: stats
+2022-11-11 22:04:41,865 DEBUG   HandlerThread:1040 [handler.py:handle_request():138] handle_request: stop_status
+2022-11-11 22:04:41,866 DEBUG   SenderThread:1040 [sender.py:send_request():317] send_request: stop_status
+2022-11-11 22:04:54,456 INFO    MainThread:1040 [internal.py:handle_exit():78] Internal process exited
+2022-11-11 22:04:54,458 WARNING MsgRouterThr:1040 [router.py:message_loop():74] EOFError seen in message_loop

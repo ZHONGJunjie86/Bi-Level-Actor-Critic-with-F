@@ -1,0 +1,49 @@
+2022-11-11 22:03:33,892 INFO    StreamThr :831 [internal.py:wandb_internal():88] W&B internal server running at pid: 831, started at: 2022-11-11 22:03:33.888444
+2022-11-11 22:03:33,904 DEBUG   HandlerThread:831 [handler.py:handle_request():138] handle_request: status
+2022-11-11 22:03:33,909 DEBUG   SenderThread:831 [sender.py:send_request():317] send_request: status
+2022-11-11 22:03:33,916 INFO    WriterThread:831 [datastore.py:open_for_write():75] open: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220333-2cq3kbhf/run-2cq3kbhf.wandb
+2022-11-11 22:03:33,916 DEBUG   SenderThread:831 [sender.py:send():303] send: header
+2022-11-11 22:03:33,982 DEBUG   SenderThread:831 [sender.py:send():303] send: run
+2022-11-11 22:03:34,474 DEBUG   HandlerThread:831 [handler.py:handle_request():138] handle_request: check_version
+2022-11-11 22:03:34,482 INFO    SenderThread:831 [dir_watcher.py:__init__():216] watching files in: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220333-2cq3kbhf/files
+2022-11-11 22:03:34,483 INFO    SenderThread:831 [sender.py:_start_run_threads():928] run started: 2cq3kbhf with start time 1668171813.884269
+2022-11-11 22:03:34,484 DEBUG   SenderThread:831 [sender.py:send():303] send: summary
+2022-11-11 22:03:34,485 INFO    SenderThread:831 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-11-11 22:03:34,486 DEBUG   SenderThread:831 [sender.py:send_request():317] send_request: check_version
+2022-11-11 22:03:34,581 DEBUG   HandlerThread:831 [handler.py:handle_request():138] handle_request: run_start
+2022-11-11 22:03:34,615 DEBUG   HandlerThread:831 [meta.py:__init__():34] meta init
+2022-11-11 22:03:34,616 DEBUG   HandlerThread:831 [meta.py:__init__():49] meta init done
+2022-11-11 22:03:34,616 DEBUG   HandlerThread:831 [meta.py:probe():215] probe
+2022-11-11 22:03:34,635 DEBUG   HandlerThread:831 [meta.py:_setup_git():205] setup git
+2022-11-11 22:03:34,672 DEBUG   HandlerThread:831 [meta.py:_setup_git():212] setup git done
+2022-11-11 22:03:34,673 DEBUG   HandlerThread:831 [meta.py:_save_pip():53] save pip
+2022-11-11 22:03:34,676 DEBUG   HandlerThread:831 [meta.py:_save_pip():67] save pip done
+2022-11-11 22:03:34,676 DEBUG   HandlerThread:831 [meta.py:_save_conda():74] save conda
+2022-11-11 22:03:35,498 INFO    Thread-19 :831 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220333-2cq3kbhf/files/conda-environment.yaml
+2022-11-11 22:03:35,499 INFO    Thread-19 :831 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220333-2cq3kbhf/files/wandb-summary.json
+2022-11-11 22:03:35,499 INFO    Thread-19 :831 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220333-2cq3kbhf/files/requirements.txt
+2022-11-11 22:03:39,298 DEBUG   HandlerThread:831 [meta.py:_save_conda():84] save conda done
+2022-11-11 22:03:39,298 DEBUG   HandlerThread:831 [meta.py:probe():253] probe done
+2022-11-11 22:03:39,310 DEBUG   SenderThread:831 [sender.py:send():303] send: files
+2022-11-11 22:03:39,311 INFO    SenderThread:831 [sender.py:_save_file():1171] saving file wandb-metadata.json with policy now
+2022-11-11 22:03:39,335 DEBUG   HandlerThread:831 [handler.py:handle_request():138] handle_request: stop_status
+2022-11-11 22:03:39,336 DEBUG   SenderThread:831 [sender.py:send_request():317] send_request: stop_status
+2022-11-11 22:03:39,488 INFO    Thread-19 :831 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220333-2cq3kbhf/files/conda-environment.yaml
+2022-11-11 22:03:39,489 INFO    Thread-19 :831 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220333-2cq3kbhf/files/wandb-metadata.json
+2022-11-11 22:03:39,530 DEBUG   SenderThread:831 [sender.py:send():303] send: telemetry
+2022-11-11 22:03:40,055 INFO    Thread-23 :831 [upload_job.py:push():143] Uploaded file /tmp/tmp8e76ccmuwandb/3qefmfhj-wandb-metadata.json
+2022-11-11 22:03:40,488 INFO    Thread-19 :831 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220333-2cq3kbhf/files/output.log
+2022-11-11 22:03:42,490 INFO    Thread-19 :831 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220333-2cq3kbhf/files/output.log
+2022-11-11 22:03:54,540 DEBUG   HandlerThread:831 [handler.py:handle_request():138] handle_request: stop_status
+2022-11-11 22:03:54,542 DEBUG   SenderThread:831 [sender.py:send_request():317] send_request: stop_status
+2022-11-11 22:04:05,346 DEBUG   SenderThread:831 [sender.py:send():303] send: stats
+2022-11-11 22:04:05,505 INFO    Thread-19 :831 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221111_220333-2cq3kbhf/files/config.yaml
+2022-11-11 22:04:09,745 DEBUG   HandlerThread:831 [handler.py:handle_request():138] handle_request: stop_status
+2022-11-11 22:04:09,746 DEBUG   SenderThread:831 [sender.py:send_request():317] send_request: stop_status
+2022-11-11 22:04:24,951 DEBUG   HandlerThread:831 [handler.py:handle_request():138] handle_request: stop_status
+2022-11-11 22:04:24,952 DEBUG   SenderThread:831 [sender.py:send_request():317] send_request: stop_status
+2022-11-11 22:04:38,495 DEBUG   SenderThread:831 [sender.py:send():303] send: stats
+2022-11-11 22:04:40,163 DEBUG   HandlerThread:831 [handler.py:handle_request():138] handle_request: stop_status
+2022-11-11 22:04:40,164 DEBUG   SenderThread:831 [sender.py:send_request():317] send_request: stop_status
+2022-11-11 22:04:54,614 INFO    MainThread:831 [internal.py:handle_exit():78] Internal process exited
+2022-11-11 22:04:54,617 WARNING MsgRouterThr:831 [router.py:message_loop():74] EOFError seen in message_loop
