@@ -151,7 +151,7 @@ class Shared_Data(): #nn.Module
 
     
     def update_lr(self):
-        if self.episode!= 0 and self.episode % 10 == 0 and self.a_lr>self.min_lr:
+        if self.episode!= 0 and self.episode % 15 == 0 and self.a_lr>self.min_lr:
             self.a_lr = max(self.a_lr  * self.lr_decay, self.min_lr)
             for agent_type in agent_type_list:
                 for name in ["leader", "follower"]:
@@ -244,7 +244,7 @@ class Shared_Data(): #nn.Module
                 batch_sample = batch_size // args.K_epochs
                 # if self.episode > 2000 and agent_type == "agent":
                 #     continue
-                if name == "follower" : # and agent_type == "agent"
+                if name == "follower" and agent_type == "agent": # 
                     continue
                 for _ in range(args.K_epochs): # batch_size#
                     indices = torch.tensor(index[index_start:index_start+batch_sample],requires_grad=False)# torch.randint(batch_size, size=(batch_sample,), requires_grad=False)

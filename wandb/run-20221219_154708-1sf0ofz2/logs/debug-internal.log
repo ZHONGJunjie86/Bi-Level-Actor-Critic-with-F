@@ -1,0 +1,50 @@
+2022-12-19 15:47:08,797 INFO    StreamThr :13695 [internal.py:wandb_internal():88] W&B internal server running at pid: 13695, started at: 2022-12-19 15:47:08.794956
+2022-12-19 15:47:08,807 DEBUG   HandlerThread:13695 [handler.py:handle_request():138] handle_request: status
+2022-12-19 15:47:08,814 DEBUG   SenderThread:13695 [sender.py:send_request():317] send_request: status
+2022-12-19 15:47:08,819 DEBUG   SenderThread:13695 [sender.py:send():303] send: header
+2022-12-19 15:47:08,820 INFO    WriterThread:13695 [datastore.py:open_for_write():75] open: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_154708-1sf0ofz2/run-1sf0ofz2.wandb
+2022-12-19 15:47:08,825 DEBUG   SenderThread:13695 [sender.py:send():303] send: run
+2022-12-19 15:47:09,317 DEBUG   HandlerThread:13695 [handler.py:handle_request():138] handle_request: check_version
+2022-12-19 15:47:09,328 INFO    SenderThread:13695 [dir_watcher.py:__init__():216] watching files in: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_154708-1sf0ofz2/files
+2022-12-19 15:47:09,329 INFO    SenderThread:13695 [sender.py:_start_run_threads():928] run started: 1sf0ofz2 with start time 1671432428.786026
+2022-12-19 15:47:09,329 DEBUG   SenderThread:13695 [sender.py:send():303] send: summary
+2022-12-19 15:47:09,330 INFO    SenderThread:13695 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-19 15:47:09,331 DEBUG   SenderThread:13695 [sender.py:send_request():317] send_request: check_version
+2022-12-19 15:47:09,422 DEBUG   HandlerThread:13695 [handler.py:handle_request():138] handle_request: run_start
+2022-12-19 15:47:09,464 DEBUG   HandlerThread:13695 [meta.py:__init__():34] meta init
+2022-12-19 15:47:09,465 DEBUG   HandlerThread:13695 [meta.py:__init__():49] meta init done
+2022-12-19 15:47:09,465 DEBUG   HandlerThread:13695 [meta.py:probe():215] probe
+2022-12-19 15:47:09,486 DEBUG   HandlerThread:13695 [meta.py:_setup_git():205] setup git
+2022-12-19 15:47:09,514 DEBUG   HandlerThread:13695 [meta.py:_setup_git():212] setup git done
+2022-12-19 15:47:09,514 DEBUG   HandlerThread:13695 [meta.py:_save_pip():53] save pip
+2022-12-19 15:47:09,517 DEBUG   HandlerThread:13695 [meta.py:_save_pip():67] save pip done
+2022-12-19 15:47:09,518 DEBUG   HandlerThread:13695 [meta.py:_save_conda():74] save conda
+2022-12-19 15:47:10,341 INFO    Thread-19 :13695 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_154708-1sf0ofz2/files/requirements.txt
+2022-12-19 15:47:10,342 INFO    Thread-19 :13695 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_154708-1sf0ofz2/files/wandb-summary.json
+2022-12-19 15:47:10,343 INFO    Thread-19 :13695 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_154708-1sf0ofz2/files/conda-environment.yaml
+2022-12-19 15:47:15,304 DEBUG   HandlerThread:13695 [meta.py:_save_conda():84] save conda done
+2022-12-19 15:47:15,305 DEBUG   HandlerThread:13695 [meta.py:probe():253] probe done
+2022-12-19 15:47:15,316 DEBUG   HandlerThread:13695 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 15:47:15,318 DEBUG   SenderThread:13695 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 15:47:15,331 INFO    Thread-19 :13695 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_154708-1sf0ofz2/files/conda-environment.yaml
+2022-12-19 15:47:15,332 INFO    Thread-19 :13695 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_154708-1sf0ofz2/files/wandb-metadata.json
+2022-12-19 15:47:15,511 DEBUG   SenderThread:13695 [sender.py:send():303] send: telemetry
+2022-12-19 15:47:15,512 DEBUG   SenderThread:13695 [sender.py:send():303] send: files
+2022-12-19 15:47:15,514 INFO    SenderThread:13695 [sender.py:_save_file():1171] saving file wandb-metadata.json with policy now
+2022-12-19 15:47:16,138 INFO    Thread-23 :13695 [upload_job.py:push():143] Uploaded file /tmp/tmp2zthqecxwandb/37bf2u42-wandb-metadata.json
+2022-12-19 15:47:30,519 DEBUG   HandlerThread:13695 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 15:47:30,520 DEBUG   SenderThread:13695 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 15:47:40,204 DEBUG   SenderThread:13695 [sender.py:send():303] send: stats
+2022-12-19 15:47:40,353 INFO    Thread-19 :13695 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_154708-1sf0ofz2/files/config.yaml
+2022-12-19 15:47:45,729 DEBUG   HandlerThread:13695 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 15:47:45,730 DEBUG   SenderThread:13695 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 15:48:00,940 DEBUG   HandlerThread:13695 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 15:48:00,941 DEBUG   SenderThread:13695 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 15:48:12,670 DEBUG   SenderThread:13695 [sender.py:send():303] send: stats
+2022-12-19 15:48:16,143 DEBUG   HandlerThread:13695 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 15:48:16,143 DEBUG   SenderThread:13695 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 15:48:31,350 DEBUG   HandlerThread:13695 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 15:48:31,351 DEBUG   SenderThread:13695 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 15:48:45,153 DEBUG   SenderThread:13695 [sender.py:send():303] send: stats
+2022-12-19 15:48:46,576 DEBUG   HandlerThread:13695 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 15:48:46,576 DEBUG   SenderThread:13695 [sender.py:send_request():317] send_request: stop_status

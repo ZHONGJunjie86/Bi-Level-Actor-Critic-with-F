@@ -1,0 +1,34 @@
+2023-01-23 16:36:20,304 INFO    StreamThr :48333 [internal.py:wandb_internal():88] W&B internal server running at pid: 48333, started at: 2023-01-23 16:36:20.302474
+2023-01-23 16:36:20,313 DEBUG   HandlerThread:48333 [handler.py:handle_request():138] handle_request: status
+2023-01-23 16:36:20,319 DEBUG   SenderThread:48333 [sender.py:send_request():317] send_request: status
+2023-01-23 16:36:20,325 DEBUG   SenderThread:48333 [sender.py:send():303] send: header
+2023-01-23 16:36:20,325 INFO    WriterThread:48333 [datastore.py:open_for_write():75] open: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20230123_163620-ossf6dm5/run-ossf6dm5.wandb
+2023-01-23 16:36:20,326 DEBUG   SenderThread:48333 [sender.py:send():303] send: run
+2023-01-23 16:36:20,833 DEBUG   HandlerThread:48333 [handler.py:handle_request():138] handle_request: check_version
+2023-01-23 16:36:20,841 INFO    SenderThread:48333 [dir_watcher.py:__init__():216] watching files in: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20230123_163620-ossf6dm5/files
+2023-01-23 16:36:20,842 INFO    SenderThread:48333 [sender.py:_start_run_threads():928] run started: ossf6dm5 with start time 1674459380.288184
+2023-01-23 16:36:20,843 DEBUG   SenderThread:48333 [sender.py:send():303] send: summary
+2023-01-23 16:36:20,844 INFO    SenderThread:48333 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2023-01-23 16:36:20,845 DEBUG   SenderThread:48333 [sender.py:send_request():317] send_request: check_version
+2023-01-23 16:36:20,929 DEBUG   HandlerThread:48333 [handler.py:handle_request():138] handle_request: run_start
+2023-01-23 16:36:20,943 DEBUG   HandlerThread:48333 [meta.py:__init__():34] meta init
+2023-01-23 16:36:20,943 DEBUG   HandlerThread:48333 [meta.py:__init__():49] meta init done
+2023-01-23 16:36:20,944 DEBUG   HandlerThread:48333 [meta.py:probe():215] probe
+2023-01-23 16:36:20,967 DEBUG   HandlerThread:48333 [meta.py:_setup_git():205] setup git
+2023-01-23 16:36:21,010 DEBUG   HandlerThread:48333 [meta.py:_setup_git():212] setup git done
+2023-01-23 16:36:21,011 DEBUG   HandlerThread:48333 [meta.py:_save_pip():53] save pip
+2023-01-23 16:36:21,014 DEBUG   HandlerThread:48333 [meta.py:_save_pip():67] save pip done
+2023-01-23 16:36:21,014 DEBUG   HandlerThread:48333 [meta.py:_save_conda():74] save conda
+2023-01-23 16:36:21,858 INFO    Thread-19 :48333 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20230123_163620-ossf6dm5/files/requirements.txt
+2023-01-23 16:36:21,859 INFO    Thread-19 :48333 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20230123_163620-ossf6dm5/files/wandb-summary.json
+2023-01-23 16:36:21,860 INFO    Thread-19 :48333 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20230123_163620-ossf6dm5/files/conda-environment.yaml
+2023-01-23 16:36:25,840 DEBUG   HandlerThread:48333 [meta.py:_save_conda():84] save conda done
+2023-01-23 16:36:25,840 DEBUG   HandlerThread:48333 [meta.py:probe():253] probe done
+2023-01-23 16:36:25,853 DEBUG   SenderThread:48333 [sender.py:send():303] send: files
+2023-01-23 16:36:25,853 INFO    SenderThread:48333 [sender.py:_save_file():1171] saving file wandb-metadata.json with policy now
+2023-01-23 16:36:25,872 INFO    Thread-19 :48333 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20230123_163620-ossf6dm5/files/conda-environment.yaml
+2023-01-23 16:36:25,872 INFO    Thread-19 :48333 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20230123_163620-ossf6dm5/files/wandb-metadata.json
+2023-01-23 16:36:25,880 DEBUG   HandlerThread:48333 [handler.py:handle_request():138] handle_request: stop_status
+2023-01-23 16:36:25,881 DEBUG   SenderThread:48333 [sender.py:send_request():317] send_request: stop_status
+2023-01-23 16:36:26,083 DEBUG   SenderThread:48333 [sender.py:send():303] send: telemetry
+2023-01-23 16:36:26,522 INFO    Thread-23 :48333 [upload_job.py:push():143] Uploaded file /tmp/tmpwgxwnshfwandb/3158n9i6-wandb-metadata.json

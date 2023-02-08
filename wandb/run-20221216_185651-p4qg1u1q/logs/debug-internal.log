@@ -1,0 +1,115 @@
+2022-12-16 18:56:51,434 INFO    StreamThr :33291 [internal.py:wandb_internal():88] W&B internal server running at pid: 33291, started at: 2022-12-16 18:56:51.433566
+2022-12-16 18:56:51,445 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: status
+2022-12-16 18:56:51,451 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: status
+2022-12-16 18:56:51,457 INFO    WriterThread:33291 [datastore.py:open_for_write():75] open: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/run-p4qg1u1q.wandb
+2022-12-16 18:56:51,458 DEBUG   SenderThread:33291 [sender.py:send():303] send: header
+2022-12-16 18:56:51,458 DEBUG   SenderThread:33291 [sender.py:send():303] send: run
+2022-12-16 18:56:51,917 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: check_version
+2022-12-16 18:56:51,925 INFO    SenderThread:33291 [dir_watcher.py:__init__():216] watching files in: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files
+2022-12-16 18:56:51,926 INFO    SenderThread:33291 [sender.py:_start_run_threads():928] run started: p4qg1u1q with start time 1671184611.41311
+2022-12-16 18:56:51,926 DEBUG   SenderThread:33291 [sender.py:send():303] send: summary
+2022-12-16 18:56:51,927 INFO    SenderThread:33291 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-16 18:56:51,928 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: check_version
+2022-12-16 18:56:52,041 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: run_start
+2022-12-16 18:56:52,055 DEBUG   HandlerThread:33291 [meta.py:__init__():34] meta init
+2022-12-16 18:56:52,055 DEBUG   HandlerThread:33291 [meta.py:__init__():49] meta init done
+2022-12-16 18:56:52,056 DEBUG   HandlerThread:33291 [meta.py:probe():215] probe
+2022-12-16 18:56:52,077 DEBUG   HandlerThread:33291 [meta.py:_setup_git():205] setup git
+2022-12-16 18:56:52,111 DEBUG   HandlerThread:33291 [meta.py:_setup_git():212] setup git done
+2022-12-16 18:56:52,112 DEBUG   HandlerThread:33291 [meta.py:_save_pip():53] save pip
+2022-12-16 18:56:52,114 DEBUG   HandlerThread:33291 [meta.py:_save_pip():67] save pip done
+2022-12-16 18:56:52,115 DEBUG   HandlerThread:33291 [meta.py:_save_conda():74] save conda
+2022-12-16 18:56:52,940 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/requirements.txt
+2022-12-16 18:56:52,940 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/conda-environment.yaml
+2022-12-16 18:56:52,941 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/wandb-summary.json
+2022-12-16 18:56:56,887 DEBUG   HandlerThread:33291 [meta.py:_save_conda():84] save conda done
+2022-12-16 18:56:56,887 DEBUG   HandlerThread:33291 [meta.py:probe():253] probe done
+2022-12-16 18:56:56,901 DEBUG   SenderThread:33291 [sender.py:send():303] send: files
+2022-12-16 18:56:56,902 INFO    SenderThread:33291 [sender.py:_save_file():1171] saving file wandb-metadata.json with policy now
+2022-12-16 18:56:56,928 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:56:56,929 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:56:56,946 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/conda-environment.yaml
+2022-12-16 18:56:56,947 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/wandb-metadata.json
+2022-12-16 18:56:57,131 DEBUG   SenderThread:33291 [sender.py:send():303] send: telemetry
+2022-12-16 18:56:57,596 INFO    Thread-23 :33291 [upload_job.py:push():143] Uploaded file /tmp/tmphlxwvf5pwandb/20uof8sa-wandb-metadata.json
+2022-12-16 18:57:12,136 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:57:12,138 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:57:22,064 DEBUG   SenderThread:33291 [sender.py:send():303] send: stats
+2022-12-16 18:57:22,971 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/config.yaml
+2022-12-16 18:57:27,343 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:57:27,344 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:57:28,355 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: partial_history
+2022-12-16 18:57:28,360 DEBUG   SenderThread:33291 [sender.py:send():303] send: history
+2022-12-16 18:57:28,361 DEBUG   SenderThread:33291 [sender.py:send():303] send: summary
+2022-12-16 18:57:28,372 INFO    SenderThread:33291 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-16 18:57:28,977 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/wandb-summary.json
+2022-12-16 18:57:42,552 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:57:42,553 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:57:54,125 DEBUG   SenderThread:33291 [sender.py:send():303] send: stats
+2022-12-16 18:57:57,754 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:57:57,755 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:58:08,049 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: partial_history
+2022-12-16 18:58:08,050 DEBUG   SenderThread:33291 [sender.py:send():303] send: history
+2022-12-16 18:58:08,051 DEBUG   SenderThread:33291 [sender.py:send():303] send: summary
+2022-12-16 18:58:08,063 INFO    SenderThread:33291 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-16 18:58:09,010 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/wandb-summary.json
+2022-12-16 18:58:12,952 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:58:12,953 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:58:26,946 DEBUG   SenderThread:33291 [sender.py:send():303] send: stats
+2022-12-16 18:58:28,153 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:58:28,154 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:58:43,355 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:58:43,357 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:58:49,342 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: partial_history
+2022-12-16 18:58:49,343 DEBUG   SenderThread:33291 [sender.py:send():303] send: history
+2022-12-16 18:58:49,344 DEBUG   SenderThread:33291 [sender.py:send():303] send: summary
+2022-12-16 18:58:49,352 INFO    SenderThread:33291 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-16 18:58:50,046 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/wandb-summary.json
+2022-12-16 18:58:58,570 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:58:58,570 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:58:59,316 DEBUG   SenderThread:33291 [sender.py:send():303] send: stats
+2022-12-16 18:59:13,776 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:59:13,777 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:59:28,981 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:59:28,981 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:59:29,123 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: partial_history
+2022-12-16 18:59:29,176 DEBUG   SenderThread:33291 [sender.py:send():303] send: history
+2022-12-16 18:59:29,177 DEBUG   SenderThread:33291 [sender.py:send():303] send: summary
+2022-12-16 18:59:29,187 INFO    SenderThread:33291 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-16 18:59:30,083 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/wandb-summary.json
+2022-12-16 18:59:31,868 DEBUG   SenderThread:33291 [sender.py:send():303] send: stats
+2022-12-16 18:59:44,191 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:59:44,192 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 18:59:59,401 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 18:59:59,402 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 19:00:04,734 DEBUG   SenderThread:33291 [sender.py:send():303] send: stats
+2022-12-16 19:00:13,302 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: partial_history
+2022-12-16 19:00:13,304 DEBUG   SenderThread:33291 [sender.py:send():303] send: history
+2022-12-16 19:00:13,305 DEBUG   SenderThread:33291 [sender.py:send():303] send: summary
+2022-12-16 19:00:13,307 INFO    SenderThread:33291 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-16 19:00:14,122 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/wandb-summary.json
+2022-12-16 19:00:14,610 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 19:00:14,610 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 19:00:29,809 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 19:00:29,810 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 19:00:37,217 DEBUG   SenderThread:33291 [sender.py:send():303] send: stats
+2022-12-16 19:00:45,014 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 19:00:45,015 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 19:00:53,464 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: partial_history
+2022-12-16 19:00:53,467 DEBUG   SenderThread:33291 [sender.py:send():303] send: history
+2022-12-16 19:00:53,467 DEBUG   SenderThread:33291 [sender.py:send():303] send: summary
+2022-12-16 19:00:53,474 INFO    SenderThread:33291 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-16 19:00:54,153 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/wandb-summary.json
+2022-12-16 19:01:00,222 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 19:01:00,223 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 19:01:09,665 DEBUG   SenderThread:33291 [sender.py:send():303] send: stats
+2022-12-16 19:01:15,422 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 19:01:15,423 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 19:01:30,630 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-16 19:01:30,631 DEBUG   SenderThread:33291 [sender.py:send_request():317] send_request: stop_status
+2022-12-16 19:01:34,382 DEBUG   HandlerThread:33291 [handler.py:handle_request():138] handle_request: partial_history
+2022-12-16 19:01:34,384 DEBUG   SenderThread:33291 [sender.py:send():303] send: history
+2022-12-16 19:01:34,384 DEBUG   SenderThread:33291 [sender.py:send():303] send: summary
+2022-12-16 19:01:34,393 INFO    SenderThread:33291 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-16 19:01:35,182 INFO    Thread-19 :33291 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221216_185651-p4qg1u1q/files/wandb-summary.json
+2022-12-16 19:01:42,593 DEBUG   SenderThread:33291 [sender.py:send():303] send: stats

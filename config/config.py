@@ -19,7 +19,7 @@ parser.add_argument(
     '--log_dir', default=datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
 # env
 parser.add_argument("--num_good",  default=1, type=int)  
-parser.add_argument("--num_adversaries",  default=3, type=int)  
+parser.add_argument("--num_adversaries",  default=6, type=int)  
 parser.add_argument("--num_obstacles",  default=2, type=int) 
 parser.add_argument("--max_cycles", default=150, type=int)  # Agent Environment Cycle 等于游戏步
 parser.add_argument("--max_episodes", default=10000000, type=int)
@@ -60,8 +60,8 @@ model_save_path = {"agent": path,
                    "adversary":path}
 
 # multiprocessing
-main_device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu") 
-device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu") 
+main_device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu") 
+device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu") 
 
 
 

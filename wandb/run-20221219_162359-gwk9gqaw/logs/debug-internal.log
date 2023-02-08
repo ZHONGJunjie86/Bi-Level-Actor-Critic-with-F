@@ -1,0 +1,57 @@
+2022-12-19 16:23:59,625 INFO    StreamThr :41846 [internal.py:wandb_internal():88] W&B internal server running at pid: 41846, started at: 2022-12-19 16:23:59.623501
+2022-12-19 16:23:59,634 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: status
+2022-12-19 16:23:59,638 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: status
+2022-12-19 16:23:59,643 DEBUG   SenderThread:41846 [sender.py:send():303] send: header
+2022-12-19 16:23:59,643 INFO    WriterThread:41846 [datastore.py:open_for_write():75] open: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_162359-gwk9gqaw/run-gwk9gqaw.wandb
+2022-12-19 16:23:59,662 DEBUG   SenderThread:41846 [sender.py:send():303] send: run
+2022-12-19 16:24:00,140 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: check_version
+2022-12-19 16:24:00,150 INFO    SenderThread:41846 [dir_watcher.py:__init__():216] watching files in: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_162359-gwk9gqaw/files
+2022-12-19 16:24:00,151 INFO    SenderThread:41846 [sender.py:_start_run_threads():928] run started: gwk9gqaw with start time 1671434639.61567
+2022-12-19 16:24:00,151 DEBUG   SenderThread:41846 [sender.py:send():303] send: summary
+2022-12-19 16:24:00,153 INFO    SenderThread:41846 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-19 16:24:00,155 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: check_version
+2022-12-19 16:24:00,245 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: run_start
+2022-12-19 16:24:00,276 DEBUG   HandlerThread:41846 [meta.py:__init__():34] meta init
+2022-12-19 16:24:00,276 DEBUG   HandlerThread:41846 [meta.py:__init__():49] meta init done
+2022-12-19 16:24:00,277 DEBUG   HandlerThread:41846 [meta.py:probe():215] probe
+2022-12-19 16:24:00,299 DEBUG   HandlerThread:41846 [meta.py:_setup_git():205] setup git
+2022-12-19 16:24:00,334 DEBUG   HandlerThread:41846 [meta.py:_setup_git():212] setup git done
+2022-12-19 16:24:00,335 DEBUG   HandlerThread:41846 [meta.py:_save_pip():53] save pip
+2022-12-19 16:24:00,338 DEBUG   HandlerThread:41846 [meta.py:_save_pip():67] save pip done
+2022-12-19 16:24:00,338 DEBUG   HandlerThread:41846 [meta.py:_save_conda():74] save conda
+2022-12-19 16:24:01,166 INFO    Thread-19 :41846 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_162359-gwk9gqaw/files/requirements.txt
+2022-12-19 16:24:01,167 INFO    Thread-19 :41846 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_162359-gwk9gqaw/files/wandb-summary.json
+2022-12-19 16:24:01,167 INFO    Thread-19 :41846 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_162359-gwk9gqaw/files/conda-environment.yaml
+2022-12-19 16:24:05,070 DEBUG   HandlerThread:41846 [meta.py:_save_conda():84] save conda done
+2022-12-19 16:24:05,071 DEBUG   HandlerThread:41846 [meta.py:probe():253] probe done
+2022-12-19 16:24:05,085 DEBUG   SenderThread:41846 [sender.py:send():303] send: files
+2022-12-19 16:24:05,086 INFO    SenderThread:41846 [sender.py:_save_file():1171] saving file wandb-metadata.json with policy now
+2022-12-19 16:24:05,115 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 16:24:05,116 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 16:24:05,155 INFO    Thread-19 :41846 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_162359-gwk9gqaw/files/conda-environment.yaml
+2022-12-19 16:24:05,156 INFO    Thread-19 :41846 [dir_watcher.py:_on_file_created():275] file/dir created: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_162359-gwk9gqaw/files/wandb-metadata.json
+2022-12-19 16:24:05,307 DEBUG   SenderThread:41846 [sender.py:send():303] send: telemetry
+2022-12-19 16:24:05,717 INFO    Thread-23 :41846 [upload_job.py:push():143] Uploaded file /tmp/tmpd7lm8opewandb/ikfzi0o0-wandb-metadata.json
+2022-12-19 16:24:20,311 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 16:24:20,312 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 16:24:31,178 INFO    Thread-19 :41846 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20221219_162359-gwk9gqaw/files/config.yaml
+2022-12-19 16:24:31,222 DEBUG   SenderThread:41846 [sender.py:send():303] send: stats
+2022-12-19 16:24:35,523 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 16:24:35,524 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 16:24:50,720 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 16:24:50,721 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 16:25:03,554 DEBUG   SenderThread:41846 [sender.py:send():303] send: stats
+2022-12-19 16:25:05,922 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 16:25:05,923 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 16:25:21,125 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 16:25:21,126 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 16:25:36,122 DEBUG   SenderThread:41846 [sender.py:send():303] send: stats
+2022-12-19 16:25:36,330 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 16:25:36,330 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 16:25:51,529 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 16:25:51,530 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 16:26:06,740 DEBUG   HandlerThread:41846 [handler.py:handle_request():138] handle_request: stop_status
+2022-12-19 16:26:06,741 DEBUG   SenderThread:41846 [sender.py:send_request():317] send_request: stop_status
+2022-12-19 16:26:08,204 DEBUG   SenderThread:41846 [sender.py:send():303] send: stats
+2022-12-19 16:26:16,290 INFO    MainThread:41846 [internal.py:handle_exit():78] Internal process exited
+2022-12-19 16:26:16,291 WARNING MsgRouterThr:41846 [router.py:message_loop():74] EOFError seen in message_loop

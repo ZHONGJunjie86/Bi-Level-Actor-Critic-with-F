@@ -1,0 +1,26 @@
+2023-01-23 16:36:20,265 INFO    MainThread:47895 [wandb_setup.py:_flush():68] Configure stats pid to 47895
+2023-01-23 16:36:20,266 INFO    MainThread:47895 [wandb_setup.py:_flush():68] Loading settings from /home/j-zhong/.config/wandb/settings
+2023-01-23 16:36:20,266 INFO    MainThread:47895 [wandb_setup.py:_flush():68] Loading settings from /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/settings
+2023-01-23 16:36:20,267 INFO    MainThread:47895 [wandb_setup.py:_flush():68] Loading settings from environment variables: {'_require_service': 'True'}
+2023-01-23 16:36:20,267 WARNING MainThread:47895 [wandb_setup.py:_flush():68] Could not save program above cwd: /home/j-zhong/work_place/Influential-Communication/train.py
+2023-01-23 16:36:20,267 INFO    MainThread:47895 [wandb_setup.py:_flush():68] Inferring run settings from compute environment: {'program_relpath': None, 'program': '/home/j-zhong/work_place/Influential-Communication/train.py'}
+2023-01-23 16:36:20,268 INFO    MainThread:47895 [wandb_init.py:_log_setup():476] Logging user logs to /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20230123_163620-ossf6dm5/logs/debug.log
+2023-01-23 16:36:20,268 INFO    MainThread:47895 [wandb_init.py:_log_setup():477] Logging internal logs to /home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/wandb/run-20230123_163620-ossf6dm5/logs/debug-internal.log
+2023-01-23 16:36:20,268 INFO    MainThread:47895 [wandb_init.py:init():516] calling init triggers
+2023-01-23 16:36:20,268 INFO    MainThread:47895 [wandb_init.py:init():519] wandb.init called with sweep_config: {}
+config: {}
+2023-01-23 16:36:20,268 INFO    MainThread:47895 [wandb_init.py:init():569] starting backend
+2023-01-23 16:36:20,269 INFO    MainThread:47895 [wandb_init.py:init():573] setting up manager
+2023-01-23 16:36:20,279 INFO    MainThread:47895 [backend.py:_multiprocessing_setup():102] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2023-01-23 16:36:20,287 INFO    MainThread:47895 [wandb_init.py:init():580] backend started and connected
+2023-01-23 16:36:20,296 INFO    MainThread:47895 [wandb_init.py:init():658] updated telemetry
+2023-01-23 16:36:20,316 INFO    MainThread:47895 [wandb_init.py:init():693] communicating run to backend with 60 second timeout
+2023-01-23 16:36:20,829 INFO    MainThread:47895 [wandb_run.py:_on_init():2000] communicating current version
+2023-01-23 16:36:20,904 INFO    MainThread:47895 [wandb_run.py:_on_init():2004] got version response upgrade_message: "wandb version 0.13.9 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2023-01-23 16:36:20,904 INFO    MainThread:47895 [wandb_init.py:init():728] starting run threads in backend
+2023-01-23 16:36:25,880 INFO    MainThread:47895 [wandb_run.py:_console_start():1980] atexit reg
+2023-01-23 16:36:25,882 INFO    MainThread:47895 [wandb_run.py:_redirect():1838] redirect: SettingsConsole.WRAP_RAW
+2023-01-23 16:36:25,884 INFO    MainThread:47895 [wandb_run.py:_redirect():1903] Wrapping output streams.
+2023-01-23 16:36:25,885 INFO    MainThread:47895 [wandb_run.py:_redirect():1925] Redirects installed.
+2023-01-23 16:36:25,889 INFO    MainThread:47895 [wandb_init.py:init():765] run started, returning control to user process
