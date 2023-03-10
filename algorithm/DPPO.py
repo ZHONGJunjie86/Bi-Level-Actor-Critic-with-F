@@ -177,7 +177,7 @@ class PPO:
         leader_adv = -(leader_action_value - leader_state_value)#0.5 * reward + 0.5*)
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward # self.reward_follower_last 
         # reward_follower = self.social_coef * type_reward + self.entropy_coef * reward 
-        reward_follower =  type_reward/10   #  0.5 * self.reward_follower_last + 0.5 * reward
+        reward_follower =  0.5 * self.reward_follower_last + 0.5 * type_reward/10   #  0.5 * self.reward_follower_last + 0.5 * reward
         #+ 0.5 * self.reward_follower_last
         #0.5*type_reward/10 
         self.reward_follower_last = leader_adv

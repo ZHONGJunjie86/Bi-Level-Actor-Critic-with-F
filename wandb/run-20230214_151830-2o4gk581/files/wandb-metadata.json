@@ -1,0 +1,24 @@
+{
+    "os": "Linux-4.15.0-142-generic-x86_64-with-glibc2.10",
+    "python": "3.8.8",
+    "heartbeatAt": "2023-02-14T06:18:31.177831",
+    "startedAt": "2023-02-14T06:18:30.367062",
+    "docker": null,
+    "gpu": "NVIDIA GeForce GTX 1080 Ti",
+    "gpu_count": 4,
+    "cpu_count": 48,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F/trainer.py",
+    "codePath": "trainer.py",
+    "git": {
+        "remote": "git@github.com:ZHONGJunjie86/Bi-Level-Actor-Critic-with-F.git",
+        "commit": "dabebdd4116497379bab1ea3c315e7636ab87af7"
+    },
+    "email": "978829509@qq.com",
+    "root": "/home/j-zhong/work_place/Bi-Level-Actor-Critic-with-F",
+    "host": "W8725005b",
+    "username": "j-zhong",
+    "executable": "/home/j-zhong/anaconda3/bin/python"
+}

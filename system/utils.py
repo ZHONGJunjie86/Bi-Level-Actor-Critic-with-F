@@ -151,7 +151,7 @@ class Shared_Data(): #nn.Module
 
     
     def update_lr(self):
-        if self.episode!= 0 and self.episode % 15 == 0 and self.a_lr>self.min_lr:
+        if self.episode!= 0 and self.episode % 12 == 0 and self.a_lr>self.min_lr:
             self.a_lr = max(self.a_lr  * self.lr_decay, self.min_lr)
             for agent_type in agent_type_list:
                 for name in ["leader", "follower"]:
