@@ -1,3 +1,3 @@
-# Bi-Level-Actor-Critic-with-F
+# Modeling Others as a Player (MOP)
 
-difficlt...
+# Modeling Others as a Player in Non-cooperativeGame for Multi-agent Coordination
